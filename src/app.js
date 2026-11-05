@@ -1,0 +1,344 @@
+(function(){
+'use strict';
+var D=window.__DATA__;
+var MK={},NK={},PK={};
+D.markets.forEach(function(m){MK[m.id]=m});D.niches.forEach(function(n){NK[n.id]=n});D.personas.forEach(function(p){PK[p.id]=p});
+var PLK={};D.plan.forEach(function(s){PLK[s.id]=s});
+
+/* ---------- storage ---------- */
+var mem={};
+function sget(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return k in mem?mem[k]:d}}
+function sset(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var S=sget('aiplan.v1',{st:{},nt:{},ck:{},theme:'auto',f:{niche:'all',mkt:'all',g:'all',stt:'all'}});
+function save(){sset('aiplan.v1',S)}
+function applyTheme(){var r=document.documentElement;if(S.theme==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',S.theme);
+ var dark=S.theme==='dark'||(S.theme==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);
+ document.querySelectorAll('meta[name=theme-color]').forEach(function(m){m.setAttribute('content',dark?'#000000':'#F2F2F7')});}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var copyStore=[];
+function reg(t){copyStore.push(t);return copyStore.length-1}
+var IC={
+ person:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-4 3.7-6 7.5-6s6.7 2 7.5 6"/>',
+ grid:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>',
+ globe:'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.6 3.6 5.5 3.6 8.5s-1 5.9-3.6 8.5c-2.6-2.6-3.6-5.5-3.6-8.5s1-5.9 3.6-8.5z"/>',
+ plan:'<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r=".6"/><circle cx="4" cy="12" r=".6"/><circle cx="4" cy="18" r=".6"/>',
+ back:'<path d="M14.5 5.5L8 12l6.5 6.5"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/>',
+ fork:'<path d="M7 4v7a2 2 0 002 2v7M11 4v7a2 2 0 01-2 2M17 4c-2 2-2.5 5-2.5 8h2.5v8"/>',
+ code:'<path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/>',pen:'<path d="M4 20l1-4L16.5 4.5a2 2 0 013 3L8 19z"/>',
+ ball:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7l4 3-1.5 5h-5L8 10z"/>',bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+ home:'<path d="M4 11l8-7 8 7v8.5a.5.5 0 01-.5.5H15v-5H9v5H4.5a.5.5 0 01-.5-.5z"/>',speech:'<path d="M4 6.5A2.5 2.5 0 016.5 4h11A2.5 2.5 0 0120 6.5v7a2.5 2.5 0 01-2.5 2.5H11l-4.5 4v-4A2.5 2.5 0 014 13.5z"/>',
+ flag:'<path d="M5 21V4M5 5h12l-2 4 2 4H5"/>',steps:'<path d="M5 7h4M5 12h8M5 17h12"/>',hook:'<path d="M12 4v10a4 4 0 11-4-4"/>',tag:'<path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.2"/>',
+ text:'<path d="M5 6h14M5 11h14M5 16h9"/>',eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+ mic:'<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0013 0M12 18v3"/>',shield:'<path d="M12 3.5l7 2.5v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/>',
+ lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/>',scale:'<path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 005 0zM19 8l-2.5 6a3 3 0 005 0z"/>',calendar:'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.5 1.5M16.5 16.5L18 18M18 6l-1.5 1.5M7.5 16.5L6 18"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>'
+};
+function svg(n,sw){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.9)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
+var CHEV='<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg>';
+function cvars(n){return '--c1:'+n.color[0]+';--c2:'+n.color[1]}
+function gtxt(g){return g==='w'?'Woman':'Man'}
+function stText(s){return s==='ok'?'Approved':s==='skip'?'Skipped':'To review'}
+function pStatus(id){return S.st[id]||'review'}
+function tagW(w){return '<span class="tag w'+w+'">Wave '+w+'</span>'}
+function betTag(m){var b=m.bet[0];return '<span class="tag '+b+'">'+(b==='ok'?'Betting: allowed, strict rules':b==='no'?'Betting: not allowed':'Betting: verify')+'</span>'}
+
+/* ---------- navigation state ---------- */
+var nav={tab:'personas',stack:[],sec:'Overview'};
+var cur=function(){return nav.stack[nav.stack.length-1]||{v:nav.tab}};
+var root=document.getElementById('root'),top=document.getElementById('top'),tabbar=document.getElementById('tabbar'),toastEl=document.getElementById('toast');
+var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['plan','Plan','plan']];
+
+/* ---------- views ---------- */
+function blocksHtml(bl){
+ return bl.map(function(b){
+  var t=b[0];
+  if(t==='h')return '<h2>'+esc(b[1])+'</h2>';
+  if(t==='p')return '<p>'+esc(b[1])+'</p>';
+  if(t==='note')return '<div class="note">'+esc(b[1])+'</div>';
+  if(t==='list')return '<div class="card"><ul class="l">'+b[1].map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+  if(t==='steps')return '<div class="card"><ol class="s">'+b[1].map(function(x){return '<li><div class="st">'+esc(x[0])+'</div><div class="sd">'+esc(x[1])+'</div></li>'}).join('')+'</ol></div>';
+  if(t==='cards')return b[1].map(function(x){return '<div class="card"><h3>'+esc(x[0])+'</h3><p style="margin:.2rem 0 0;color:var(--label2)">'+esc(x[1])+'</p></div>'}).join('');
+  if(t==='prompt')return promptHtml(b[1],b[2]);
+  return '';
+ }).join('');
+}
+function promptHtml(title,text){
+ return '<div class="ph"><h3>'+esc(title)+'</h3><button class="btn sm sec" data-do="copy" data-i="'+reg(text)+'">Copy</button></div><div class="prompt">'+esc(text)+'</div>';
+}
+function kv(k,v){return '<div class="kv"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+'</div></div>'}
+function personaRow(p){
+ var n=NK[p.niche],m=MK[p.mkt];
+ return '<button class="row" data-do="open" data-v="persona" data-id="'+p.id+'"><span class="av" style="'+cvars(n)+'">'+esc(p.name[0])+'</span>'+
+  '<span class="grow"><div class="t1">'+esc(p.name)+' · '+esc(n.name)+'</div><div class="t2">'+esc(m.name)+' · '+gtxt(p.g)+' · Wave '+p.wave+' · '+stText(pStatus(p.id))+'</div></span>'+CHEV+'</button>';
+}
+function filtered(){
+ var f=S.f,q=(nav.q||'').toLowerCase().trim();
+ return D.personas.filter(function(p){
+  if(f.niche!=='all'&&p.niche!==f.niche)return false;
+  if(f.mkt!=='all'&&p.mkt!==f.mkt)return false;
+  if(f.g!=='all'&&p.g!==f.g)return false;
+  if(f.stt!=='all'&&pStatus(p.id)!==f.stt)return false;
+  if(q&&(p.name+' '+NK[p.niche].name+' '+MK[p.mkt].name+' '+p.angle).toLowerCase().indexOf(q)<0)return false;
+  return true;
+ });
+}
+function listHtml(){
+ var l=filtered();
+ if(!l.length)return '<div class="empty">No personas match these filters.</div>';
+ return '<div class="grp">'+l.map(personaRow).join('')+'</div>';
+}
+function chipRow(key,items,label){
+ return '<div class="chips" role="group" aria-label="'+label+'">'+items.map(function(i){return '<button class="chip" aria-pressed="'+(S.f[key]===i[0])+'" data-do="filter" data-k="'+key+'" data-v="'+i[0]+'">'+esc(i[1])+'</button>'}).join('')+'</div>';
+}
+function vPersonas(){
+ var ok=0,sk=0;D.personas.forEach(function(p){var s=pStatus(p.id);if(s==='ok')ok++;if(s==='skip')sk++});
+ var tot=D.personas.length;
+ var h='<h1 class="lt">Personas</h1><p class="sub">'+tot+' personas across '+D.niches.length+' niches and '+D.markets.length+' markets. Tap one to read the whole plan.</p>';
+ h+='<div class="card"><div style="display:flex;justify-content:space-between"><b>Review progress</b><span style="color:var(--label2)">'+ok+' approved · '+sk+' skipped</span></div><div class="bar"><i style="width:'+Math.round(ok/tot*100)+'%"></i></div></div>';
+ h+='<div class="search">'+svg('search')+'<input id="q" type="search" inputmode="search" placeholder="Search name, niche, language" value="'+esc(nav.q||'')+'" aria-label="Search personas"></div>';
+ h+=chipRow('niche',[['all','All niches']].concat(D.niches.map(function(n){return [n.id,n.name]})),'Niche');
+ h+=chipRow('mkt',[['all','All languages']].concat(D.markets.map(function(m){return [m.id,m.name]})),'Language');
+ h+=chipRow('g',[['all','Everyone'],['w','Women'],['m','Men']],'Gender');
+ h+=chipRow('stt',[['all','Any status'],['review','To review'],['ok','Approved'],['skip','Skipped']],'Status');
+ h+='<div id="plist">'+listHtml()+'</div>';
+ return h;
+}
+function vNiches(){
+ var h='<h1 class="lt">Niches</h1><p class="sub">Seven niches. Open one for its format, series, clips and offer.</p><div class="grp">';
+ D.niches.forEach(function(n){
+  var c=D.personas.filter(function(p){return p.niche===n.id}).length;
+  h+='<button class="row" data-do="open" data-v="niche" data-id="'+n.id+'"><span class="ic" style="'+cvars(n)+'">'+svg(n.icon)+'</span><span class="grow"><div class="t1">'+esc(n.name)+'</div><div class="t2">'+esc(n.tagline)+'</div></span><span class="t2">'+c+'</span>'+CHEV+'</button>';
+ });
+ return h+'</div>';
+}
+function vMarkets(){
+ var h='<h1 class="lt">Languages</h1><p class="sub">Eleven markets. Open one for speech notes, rules and its personas.</p><div class="grp">';
+ D.markets.forEach(function(m){
+  var c=D.personas.filter(function(p){return p.mkt===m.id}).length;
+  h+='<button class="row" data-do="open" data-v="market" data-id="'+m.id+'"><span class="av" style="--c1:#BF5AF2;--c2:#5E5CE6;font-size:.8rem">'+esc(m.short.split('-')[0])+'</span><span class="grow"><div class="t1">'+esc(m.name)+'</div><div class="t2">'+esc(m.city)+' · '+c+' personas</div></span>'+CHEV+'</button>';
+ });
+ return h+'</div>';
+}
+function vPlan(){
+ var h='<h1 class="lt">Plan</h1><p class="sub">How the business works: build steps, hooks, selling, rules and cost.</p><div class="grp">';
+ D.plan.forEach(function(s){
+  h+='<button class="row" data-do="open" data-v="plan" data-id="'+s.id+'"><span class="ic" style="--c1:#BF5AF2;--c2:#5E5CE6">'+svg(s.icon)+'</span><span class="grow"><div class="t1">'+esc(s.title)+'</div><div class="t2">'+esc(s.sub)+'</div></span>'+CHEV+'</button>';
+ });
+ h+='</div><h2>Appearance</h2><div class="seg" role="group" aria-label="Appearance">'+[['auto','Auto'],['light','Light'],['dark','Dark']].map(function(t){return '<button aria-pressed="'+(S.theme===t[0])+'" data-do="theme" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+ h+='<div class="grp"><button class="row" data-do="export"><span class="grow"><div class="t1">Copy my review notes</div><div class="t2">Statuses, notes and checklists as text</div></span></button></div>';
+ return h;
+}
+function vPlanPage(id){
+ var s=PLK[id];
+ return '<h1 class="lt">'+esc(s.title)+'</h1><p class="sub">'+esc(s.sub)+'</p>'+blocksHtml(s.blocks);
+}
+function vNiche(id){
+ var n=NK[id],ps=D.personas.filter(function(p){return p.niche===id});
+ var h='<div class="hero" style="'+cvars(n)+'"><div class="big">'+esc(n.name)+'</div><p>'+esc(n.tagline)+'</p></div>';
+ h+='<div class="card"><div class="kv"><div class="k">What it is</div><div class="v">'+esc(n.what)+'</div></div><div class="kv"><div class="k">Why it works</div><div class="v">'+esc(n.why)+'</div></div><div class="kv"><div class="k">Genders</div><div class="v">'+esc(n.genders)+'</div></div></div>';
+ h+='<h2>Content pillars</h2><div class="card"><ul class="l">'+n.pillars.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+ h+='<h2>Series formats</h2>'+n.series.map(function(s){return '<div class="card"><h3>'+esc(s[0].replace('{cur}','')) +'</h3><p style="margin:.2rem 0 0;color:var(--label2)">'+esc(s[1])+'</p></div>'}).join('');
+ h+='<h2>First 10 clips</h2><div class="card"><ol class="s">'+n.clips.map(function(c){return '<li><div class="st">'+esc(c[1].replace('{dish}','local dish').replace('{cur}','local currency '))+'</div><div class="sd">'+esc(c[0].replace('{cur}',''))+'</div></li>'}).join('')+'</ol></div>';
+ h+='<h2>Hook patterns</h2><div class="card"><ul class="l">'+n.hooks.map(function(x){return '<li>'+esc(x.replace('{c}','first clip title'))+'</li>'}).join('')+'</ul></div>';
+ h+='<h2>What it sells</h2><div class="card"><p style="margin-top:0">'+esc(n.offer)+'</p><div class="kv"><div class="k">Product ladder</div><div class="v">'+n.ladder.map(esc).join(' → ')+'</div></div></div>';
+ h+='<h2>Honesty and rules</h2><div class="note">'+esc(n.honesty)+'</div>';
+ h+='<h2>What to measure</h2><div class="card"><ul class="l">'+n.kpis.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+ if(id==='lang'){
+  h+='<h2>30-episode plan</h2>'+D.epis.map(function(s,si){return '<div class="card"><h3>'+esc(s[0])+'</h3><ol class="s" style="counter-reset:s '+(si*10)+'">'+s[1].map(function(e){return '<li><div class="st">'+esc(e)+'</div></li>'}).join('')+'</ol></div>'}).join('');
+ }
+ h+='<h2>Personas in this niche</h2>';
+ D.markets.forEach(function(m){
+  var l=ps.filter(function(p){return p.mkt===m.id});if(!l.length)return;
+  h+='<div class="grp">'+l.map(personaRow).join('')+'</div>';
+ });
+ return h;
+}
+function vMarket(id){
+ var m=MK[id],ps=D.personas.filter(function(p){return p.mkt===id});
+ var h='<div class="hero" style="--c1:#BF5AF2;--c2:#5E5CE6"><div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
+ h+='<div class="card">'+kv('Speak it as',m.speech)+kv('Voice accent',m.accent)+kv('Watch out for',m.watch)+kv('Natural filler words',m.fillers)+'</div>';
+ h+='<h2>Local details to show</h2><div class="card"><ul class="l">'+m.local.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+ h+='<h2>AI label and sponsored posts</h2><div class="note">'+esc(m.ai)+'</div>';
+ h+='<h2>Sports betting here</h2><p>'+betTag(m)+'</p><div class="card"><p style="margin:0">'+esc(m.bet[1])+'</p></div>';
+ h+='<h2>Local dish for the food persona</h2><div class="card"><p style="margin:0">'+esc(m.dish)+'</p></div>';
+ var lp=ps.filter(function(p){return p.niche==='lang'})[0];
+ if(lp&&lp.ph){
+  h+='<h2>Language-learning sample phrases</h2><div class="card">'+kv('Hello',lp.ph.hello[0]+'  '+lp.ph.hello[1])+kv('Thank you',lp.ph.thanks[0]+'  '+lp.ph.thanks[1])+kv('Where is the station?',lp.ph.station[0]+'  '+lp.ph.station[1])+'<div style="color:var(--label2);font-size:.875rem">Respellings are approximate. A native speaker must confirm every phrase.</div></div>';
+ }
+ h+='<h2>Personas</h2>';
+ D.niches.forEach(function(n){
+  var l=ps.filter(function(p){return p.niche===n.id});if(!l.length)return;
+  h+='<div style="color:var(--label2);font-size:.8125rem;font-weight:600;margin:.4rem .25rem">'+esc(n.name)+'</div><div class="grp">'+l.map(personaRow).join('')+'</div>';
+ });
+ return h;
+}
+var SECS=['Overview','Look and voice','Content','Sell','Rules','Prompts','Checklist'];
+function vPersona(id){
+ var p=PK[id],n=NK[p.niche],m=MK[p.mkt],st=pStatus(id);
+ var h='<div style="display:flex;gap:1rem;align-items:center;margin:.3rem 0 1rem"><span class="av lg" style="'+cvars(n)+'">'+esc(p.name[0])+'</span><div><h1 class="lt" style="margin:0">'+esc(p.name)+'</h1><div style="color:var(--label2)">'+esc(n.name)+' · '+esc(m.name)+'</div></div></div>';
+ h+='<div>'+tagW(p.wave)+'<span class="tag">'+gtxt(p.g)+', '+p.age+'</span><span class="tag">'+esc(m.city)+'</span>'+(p.niche==='bet'?betTag(m):'')+'</div>';
+ h+='<div class="seg" role="group" aria-label="Review status" style="margin-top:.5rem">'+[['review','To review'],['ok','Approved'],['skip','Skip']].map(function(s){return '<button aria-pressed="'+(st===s[0])+'" data-do="status" data-id="'+id+'" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('')+'</div>';
+ h+='<div class="pills" role="tablist">'+SECS.map(function(s){return '<button class="pill" role="tab" aria-current="'+(nav.sec===s)+'" data-do="sec" data-v="'+s+'">'+s+'</button>'}).join('')+'</div>';
+ h+=secHtml(p,n,m);
+ return h;
+}
+function secHtml(p,n,m){
+ var s=nav.sec,h='',id=p.id;
+ if(s==='Overview'){
+  h+='<div class="card"><div class="big">'+esc(p.angle)+'</div><p style="color:var(--label2);margin-bottom:0">The signature angle that makes this persona distinctive rather than generic.</p></div>';
+  h+='<div class="card">'+kv('Niche',n.name+': '+n.tagline)+kv('Market',m.name+' · '+m.city)+kv('Wave',p.wave===1?'Wave 1: build first (default test languages: English US and Portuguese Portugal)':p.wave===2?'Wave 2: after Wave 1 works':p.wave===3?'Wave 3: only after a legal check':'Wave 4: later markets'+(['fi','dk','no'].indexOf(p.mkt)>=0?' (Nordic: last)':''))+kv('Account bio',p.bio)+(p.learner?kv('Audience',(p.niche==='lang'&&['us','uk'].indexOf(p.mkt)>=0?'Learners of English; captions in '+p.learner:'English speakers learning '+m.lang+'; captions in English')):'')+'</div>';
+  h+='<h2>Backstory</h2><div class="card"><p style="margin:0">'+esc(p.backstory)+'</p></div>';
+  h+='<div class="note">'+esc(n.what)+'</div>';
+ }else if(s==='Look and voice'){
+  h+='<div class="card">'+kv('Age and gender',p.age+', '+gtxt(p.g).toLowerCase())+kv('Hair',p.hair)+kv('Outfit for the saved look',p.outfit)+kv('Setting',p.setting)+kv('Weather note',p.weather)+'</div>';
+  h+='<div class="card">'+kv('Voice',p.voice)+kv('Speak it as',m.speech)+kv('Natural filler words',m.fillers)+kv('Watch out for',m.watch)+'</div>';
+  h+='<div class="note">The face is yours to choose from the generated photo. Check that it resembles no real person. Native voice quality in '+esc(m.lang)+' is untested: test it on an ordinary sentence.</div>';
+  h+='<h2>Local details to show</h2><div class="card"><ul class="l">'+m.local.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+ }else if(s==='Content'){
+  h+='<h2 style="margin-top:.2rem">Series</h2>'+n.series.map(function(x){return '<div class="card"><h3>'+esc(x[0].replace('{cur}',m.cur))+'</h3><p style="margin:.2rem 0 0;color:var(--label2)">'+esc(x[1])+'</p></div>'}).join('');
+  h+='<h2>First 10 clips</h2><div class="card"><ol class="s">'+p.clips.map(function(c){return '<li><div class="st">'+esc(c.title)+'</div><div class="sd">'+esc(c.kind)+'</div></li>'}).join('')+'</ol></div>';
+  h+='<h2>Hook variants for clip 1</h2><div class="card"><ul class="l">'+p.hooks.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div><div class="note">These are English patterns. Ask Claude (Prompts tab) to write native '+esc(m.lang)+' versions.</div>';
+  if(p.niche==='lang'){
+   h+='<h2>30-episode plan</h2>'+D.epis.map(function(se,si){return '<div class="card"><h3>'+esc(se[0])+'</h3><ol class="s" style="counter-reset:s '+(si*10)+'">'+se[1].map(function(e){return '<li><div class="st">'+esc(e)+'</div></li>'}).join('')+'</ol></div>'}).join('');
+   if(p.ph)h+='<h2>First phrases</h2><div class="card">'+kv('Hello',p.ph.hello[0]+'  '+p.ph.hello[1])+kv('Thank you',p.ph.thanks[0]+'  '+p.ph.thanks[1])+kv('Where is the station?',p.ph.station[0]+'  '+p.ph.station[1])+'<div style="color:var(--label2);font-size:.875rem">Approximate respellings. A native speaker must confirm.</div></div>';
+  }
+ }else if(s==='Sell'){
+  h+='<div class="card">'+kv('Offer',n.offer)+kv('Price range',p.price)+kv('Product ladder',n.ladder.join(' → '))+'</div>';
+  h+='<h2>How it sells without selling</h2><div class="card"><ul class="l"><li>About 60% value-first posts, 25% story posts, 15% soft call to action.</li><li>Show the result first, then let the offer appear as the next step.</li><li>One calm line: "The full plan is in my bio if you want it, no pressure."</li></ul></div>';
+  h+='<h2>Descriptions for clip 1 (English draft)</h2>'+promptHtml('TikTok',p.desc.tt)+promptHtml('Instagram Reels',p.desc.ig)+promptHtml('YouTube Shorts title',p.desc.yt_title)+promptHtml('YouTube Shorts description',p.desc.yt);
+  h+='<div class="note">Claude writes the finished versions in '+esc(m.lang)+'. Use the request in the Prompts tab.</div>';
+  h+='<h2>What to measure</h2><div class="card"><ul class="l">'+n.kpis.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+ }else if(s==='Rules'){
+  h+=p.rules.map(function(r){return '<div class="card"><h3>'+esc(r[0])+'</h3><p style="margin:.2rem 0 0;color:var(--label2)">'+esc(r[1])+'</p></div>'}).join('');
+  h+='<div class="note">Checked 5 Nov 2026 from web sources. Not legal advice. Verify locally before launch.</div>';
+ }else if(s==='Prompts'){
+  h+='<p style="color:var(--label2)">Ready to paste. Brackets and details are already filled for '+esc(p.name)+'.</p>';
+  h+=promptHtml('1. First photo (OpenArt Image)',p.photo);
+  h+=promptHtml('2. Voice description (Design a voice)',p.voice);
+  h+=promptHtml('3. Backstory (paste in the character)',p.backstory);
+  h+=promptHtml('4. Character sheet (16:9, with @'+p.name+')',p.sheet);
+  h+=promptHtml('5. First video (Seedance 2.5)',p.video);
+  h+=promptHtml('6. Ask Claude for native hooks and descriptions',p.ask);
+  h+='<div class="note">Settings: GPT Image 2.5, 4:5, 4K, quality High, Auto Polish off. Video: Seedance 2.5, 9:16, 1080p, 12 s, audio on. Run the phonetic step for any brand name before the final line.</div>';
+ }else if(s==='Checklist'){
+  var ck=S.ck[id]||[];
+  h+='<div class="grp">'+p.check.map(function(c,i){var on=ck.indexOf(i)>=0;return '<button class="check'+(on?' on':'')+'" data-do="ck" data-id="'+id+'" data-i="'+i+'" aria-pressed="'+on+'"><span class="box">'+svg('check',3)+'</span><span class="tx">'+esc(c)+'</span></button>'}).join('')+'</div>';
+  h+='<h2>My notes</h2><textarea class="nt" id="nt" data-id="'+id+'" placeholder="Notes about '+esc(p.name)+'" aria-label="Notes">'+esc(S.nt[id]||'')+'</textarea>';
+ }
+ return h;
+}
+
+/* ---------- render ---------- */
+function titleOf(c){
+ if(c.v==='persona')return PK[c.id].name;if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
+ return ({personas:'Personas',niches:'Niches',markets:'Languages',plan:'Plan'})[c.v]||'';
+}
+function viewHtml(c){
+ copyStore=[];
+ switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();
+  case'persona':return vPersona(c.id);case'niche':return vNiche(c.id);case'market':return vMarket(c.id);case'plan-page':return vPlanPage(c.id);}
+ return '';
+}
+function renderTop(){
+ var c=cur(),back=nav.stack.length>0;
+ top.innerHTML=(back?'<button class="glassbtn" data-do="back" aria-label="Back">'+svg('back',2.2)+'</button>':'<span></span>')+'<div class="t">'+esc(titleOf(c))+'</div>'+'<span></span>';
+ top.classList.toggle('sc',scrollY>50);
+}
+function renderTab(){
+ tabbar.style.setProperty('--n',TABS.length);
+ tabbar.innerHTML='<div class="tb-ind" style="width:calc((100% - .5rem)/'+TABS.length+');transform:translateX('+TABS.findIndex(function(t){return t[0]===nav.tab})*100+'%)"></div>'+
+  TABS.map(function(t){return '<button class="tab" data-do="tab" data-v="'+t[0]+'" aria-label="'+t[1]+'"'+(t[0]===nav.tab?' aria-current="page"':'')+'>'+svg(t[2])+'<span>'+t[1]+'</span></button>'}).join('');
+}
+function renderView(){
+ var c=cur();
+ root.innerHTML='<main class="view cur">'+viewHtml(c)+'</main>';
+ renderTop();
+}
+var animUntil=0;
+function go(kind,fn){ // kind: fwd|back|none
+ var old=root.querySelector('.view');var snap=null;
+ if(kind!=='none'&&old&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+  snap=document.createElement('div');snap.className='pg pg-old';
+  var inner=old.cloneNode(true);inner.classList.remove('cur');inner.removeAttribute('id');
+  inner.querySelectorAll('[id]').forEach(function(e){e.removeAttribute('id')});inner.setAttribute('aria-hidden','true');
+  inner.style.transform='translateY('+(-scrollY)+'px)';snap.appendChild(inner);
+ }
+ fn();
+ if(snap){
+  document.body.appendChild(snap);
+  var h=document.documentElement;h.classList.add('pg-run','pg-'+kind);
+  if(kind==='back')snap.style.pointerEvents='none';
+  animUntil=Date.now()+460;
+  setTimeout(function(){snap.remove();h.classList.remove('pg-run','pg-fwd','pg-back')},460);
+ }
+}
+function setTab(t){
+ nav.tab=t;nav.stack=[];nav.sec='Overview';renderTab();renderView();scrollTo(0,0);
+}
+
+/* ---------- toast ---------- */
+var tt;function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('on')},1600)}
+function copy(t){
+ var done=function(){toast('Copied')};
+ try{navigator.clipboard.writeText(t).then(done,function(){fallback(t);done()})}catch(e){fallback(t);done()}
+}
+function fallback(t){var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0;font-size:16px';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+ var el=e.target.closest('[data-do]');if(!el)return;
+ var d=el.dataset,a=d.do;
+ if(Date.now()<animUntil&&(a==='open'||a==='back'))return;
+ if(a==='tab'){
+  tabbar.classList.remove('tap');void tabbar.offsetWidth;tabbar.classList.add('tap');setTimeout(function(){tabbar.classList.remove('tap')},650);
+  if(d.v===nav.tab&&nav.stack.length===0){scrollTo({top:0,behavior:'smooth'});return}
+  setTab(d.v);
+ }else if(a==='open'){
+  var vv=d.v==='plan'?'plan-page':d.v;
+  go('fwd',function(){nav.stack.push({v:vv,id:d.id});nav.sec='Overview';renderView();scrollTo(0,0)});
+ }else if(a==='back'){
+  go('back',function(){nav.stack.pop();nav.sec='Overview';renderView();restore()});
+ }else if(a==='filter'){
+  S.f[d.k]=d.v;save();var y=scrollY;renderView();scrollTo(0,y);
+ }else if(a==='sec'){
+  nav.sec=d.v;var y2=scrollY;var pill=document.querySelector('.pills');var left=pill?pill.scrollLeft:0;renderView();var p2=document.querySelector('.pills');if(p2)p2.scrollLeft=left;scrollTo(0,Math.min(y2,200));
+ }else if(a==='status'){
+  S.st[d.id]=d.v;save();var y3=scrollY;renderView();scrollTo(0,y3);
+ }else if(a==='ck'){
+  var ck=S.ck[d.id]||[],i=+d.i,ix=ck.indexOf(i);if(ix>=0)ck.splice(ix,1);else ck.push(i);S.ck[d.id]=ck;save();var y4=scrollY;renderView();scrollTo(0,y4);
+ }else if(a==='copy'){
+  var t=copyStore[+d.i];if(t!=null)copy(t);
+ }else if(a==='theme'){
+  S.theme=d.v;save();applyTheme();var y5=scrollY;renderView();scrollTo(0,y5);
+ }else if(a==='export'){
+  var lines=[];D.personas.forEach(function(p){var s=pStatus(p.id),n=S.nt[p.id],ck=(S.ck[p.id]||[]).length;if(s!=='review'||n||ck)lines.push(p.name+' ('+NK[p.niche].name+', '+MK[p.mkt].name+', '+gtxt(p.g)+'): '+stText(s)+', checklist '+ck+'/'+p.check.length+(n?'. Notes: '+n:''))});
+  copy(lines.length?lines.join('\n'):'No review notes yet.');
+ }
+});
+document.addEventListener('input',function(e){
+ if(e.target.id==='q'){nav.q=e.target.value;var l=document.getElementById('plist');if(l){copyStore=[];l.innerHTML=listHtml()}}
+ else if(e.target.id==='nt'){S.nt[e.target.dataset.id]=e.target.value;save()}
+});
+var lastY=0,ticking=false;
+addEventListener('scroll',function(){
+ if(ticking)return;ticking=true;
+ requestAnimationFrame(function(){
+  ticking=false;var y=scrollY;
+  top.classList.toggle('sc',y>50);
+  if(y>lastY+8&&y>12)tabbar.classList.add('min');else if(y<lastY-8||y<=12)tabbar.classList.remove('min');
+  lastY=y;
+ });
+},{passive:true});
+var saved={};
+function restore(){}
+addEventListener('popstate',function(){});
+matchMedia('(prefers-color-scheme:dark)').addEventListener&&matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);
+
+/* ---------- boot ---------- */
+applyTheme();renderTab();renderView();
+if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('sw.js').catch(function(){})}
+})();
