@@ -38,6 +38,22 @@ var IC={
  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',filter:'<path d="M4 7h16M7 12h10M10 17h4"/>'
 };
 function svg(n,sw){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.9)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
+
+var FLAG={
+ us:'<rect width="36" height="24" fill="#fff"/>'+[0,2,4,6,8,10,12].map(function(i){return '<rect y="'+(i*24/13).toFixed(2)+'" width="36" height="'+(24/13).toFixed(2)+'" fill="#D22F3E"/>'}).join('')+'<rect width="16" height="'+(7*24/13).toFixed(2)+'" fill="#2B3A8C"/>'+[[3,2.5],[7,2.5],[11,2.5],[5,5.5],[9,5.5],[13,5.5],[3,8.5],[7,8.5],[11,8.5]].map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r=".8" fill="#fff"/>'}).join(''),
+ uk:'<rect width="36" height="24" fill="#243A7C"/><path d="M0 0L36 24M36 0L0 24" stroke="#fff" stroke-width="4.5"/><path d="M0 0L36 24M36 0L0 24" stroke="#CF2B3C" stroke-width="1.6"/><path d="M18 0v24M0 12h36" stroke="#fff" stroke-width="7"/><path d="M18 0v24M0 12h36" stroke="#CF2B3C" stroke-width="4"/>',
+ es:'<rect width="12" height="24" fill="#1E8A4C"/><rect x="12" width="12" height="24" fill="#fff"/><rect x="24" width="12" height="24" fill="#D8343D"/><circle cx="18" cy="12" r="3.4" fill="#A9743B"/><circle cx="18" cy="12" r="1.7" fill="#1E8A4C"/>',
+ br:'<rect width="36" height="24" fill="#1E9B4B"/><path d="M18 2.5L32 12 18 21.5 4 12z" fill="#F7D117"/><circle cx="18" cy="12" r="5.2" fill="#2A3E8E"/><path d="M13 11.2c3.5-1 7-.4 10 1.6" stroke="#fff" stroke-width="1" fill="none"/>',
+ pt:'<rect width="36" height="24" fill="#D8343D"/><rect width="14" height="24" fill="#1E7A3C"/><circle cx="14" cy="12" r="4.6" fill="#F7D117"/><circle cx="14" cy="12" r="2.6" fill="#D8343D"/><circle cx="14" cy="12" r="1.2" fill="#fff"/>',
+ fr:'<rect width="12" height="24" fill="#2A4DA0"/><rect x="12" width="12" height="24" fill="#fff"/><rect x="24" width="12" height="24" fill="#D8343D"/>',
+ it:'<rect width="12" height="24" fill="#1E9B4B"/><rect x="12" width="12" height="24" fill="#fff"/><rect x="24" width="12" height="24" fill="#D8343D"/>',
+ de:'<rect width="36" height="8" fill="#1C1C1E"/><rect y="8" width="36" height="8" fill="#D8343D"/><rect y="16" width="36" height="8" fill="#F7C61B"/>',
+ fi:'<rect width="36" height="24" fill="#fff"/><rect x="9.5" width="5.5" height="24" fill="#2A4DA0"/><rect y="9.25" width="36" height="5.5" fill="#2A4DA0"/>',
+ dk:'<rect width="36" height="24" fill="#D8343D"/><rect x="10" width="4.5" height="24" fill="#fff"/><rect y="9.75" width="36" height="4.5" fill="#fff"/>',
+ no:'<rect width="36" height="24" fill="#D8343D"/><rect x="9" width="7" height="24" fill="#fff"/><rect y="8.5" width="36" height="7" fill="#fff"/><rect x="10.5" width="4" height="24" fill="#2A4DA0"/><rect y="10" width="36" height="4" fill="#2A4DA0"/>'
+};
+function flag(id,cls){return '<span class="fl '+(cls||'')+'" role="img" aria-label="'+esc(MK[id].name)+' flag"><svg viewBox="6 0 24 24" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+FLAG[id]+'</svg></span>'}
+function avHtml(p,cls){var n=NK[p.niche];return '<span class="av '+(cls||'')+' g'+p.g+'" style="'+cvars(n)+'">'+esc(p.name[0])+'<span class="nb" aria-hidden="true">'+svg(n.icon,2.2)+'</span></span>'}
 var CHEV='<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg>';
 function cvars(n){return '--c1:'+n.color[0]+';--c2:'+n.color[1]}
 function gtxt(g){return g==='w'?'Woman':'Man'}
@@ -72,8 +88,8 @@ function promptHtml(title,text){
 function kv(k,v){return '<div class="kv"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+'</div></div>'}
 function personaRow(p){
  var n=NK[p.niche],m=MK[p.mkt];
- return '<button class="row" data-do="open" data-v="persona" data-id="'+p.id+'"><span class="av" style="'+cvars(n)+'">'+esc(p.name[0])+'</span>'+
-  '<span class="grow"><div class="t1">'+esc(p.name)+' · '+esc(n.name)+'</div><div class="t2">'+esc(m.name)+' · '+gtxt(p.g)+' · Wave '+p.wave+' · '+stText(pStatus(p.id))+'</div></span>'+CHEV+'</button>';
+ return '<button class="row" data-do="open" data-v="persona" data-id="'+p.id+'">'+avHtml(p)+
+  '<span class="grow"><div class="t1">'+esc(p.name)+' · '+esc(n.name)+'</div><div class="t2">'+flag(p.mkt,'s')+esc(m.name)+' · '+gtxt(p.g)+' · Wave '+p.wave+(pStatus(p.id)==='review'?'':' · '+stText(pStatus(p.id)))+'</div></span>'+CHEV+'</button>';
 }
 function filtered(){
  var f=S.f,q=(nav.q||'').toLowerCase().trim();
@@ -119,13 +135,13 @@ function refreshList(){
 }
 var sheetEl=null,scrimEl=null;
 function optList(key,items){
- return '<div class="grp">'+items.map(function(i){return '<button class="opt" role="radio" aria-checked="'+(S.f[key]===i[0])+'" data-do="fset" data-k="'+key+'" data-v="'+i[0]+'"><span>'+esc(i[1])+(i[2]?'<small>'+esc(i[2])+'</small>':'')+'</span>'+svg('check',2.6)+'</button>'}).join('')+'</div>';
+ return '<div class="grp">'+items.map(function(i){return '<button class="opt" role="radio" aria-checked="'+(S.f[key]===i[0])+'" data-do="fset" data-k="'+key+'" data-v="'+i[0]+'"><span style="display:flex;align-items:center;gap:.6rem">'+(i[3]||'')+'<span>'+esc(i[1])+(i[2]?'<small>'+esc(i[2])+'</small>':'')+'</span></span>'+svg('check',2.6)+'</button>'}).join('')+'</div>';
 }
 function sheetBody(){
  var cnt={};D.personas.forEach(function(p){cnt[p.niche]=(cnt[p.niche]||0)+1});
  return '<div class="sl">Niche</div>'+optList('niche',[['all','All niches']].concat(D.niches.map(function(n){return [n.id,n.name,String(cnt[n.id])]})))+
-  '<div class="sl">Language</div>'+optList('mkt',[['all','All languages']].concat(D.markets.map(function(m){return [m.id,m.name]})))+
-  '<div class="sl">Gender</div><div class="seg" role="radiogroup" aria-label="Gender">'+[['all','All'],['w','Women'],['m','Men']].map(function(t){return '<button role="radio" aria-pressed="'+(S.f.g===t[0])+'" data-do="fset" data-k="g" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+  '<div class="sl">Language</div>'+optList('mkt',[['all','All languages']].concat(D.markets.map(function(m){return [m.id,m.name,'',flag(m.id)]})))+
+  '<div class="sl">Gender</div><div class="seg" role="radiogroup" aria-label="Gender">'+[['all','All'],['w','Women'],['m','Men']].map(function(t){return '<button class="'+(t[0]==='w'?'gw':t[0]==='m'?'gm':'')+'" role="radio" aria-pressed="'+(S.f.g===t[0])+'" data-do="fset" data-k="g" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
 }
 function sheetInner(){return '<div class="sh" id="sh"><button data-do="freset">Reset</button><b>Filters</b><button class="dn" data-do="fclose">Done</button></div><div class="sb" id="sb">'+sheetBody()+'</div>'}
 function openSheet(){
@@ -159,7 +175,7 @@ function vMarkets(){
  var h='<h1 class="lt">Languages</h1><p class="sub">Eleven markets. Open one for speech notes, rules and its personas.</p><div class="grp">';
  D.markets.forEach(function(m){
   var c=D.personas.filter(function(p){return p.mkt===m.id}).length;
-  h+='<button class="row" data-do="open" data-v="market" data-id="'+m.id+'"><span class="av" style="--c1:#BF5AF2;--c2:#5E5CE6;font-size:.8rem">'+esc(m.short.split('-')[0])+'</span><span class="grow"><div class="t1">'+esc(m.name)+'</div><div class="t2">'+esc(m.city)+' · '+c+' personas</div></span>'+CHEV+'</button>';
+  h+='<button class="row" data-do="open" data-v="market" data-id="'+m.id+'">'+flag(m.id,'m')+'<span class="grow"><div class="t1">'+esc(m.name)+'</div><div class="t2">'+esc(m.city)+' · '+c+' personas</div></span>'+CHEV+'</button>';
  });
  return h+'</div>';
 }
@@ -199,7 +215,7 @@ function vNiche(id){
 }
 function vMarket(id){
  var m=MK[id],ps=D.personas.filter(function(p){return p.mkt===id});
- var h='<div class="hero" style="--c1:#BF5AF2;--c2:#5E5CE6"><div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
+ var h='<div class="hero" style="--c1:#BF5AF2;--c2:#5E5CE6">'+flag(m.id)+'<div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
  h+='<div class="card">'+kv('Speak it as',m.speech)+kv('Voice accent',m.accent)+kv('Watch out for',m.watch)+kv('Natural filler words',m.fillers)+'</div>';
  h+='<h2>Local details to show</h2><div class="card"><ul class="l">'+m.local.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
  h+='<h2>AI label and sponsored posts</h2><div class="note">'+esc(m.ai)+'</div>';
@@ -219,8 +235,8 @@ function vMarket(id){
 var SECS=['Overview','Look and voice','Content','Sell','Rules','Prompts','Checklist'];
 function vPersona(id){
  var p=PK[id],n=NK[p.niche],m=MK[p.mkt],st=pStatus(id);
- var h='<div style="display:flex;gap:1rem;align-items:center;margin:.3rem 0 1rem"><span class="av lg" style="'+cvars(n)+'">'+esc(p.name[0])+'</span><div><h1 class="lt" style="margin:0">'+esc(p.name)+'</h1><div style="color:var(--label2)">'+esc(n.name)+' · '+esc(m.name)+'</div></div></div>';
- h+='<div>'+tagW(p.wave)+'<span class="tag">'+gtxt(p.g)+', '+p.age+'</span><span class="tag">'+esc(m.city)+'</span>'+(p.niche==='bet'?betTag(m):'')+'</div>';
+ var h='<div style="display:flex;gap:1rem;align-items:center;margin:.3rem 0 1rem">'+avHtml(p,'lg')+'<div><h1 class="lt" style="margin:0">'+esc(p.name)+'</h1><div style="color:var(--label2)">'+esc(n.name)+' · '+flag(p.mkt,'s')+esc(m.name)+'</div></div></div>';
+ h+='<div>'+tagW(p.wave)+'<span class="tag g'+p.g+'">'+gtxt(p.g)+', '+p.age+'</span><span class="tag">'+esc(m.city)+'</span>'+(p.niche==='bet'?betTag(m):'')+'</div>';
  h+='<div class="seg" role="group" aria-label="Review status" style="margin-top:.5rem">'+[['review','To review'],['ok','Approved'],['skip','Skip']].map(function(s){return '<button aria-pressed="'+(st===s[0])+'" data-do="status" data-id="'+id+'" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('')+'</div>';
  h+='<div class="pills" role="tablist">'+SECS.map(function(s){return '<button class="pill" role="tab" aria-current="'+(nav.sec===s)+'" data-do="sec" data-v="'+s+'">'+s+'</button>'}).join('')+'</div>';
  h+=secHtml(p,n,m);
