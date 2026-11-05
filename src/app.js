@@ -302,7 +302,7 @@ function viewHtml(c){
 function renderTop(){
  var c=cur(),back=nav.stack.length>0;
  top.innerHTML=(back?'<button class="glassbtn" data-do="back" aria-label="Back">'+svg('back',2.2)+'</button>':'<span></span>')+'<div class="t">'+esc(titleOf(c))+'</div>'+'<span></span>';
- top.classList.toggle('sc',scrollY>50);navbg.classList.toggle('sc',scrollY>8);
+ top.classList.toggle('sc',scrollY>50);navbg.classList.toggle('sc',scrollY>8);navbg.classList.toggle('tall',c.v==='persona');
 }
 function renderTab(){
  tabbar.style.setProperty('--n',TABS.length);
