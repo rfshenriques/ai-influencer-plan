@@ -9,7 +9,7 @@ var PLK={};D.plan.forEach(function(s){PLK[s.id]=s});
 var mem={};
 function sget(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return k in mem?mem[k]:d}}
 function sset(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-var S=sget('aiplan.v1',{st:{},nt:{},ck:{},theme:'auto',f:{niche:'all',mkt:'all',g:'all',stt:'all'}});
+var S=sget('aiplan.v1',{st:{},nt:{},ck:{},theme:'auto',f:{niche:'all',mkt:'all',g:'all'}});
 function save(){sset('aiplan.v1',S)}
 function applyTheme(){var r=document.documentElement;if(S.theme==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',S.theme);
  var dark=S.theme==='dark'||(S.theme==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);
@@ -35,7 +35,7 @@ var IC={
  mic:'<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0013 0M12 18v3"/>',shield:'<path d="M12 3.5l7 2.5v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/>',
  lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/>',scale:'<path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 005 0zM19 8l-2.5 6a3 3 0 005 0z"/>',calendar:'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.5 1.5M16.5 16.5L18 18M18 6l-1.5 1.5M7.5 16.5L6 18"/>',
- check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>'
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',filter:'<path d="M4 7h16M7 12h10M10 17h4"/>'
 };
 function svg(n,sw){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.9)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
 var CHEV='<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg>';
@@ -81,7 +81,6 @@ function filtered(){
   if(f.niche!=='all'&&p.niche!==f.niche)return false;
   if(f.mkt!=='all'&&p.mkt!==f.mkt)return false;
   if(f.g!=='all'&&p.g!==f.g)return false;
-  if(f.stt!=='all'&&pStatus(p.id)!==f.stt)return false;
   if(q&&(p.name+' '+NK[p.niche].name+' '+MK[p.mkt].name+' '+p.angle).toLowerCase().indexOf(q)<0)return false;
   return true;
  });
@@ -91,21 +90,62 @@ function listHtml(){
  if(!l.length)return '<div class="empty">No personas match these filters.</div>';
  return '<div class="grp">'+l.map(personaRow).join('')+'</div>';
 }
-function chipRow(key,items,label){
- return '<div class="chips" role="group" aria-label="'+label+'">'+items.map(function(i){return '<button class="chip" aria-pressed="'+(S.f[key]===i[0])+'" data-do="filter" data-k="'+key+'" data-v="'+i[0]+'">'+esc(i[1])+'</button>'}).join('')+'</div>';
+function nFilters(){var f=S.f;return (f.niche!=='all'?1:0)+(f.mkt!=='all'?1:0)+(f.g!=='all'?1:0)}
+function activeHtml(){
+ var f=S.f,a=[];
+ if(f.niche!=='all')a.push(['niche',NK[f.niche].name]);
+ if(f.mkt!=='all')a.push(['mkt',MK[f.mkt].name]);
+ if(f.g!=='all')a.push(['g',f.g==='w'?'Women':'Men']);
+ if(!a.length)return '';
+ return '<div class="act">'+a.map(function(x){return '<button class="ac" data-do="clear" data-k="'+x[0]+'" aria-label="Remove filter '+esc(x[1])+'">'+esc(x[1])+' <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>'}).join('')+'</div>';
 }
+function countHtml(){var n=filtered().length;return '<div class="cnt">'+n+' of '+D.personas.length+' personas</div>'}
+function fbtnHtml(){var nf=nFilters();return svg('filter')+(nf?'<span class="bd">'+nf+'</span>':'')}
 function vPersonas(){
  var ok=0,sk=0;D.personas.forEach(function(p){var s=pStatus(p.id);if(s==='ok')ok++;if(s==='skip')sk++});
- var tot=D.personas.length;
+ var tot=D.personas.length,nf=nFilters();
  var h='<h1 class="lt">Personas</h1><p class="sub">'+tot+' personas across '+D.niches.length+' niches and '+D.markets.length+' markets. Tap one to read the whole plan.</p>';
- h+='<div class="card"><div style="display:flex;justify-content:space-between"><b>Review progress</b><span style="color:var(--label2)">'+ok+' approved · '+sk+' skipped</span></div><div class="bar"><i style="width:'+Math.round(ok/tot*100)+'%"></i></div></div>';
- h+='<div class="search">'+svg('search')+'<input id="q" type="search" inputmode="search" placeholder="Search name, niche, language" value="'+esc(nav.q||'')+'" aria-label="Search personas"></div>';
- h+=chipRow('niche',[['all','All niches']].concat(D.niches.map(function(n){return [n.id,n.name]})),'Niche');
- h+=chipRow('mkt',[['all','All languages']].concat(D.markets.map(function(m){return [m.id,m.name]})),'Language');
- h+=chipRow('g',[['all','Everyone'],['w','Women'],['m','Men']],'Gender');
- h+=chipRow('stt',[['all','Any status'],['review','To review'],['ok','Approved'],['skip','Skipped']],'Status');
- h+='<div id="plist">'+listHtml()+'</div>';
+ h+='<div class="sr"><div class="search">'+svg('search')+'<input id="q" type="search" inputmode="search" placeholder="Search" value="'+esc(nav.q||'')+'" aria-label="Search personas"></div>'+
+  '<button class="fbtn" data-do="filters" aria-label="Filters'+(nf?', '+nf+' active':'')+'">'+fbtnHtml()+'</button></div>';
+ h+='<div id="act">'+activeHtml()+'</div>';
+ h+='<div id="cnt">'+countHtml()+'</div><div id="plist">'+listHtml()+'</div>';
+ h+='<div class="card" style="margin-top:.9rem"><div style="display:flex;justify-content:space-between"><b>Review progress</b><span style="color:var(--label2)">'+ok+' approved · '+sk+' skipped</span></div><div class="bar"><i style="width:'+Math.round(ok/tot*100)+'%"></i></div></div>';
  return h;
+}
+function refreshList(){
+ var l=document.getElementById('plist');if(!l)return;copyStore=[];
+ l.innerHTML=listHtml();var a=document.getElementById('act');if(a)a.innerHTML=activeHtml();var c=document.getElementById('cnt');if(c)c.innerHTML=countHtml();
+ var b=document.querySelector('.fbtn');if(b)b.innerHTML=fbtnHtml();
+}
+var sheetEl=null,scrimEl=null;
+function optList(key,items){
+ return '<div class="grp">'+items.map(function(i){return '<button class="opt" role="radio" aria-checked="'+(S.f[key]===i[0])+'" data-do="fset" data-k="'+key+'" data-v="'+i[0]+'"><span>'+esc(i[1])+(i[2]?'<small>'+esc(i[2])+'</small>':'')+'</span>'+svg('check',2.6)+'</button>'}).join('')+'</div>';
+}
+function sheetBody(){
+ var cnt={};D.personas.forEach(function(p){cnt[p.niche]=(cnt[p.niche]||0)+1});
+ return '<div class="sl">Niche</div>'+optList('niche',[['all','All niches']].concat(D.niches.map(function(n){return [n.id,n.name,String(cnt[n.id])]})))+
+  '<div class="sl">Language</div>'+optList('mkt',[['all','All languages']].concat(D.markets.map(function(m){return [m.id,m.name]})))+
+  '<div class="sl">Gender</div><div class="seg" role="radiogroup" aria-label="Gender">'+[['all','All'],['w','Women'],['m','Men']].map(function(t){return '<button role="radio" aria-pressed="'+(S.f.g===t[0])+'" data-do="fset" data-k="g" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+}
+function sheetInner(){return '<div class="sh" id="sh"><button data-do="freset">Reset</button><b>Filters</b><button class="dn" data-do="fclose">Done</button></div><div class="sb" id="sb">'+sheetBody()+'</div>'}
+function openSheet(){
+ if(sheetEl)return;
+ scrimEl=document.createElement('div');scrimEl.className='scrim';scrimEl.dataset.do='fclose';
+ sheetEl=document.createElement('div');sheetEl.className='sheet';sheetEl.setAttribute('role','dialog');sheetEl.setAttribute('aria-modal','true');sheetEl.setAttribute('aria-label','Filters');
+ sheetEl.innerHTML=sheetInner();
+ document.body.appendChild(scrimEl);document.body.appendChild(sheetEl);
+ requestAnimationFrame(function(){requestAnimationFrame(function(){if(scrimEl){scrimEl.classList.add('on');sheetEl.classList.add('on')}})});
+ dragInit();
+}
+function closeSheet(){
+ if(!sheetEl)return;var s=sheetEl,c=scrimEl;sheetEl=null;scrimEl=null;
+ s.style.transform='';s.classList.remove('on');c.classList.remove('on');setTimeout(function(){s.remove();c.remove()},350);
+}
+function dragInit(){
+ var sh=document.getElementById('sh'),y0=0,dy=0,t0=0,on=false;
+ sh.addEventListener('touchstart',function(e){on=true;y0=e.touches[0].clientY;t0=Date.now();dy=0;sheetEl.style.transition='none'},{passive:true});
+ sh.addEventListener('touchmove',function(e){if(!on)return;dy=Math.max(0,e.touches[0].clientY-y0);sheetEl.style.transform='translateY('+dy+'px)'},{passive:true});
+ sh.addEventListener('touchend',function(){if(!on)return;on=false;var v=dy/Math.max(1,Date.now()-t0);sheetEl.style.transition='';if(dy>sheetEl.offsetHeight*.28||v>.5)closeSheet();else sheetEl.style.transform=''});
 }
 function vNiches(){
  var h='<h1 class="lt">Niches</h1><p class="sub">Seven niches. Open one for its format, series, clips and offer.</p><div class="grp">';
@@ -302,8 +342,11 @@ document.addEventListener('click',function(e){
   go('fwd',function(){nav.stack.push({v:vv,id:d.id});nav.sec='Overview';renderView();scrollTo(0,0)});
  }else if(a==='back'){
   go('back',function(){nav.stack.pop();nav.sec='Overview';renderView();restore()});
- }else if(a==='filter'){
-  S.f[d.k]=d.v;save();var y=scrollY;renderView();scrollTo(0,y);
+ }else if(a==='filters'){openSheet();
+ }else if(a==='fclose'){closeSheet();
+ }else if(a==='freset'){S.f={niche:'all',mkt:'all',g:'all'};save();if(sheetEl){document.getElementById('sb').innerHTML=sheetBody()}refreshList();
+ }else if(a==='fset'){S.f[d.k]=d.v;save();if(sheetEl){var sb=document.getElementById('sb'),st=sb.scrollTop;sb.innerHTML=sheetBody();sb.scrollTop=st}refreshList();
+ }else if(a==='clear'){S.f[d.k]='all';save();refreshList();
  }else if(a==='sec'){
   nav.sec=d.v;var y2=scrollY;var pill=document.querySelector('.pills');var left=pill?pill.scrollLeft:0;renderView();var p2=document.querySelector('.pills');if(p2)p2.scrollLeft=left;scrollTo(0,Math.min(y2,200));
  }else if(a==='status'){
@@ -320,9 +363,10 @@ document.addEventListener('click',function(e){
  }
 });
 document.addEventListener('input',function(e){
- if(e.target.id==='q'){nav.q=e.target.value;var l=document.getElementById('plist');if(l){copyStore=[];l.innerHTML=listHtml()}}
+ if(e.target.id==='q'){nav.q=e.target.value;refreshList()}
  else if(e.target.id==='nt'){S.nt[e.target.dataset.id]=e.target.value;save()}
 });
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet()});
 var lastY=0,ticking=false;
 addEventListener('scroll',function(){
  if(ticking)return;ticking=true;
