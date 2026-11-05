@@ -65,7 +65,7 @@ function betTag(m){var b=m.bet[0];return '<span class="tag '+b+'">'+(b==='ok'?'B
 /* ---------- navigation state ---------- */
 var nav={tab:'personas',stack:[],sec:'Overview'};
 var cur=function(){return nav.stack[nav.stack.length-1]||{v:nav.tab}};
-var root=document.getElementById('root'),top=document.getElementById('top'),tabbar=document.getElementById('tabbar'),toastEl=document.getElementById('toast');
+var navbg=document.querySelector('.nav-bg'),root=document.getElementById('root'),top=document.getElementById('top'),tabbar=document.getElementById('tabbar'),toastEl=document.getElementById('toast');
 var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['plan','Plan','plan']];
 
 /* ---------- views ---------- */
@@ -238,7 +238,7 @@ function vPersona(id){
  var h='<div style="display:flex;gap:1rem;align-items:center;margin:.3rem 0 1rem">'+avHtml(p,'lg')+'<div><h1 class="lt" style="margin:0">'+esc(p.name)+'</h1><div style="color:var(--label2)">'+esc(n.name)+' · '+flag(p.mkt,'s')+esc(m.name)+'</div></div></div>';
  h+='<div>'+tagW(p.wave)+'<span class="tag g'+p.g+'">'+gtxt(p.g)+', '+p.age+'</span><span class="tag">'+esc(m.city)+'</span>'+(p.niche==='bet'?betTag(m):'')+'</div>';
  h+='<div class="seg" role="group" aria-label="Review status" style="margin-top:.5rem">'+[['review','To review'],['ok','Approved'],['skip','Skip']].map(function(s){return '<button aria-pressed="'+(st===s[0])+'" data-do="status" data-id="'+id+'" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('')+'</div>';
- h+='<div class="pills" role="tablist">'+SECS.map(function(s){return '<button class="pill" role="tab" aria-current="'+(nav.sec===s)+'" data-do="sec" data-v="'+s+'">'+s+'</button>'}).join('')+'</div>';
+ h+='<div class="pw"><div class="pills" role="tablist">'+SECS.map(function(s){return '<button class="pill" role="tab" aria-current="'+(nav.sec===s)+'" data-do="sec" data-v="'+s+'">'+s+'</button>'}).join('')+'</div></div>';
  h+=secHtml(p,n,m);
  return h;
 }
@@ -302,7 +302,7 @@ function viewHtml(c){
 function renderTop(){
  var c=cur(),back=nav.stack.length>0;
  top.innerHTML=(back?'<button class="glassbtn" data-do="back" aria-label="Back">'+svg('back',2.2)+'</button>':'<span></span>')+'<div class="t">'+esc(titleOf(c))+'</div>'+'<span></span>';
- top.classList.toggle('sc',scrollY>50);
+ top.classList.toggle('sc',scrollY>50);navbg.classList.toggle('sc',scrollY>8);
 }
 function renderTab(){
  tabbar.style.setProperty('--n',TABS.length);
@@ -388,7 +388,7 @@ addEventListener('scroll',function(){
  if(ticking)return;ticking=true;
  requestAnimationFrame(function(){
   ticking=false;var y=scrollY;
-  top.classList.toggle('sc',y>50);
+  top.classList.toggle('sc',y>50);navbg.classList.toggle('sc',y>8);
   if(y>lastY+8&&y>12)tabbar.classList.add('min');else if(y<lastY-8||y<=12)tabbar.classList.remove('min');
   lastY=y;
  });
