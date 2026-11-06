@@ -197,3 +197,5 @@ html.pg-fwd .view.cur,html.pg-back .pg-old{background:var(--glowbg),var(--bg)}
 .pg-prev{position:fixed;inset:0;z-index:14;overflow:hidden;pointer-events:none;background:var(--glowbg),var(--bg)}
 .pg-prev .dim{position:absolute;inset:0;background:#000;opacity:.22;z-index:2}
 .view.sw{position:relative;z-index:18;min-height:100vh;background:var(--glowbg),var(--bg);box-shadow:-10px 0 28px rgba(0,0,0,.25);will-change:transform}
+
+.tag.w0{background:rgba(124,77,219,.2);color:var(--acc)}

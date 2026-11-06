@@ -362,6 +362,8 @@ def price_str(niche, m):
     about = '' if r == 1 else f' (about ${lo} to ${hi})'
     return f"from {c}{f(lo)} to {c}{f(hi)}{about}; rough starting range, not researched"
 
+PILOT = {('us', 'food', 'w'), ('us', 'code', 'm')}
+
 def wave_of(market, niche):
     if niche == 'bet': return 3
     if market in ('us', 'pt'):
@@ -410,7 +412,7 @@ def build_persona(mid, nid, g, name, idx):
     dd = dict(
         tt=d['tt'].format(h=h0, tags=tags, n=1), ig=d['ig'].format(h=h0, tags=tags, n=1),
         yt_title=first['title'][:70], yt=d['yt'].format(tags=tags, h=h0))
-    wave = wave_of(mid, nid)
+    wave = 0 if (mid, nid, g) in PILOT else wave_of(mid, nid)
     rules = [('AI label', m['ai'])]
     if nid == 'bet': rules.append(('Betting', m['bet'][1]))
     rules.append(('Niche rule', n['honesty']))
@@ -420,7 +422,7 @@ def build_persona(mid, nid, g, name, idx):
     # checklist
     check = ['Chose the face from the first photo', 'Named and saved the character in OpenArt', 'Voice designed and tested with a normal sentence',
              'Character sheet added', 'Three photos in different outfits and places', 'Native speaker checked three sample clips',
-             'Account created with AI label and bio', 'First 10 clips posted', 'Reviewed the numbers after 10 clips']
+             'Account created with AI label and bio', 'First 8 clips posted over 4 weeks (mix of formats)', 'Reviewed the numbers and the credits spent']
     sample_ph = None
     if nid == 'lang':
         ph = m['ph']
@@ -464,17 +466,44 @@ def ST(*items): return ('steps', [list(i) for i in items])
 def CD(*items): return ('cards', [list(i) for i in items])
 
 PLAN = [
- dict(id='waves', title='Launch waves and cost', sub='What to build first and what it costs', icon='flag', blocks=[
-  Pp('Do not launch everything at once. Each wave tests the format before adding more characters. Wave 1 uses English (US) and Portuguese (Portugal) as defaults; change them to the two languages you can judge best.'),
-  CD(('Wave 1 · about 3 weeks', 'Healthy food, Coding and AI, Design in two languages you can judge: six personas (12 with both genders). 10 clips each. Record views, follows, link clicks, sales.'),
-     ('Wave 2', 'Add Gadgets, Home finds and Language learning in the languages that worked.'),
-     ('Wave 3', 'Add one betting persona only after a legal check in an allowed market, and only with real bets and real results.'),
+ dict(id='waves', title='Launch plan: pilot first', sub='Two personas, four weeks, then decide', icon='flag', blocks=[
+  Pp('A 12 s talking video costs about 3,850 credits, so this plan starts small. Run a pilot with two personas, learn what works and what it costs, and only then add more.'),
+  CD(('Pilot · weeks 1 to 4', 'Hannah (Healthy food, English US) and Ethan (Coding and AI, English US). Each posts about 2 clips a week: 1 talking video and 1 cheap format. Record views, follows, link clicks and credits spent per clip.'),
+     ('Wave 1 · only if the pilot works', 'The other healthy food, coding and design personas in English (US) and Portuguese (Portugal). Add 2 to 4 at a time, never all at once.'),
+     ('Wave 2', 'Gadgets, Home finds and Language learning in the languages that worked.'),
+     ('Wave 3', 'One betting persona only after a legal check in an allowed market, and only with real bets and real results.'),
      ('Wave 4', 'The remaining languages. Nordic ones last because voice quality is untested and they need native review.')),
-  H('Fix before you scale'),
-  Pp('If a persona has no traction after 10 clips, change the angle (hook, video type, niche focus) before adding more characters. Do not judge in 7 days: the 7-day challenge account that was written off later had a video pass 250,000 views.'),
+  H('Move on when'),
+  L('After about 8 clips a persona, you can see which hooks and formats get views, and what each clip cost in credits.', 'Keep a persona if people follow and click. Change the angle before you spend more on it.', 'Do not judge in 7 days: the 7-day challenge account that was written off later had a video pass 250,000 views.'),
   H('Credits and cost'),
-  L('A 12 s video cost about 3,850 credits in the tutorial, so 10 clips for one persona is about 38,500 credits.', 'Six personas at 10 clips each is about 231,000 credits at the tutorial price.', 'A 4K photo cost about 245 credits; a 15 s video about 4,800.', 'What a credit costs in money was not stated. Check your plan before planning many clips.'),
+  Pp('The full price list, plan comparison and monthly budgets are on the next page: Credits and cost.'),
   NT('Later languages to consider (general knowledge, not researched): Swedish, Dutch, Polish, Hindi and Indian English, Indonesian, Turkish, Arabic.'),
+ ]),
+ dict(id='cost', title='Credits and cost', sub='What each piece costs, which plan, monthly budgets', icon='bolt', blocks=[
+  Pp('Numbers come from the first tutorial (screens shown in Oct 2026) and the OpenArt plan page (6 Nov 2026). They change, so trust the Generate button on your own screen. Figures marked "estimate" are my arithmetic, not shown on screen.'),
+  H('What each thing costs'),
+  CD(('Talking video · 3,850 credits', 'Seedance 2.5, 9:16, 1080p, 12 seconds, audio on. The voice is made inside the video, so there is no separate voice fee per clip. A 15 s video is about 4,800 (estimate).'),
+     ('Photo · 245 credits', 'GPT Image 2.5, 4K, quality High. The character sheet is one such generation. Lower resolution or a lighter model should cost less; check the button.'),
+     ('Character · no price shown', 'Creating and saving the character did not show a credit price. You are limited by the number of character slots in your plan.'),
+     ('Voice · 250 credits, once', 'Designing a voice costs 1 credit per preview. Saving it costs 250 once, and it can be reused for other characters without paying again.'),
+     ('Cheaper video settings', 'The model list shows Seedance 2.5 Draft at 480p (can be upgraded to 1080p within 7 days), 720p and 480p options, and Kling 4.0 marked 50% off. Their exact prices were not shown.')),
+  H('Plans'),
+  CD(('Starter · $14 a month ($13 annual)', '4,000 credits: about 1 talking video a month. Commercial use rights are not listed on this plan, so skip it for a monetized account. 13 characters.'),
+     ('Plus · $34 ($27 annual)', '12,000 credits: about 3 talking videos a month. Commercial use rights. 40 characters. Credits can be added as needed.'),
+     ('Pro · $56 ($44 annual)', '24,000 credits: about 6 talking videos a month. 80 characters, 32 parallel generations. Kling 4.0 50% off and GPT Image 2.6 30% off.'),
+     ('Wonder · $240 ($175 annual)', '106,000 credits: about 27 talking videos a month. 353 characters, priority support, and "Unlimited Creation" (check which models it covers before counting on it).')),
+  H('Cost of one 12 s talking video (estimate)'),
+  L('Starter: about $13.50 monthly, $12.50 annual.', 'Plus: about $10.90 monthly, $8.70 annual.', 'Pro: about $9.00 monthly, $7.10 annual.', 'Wonder: about $8.70 monthly, $6.40 annual.', 'Expect at least one retry per clip, so double these for real planning.'),
+  H('Budgets'),
+  CD(('Setting up one persona', 'About 2,000 to 2,500 credits (estimate): character sheet, three photos with a few retries, and the 250 voice fee. Roughly $5 to $6 on Pro.'),
+     ('Pilot: 2 personas, 4 weeks', 'Per persona per week: 1 talking video (3,850) and 1 cheap format (a photo with voiceover, about 250 to 750). About 17 talking videos and 17 cheap posts in the month would be about 65,000 credits without retries, or about 130,000 with them. Start with Wonder or Pro plus added credits, and cut to 1 talking video a week if the budget runs out.'),
+     ('Wave 1: 12 personas', 'At 3 talking videos a week each this is about 600,000 credits a month, nearly six Wonder plans. Not realistic. Add personas only as the budget and the results allow.')),
+  H('Ways to spend less'),
+  L('Preview in Draft 480p and upgrade only the winners within 7 days.', 'Use 6 second clips when a short line is enough: cost grows with length (estimate).', 'Mix formats: a photo with a slow push-in and a voiceover costs a fraction of a talking video.', 'Use 1K or 2K photos for references and 4K only for the final.', 'Try Kling 4.0 on Pro or Wonder while it is 50% off.', 'Make one video and post it on TikTok, Instagram and YouTube Shorts with three different captions.', 'Set a credit cap per persona per week and write down what each clip cost.'),
+  H('Before you subscribe'),
+  ST(('1. Read the real prices', 'In OpenArt, open each video and image setting you plan to use and note the number on the Generate button: 480p, 720p, 1080p, 6 s and 12 s, Draft, and Kling.'),
+     ('2. Check the terms', 'Read the commercial-use terms and what Unlimited Creation includes.'),
+     ('3. Start one month', 'Pick the smallest plan that covers the pilot, not the biggest. Switch only after you have measured real credits per clip.')),
  ]),
  dict(id='stages', title='Build a persona, step by step', sub='Stages 1 to 7 with prompts', icon='steps', blocks=[
   Pp('The same seven stages for every persona. Each persona page has its own filled-in prompts. Settings come from the tutorial (Oct 2026); if your screen differs, trust the screen.'),
@@ -570,14 +599,14 @@ PLAN = [
   NT('Launch after Wave 1, once lifestyle content shows an audience, and only after reading the current rules of the subscription site and each posting platform.'),
  ]),
  dict(id='caveats', title='Honest expectations', sub='What the tutorials really showed', icon='scale', blocks=[
-  L('The only real-money result: 23 workbook sales at $12 = $276 revenue, minus $19.52 payment fees and a $99 tool plan = $157.48 profit in a week, short of the author\'s $1,000 goal.', 'Both tutorials carry affiliate links and one is sponsored. Results shown are curated; real work includes retries and wasted credits.', 'Label every account as AI. Do not present generated people, testimonials or sponsored content as a real person\'s genuine experience.', 'Not covered by the tutorials: OpenArt\'s commercial terms, the money cost per credit, each platform\'s current rules for AI accounts, and tax rules.'),
+  L('The only real-money result: 23 workbook sales at $12 = $276 revenue, minus $19.52 payment fees and a $99 tool plan = $157.48 profit in a week, short of the author\'s $1,000 goal.', 'Both tutorials carry affiliate links and one is sponsored. Results shown are curated; real work includes retries and wasted credits.', 'Label every account as AI. Do not present generated people, testimonials or sponsored content as a real person\'s genuine experience.', 'Not covered by the tutorials: OpenArt\'s commercial terms, each platform\'s current rules for AI accounts, and tax rules.'),
   H('Strategy from the 7-day challenge'),
   L('Research first: study existing AI accounts and how they earn.', 'Make the character distinctive, not generic.', 'Test several accounts, about 10 videos each, and compare.', 'Ways to earn: brand deals (slow), physical products, affiliate (quick), digital products (a structured workbook sold for $12 and linked from the bio).', 'Use the persona to gain attention, then put one offer in front of that audience through the bio link.'),
  ]),
  dict(id='week', title='First-week plan', sub='Five steps to start', icon='calendar', blocks=[
-  ST(('1. Check credits and terms', 'Pick a niche, market and a distinctive character concept.'), ('2. Build the character', 'Stages 1 to 5. Save the persona bible.'),
+  ST(('1. Check credits and terms', 'Read the Credits and cost page, check the Generate prices on your screen, and pick a pilot persona and a distinctive character concept.'), ('2. Build the character', 'Stages 1 to 5. Save the persona bible.'),
      ('3. Make content', 'Three photos, one talking video from a photo, one selfie video. Run the hook step, the naturality checklist and the phonetic step. Write the three platform descriptions.'),
-     ('4. Create the account', 'AI label and a clear bio. Post 5 to 10 clips over several days, with captions.'),
+     ('4. Create the account', 'AI label and a clear bio. Post 2 to 4 clips over the week, with captions, mixing one talking video and cheaper formats.'),
      ('5. Review', 'After a week, note which hooks and video types got views. Only then choose how the persona earns.')),
  ]),
 ]

@@ -59,7 +59,8 @@ function cvars(n){return '--c1:'+n.color[0]+';--c2:'+n.color[1]}
 function gtxt(g){return g==='w'?'Woman':'Man'}
 function stText(s){return s==='ok'?'Approved':s==='skip'?'Skipped':'To review'}
 function pStatus(id){return S.st[id]||'review'}
-function tagW(w){return '<span class="tag w'+w+'">Wave '+w+'</span>'}
+function wl(w){return w===0?'Pilot':'Wave '+w}
+function tagW(w){return '<span class="tag w'+w+'">'+wl(w)+'</span>'}
 function betTag(m){var b=m.bet[0];return '<span class="tag '+b+'">'+(b==='ok'?'Betting: allowed, strict rules':b==='no'?'Betting: not allowed':'Betting: verify')+'</span>'}
 
 /* ---------- navigation state ---------- */
@@ -89,7 +90,7 @@ function kv(k,v){return '<div class="kv"><div class="k">'+esc(k)+'</div><div cla
 function personaRow(p){
  var n=NK[p.niche],m=MK[p.mkt];
  return '<button class="row" data-do="open" data-v="persona" data-id="'+p.id+'">'+avHtml(p)+
-  '<span class="grow"><div class="t1">'+esc(p.name)+' · '+esc(n.name)+'</div><div class="t2">'+flag(p.mkt,'s')+esc(m.name)+' · '+gtxt(p.g)+' · Wave '+p.wave+(pStatus(p.id)==='review'?'':' · '+stText(pStatus(p.id)))+'</div></span>'+CHEV+'</button>';
+  '<span class="grow"><div class="t1">'+esc(p.name)+' · '+esc(n.name)+'</div><div class="t2">'+flag(p.mkt,'s')+esc(m.name)+' · '+gtxt(p.g)+' · '+wl(p.wave)+(pStatus(p.id)==='review'?'':' · '+stText(pStatus(p.id)))+'</div></span>'+CHEV+'</button>';
 }
 function filtered(){
  var f=S.f,q=(nav.q||'').toLowerCase().trim();
@@ -246,7 +247,7 @@ function secHtml(p,n,m){
  var s=nav.sec,h='',id=p.id;
  if(s==='Overview'){
   h+='<div class="card"><div class="big">'+esc(p.angle)+'</div><p style="color:var(--label2);margin-bottom:0">The signature angle that makes this persona distinctive rather than generic.</p></div>';
-  h+='<div class="card">'+kv('Niche',n.name+': '+n.tagline)+kv('Market',m.name+' · '+m.city)+kv('Wave',p.wave===1?'Wave 1: build first (default test languages: English US and Portuguese Portugal)':p.wave===2?'Wave 2: after Wave 1 works':p.wave===3?'Wave 3: only after a legal check':'Wave 4: later markets'+(['fi','dk','no'].indexOf(p.mkt)>=0?' (Nordic: last)':''))+kv('Account bio',p.bio)+(p.learner?kv('Audience',(p.niche==='lang'&&['us','uk'].indexOf(p.mkt)>=0?'Learners of English; captions in '+p.learner:'English speakers learning '+m.lang+'; captions in English')):'')+'</div>';
+  h+='<div class="card">'+kv('Niche',n.name+': '+n.tagline)+kv('Market',m.name+' · '+m.city)+kv('Wave',p.wave===0?'Pilot: build first. Two personas for four weeks, then decide':p.wave===1?'Wave 1: build first (default test languages: English US and Portuguese Portugal)':p.wave===2?'Wave 2: after Wave 1 works':p.wave===3?'Wave 3: only after a legal check':'Wave 4: later markets'+(['fi','dk','no'].indexOf(p.mkt)>=0?' (Nordic: last)':''))+kv('Credits',p.wave===0?'Setup about 2,000 to 2,500 credits. One 12 s talking video 3,850; one 4K photo 245. See Credits and cost.':'A 12 s talking video is 3,850 credits and a 4K photo 245. See Credits and cost before adding this persona.')+kv('Account bio',p.bio)+(p.learner?kv('Audience',(p.niche==='lang'&&['us','uk'].indexOf(p.mkt)>=0?'Learners of English; captions in '+p.learner:'English speakers learning '+m.lang+'; captions in English')):'')+'</div>';
   h+='<h2>Backstory</h2><div class="card"><p style="margin:0">'+esc(p.backstory)+'</p></div>';
   h+='<div class="note">'+esc(n.what)+'</div>';
  }else if(s==='Look and voice'){
