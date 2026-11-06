@@ -183,7 +183,7 @@ function vMarkets(){
 function vPlan(){
  var h='<h1 class="lt">Plan</h1><p class="sub">How the business works: build steps, hooks, selling, rules and cost.</p><div class="grp">';
  D.plan.forEach(function(s){
-  h+='<button class="row" data-do="open" data-v="plan" data-id="'+s.id+'"><span class="ic" style="--c1:#BF5AF2;--c2:#5E5CE6">'+svg(s.icon)+'</span><span class="grow"><div class="t1">'+esc(s.title)+'</div><div class="t2">'+esc(s.sub)+'</div></span>'+CHEV+'</button>';
+  h+='<button class="row" data-do="open" data-v="plan" data-id="'+s.id+'"><span class="ic" style="--c1:#8B7CC7;--c2:#5A3B8C">'+svg(s.icon)+'</span><span class="grow"><div class="t1">'+esc(s.title)+'</div><div class="t2">'+esc(s.sub)+'</div></span>'+CHEV+'</button>';
  });
  h+='</div><h2>Appearance</h2><div class="seg" role="group" aria-label="Appearance">'+[['auto','Auto'],['light','Light'],['dark','Dark']].map(function(t){return '<button aria-pressed="'+(S.theme===t[0])+'" data-do="theme" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
  h+='<div class="grp"><button class="row" data-do="export"><span class="grow"><div class="t1">Copy my review notes</div><div class="t2">Statuses, notes and checklists as text</div></span></button></div>';
@@ -216,7 +216,7 @@ function vNiche(id){
 }
 function vMarket(id){
  var m=MK[id],ps=D.personas.filter(function(p){return p.mkt===id});
- var h='<div class="hero" style="--c1:#BF5AF2;--c2:#5E5CE6">'+flag(m.id)+'<div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
+ var h='<div class="hero" style="--c1:#8B7CC7;--c2:#5A3B8C">'+flag(m.id)+'<div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
  h+='<div class="card">'+kv('Speak it as',m.speech)+kv('Voice accent',m.accent)+kv('Watch out for',m.watch)+kv('Natural filler words',m.fillers)+'</div>';
  h+='<h2>Local details to show</h2><div class="card"><ul class="l">'+m.local.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
  h+='<h2>AI label and sponsored posts</h2><div class="note">'+esc(m.ai)+'</div>';

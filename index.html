@@ -12,8 +12,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Persona Plan">
-<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F4F1FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E0B1D" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <link rel="apple-touch-startup-image" href="splash/440x956@3-light.png" media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait) and (prefers-color-scheme:light)">
 <link rel="apple-touch-startup-image" href="splash/440x956@3-dark.png" media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait) and (prefers-color-scheme:dark)">
@@ -42,21 +42,21 @@
 <script>try{var s=JSON.parse(localStorage.getItem('aiplan.v1')||'{}');if(s.theme&&s.theme!=='auto')document.documentElement.setAttribute('data-theme',s.theme)}catch(e){}</script>
 <style>:root{
 --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Segoe UI",Roboto,sans-serif;
---bg:#F2F2F7;--card:#fff;--label:#1C1C1E;--label2:rgba(60,60,67,.6);--label3:rgba(60,60,67,.3);--sep:rgba(60,60,67,.18);
---acc:#7C4DDB;--blue:#007AFF;--red:#FF3B30;--green:#34C759;--orange:#FF9500;--acc1:#BF5AF2;--acc2:#5E5CE6;--fill:rgba(120,120,128,.12);
---lg-tint:rgba(255,255,255,.55);--lg-edge2:rgba(60,60,67,.16);--lg-rim:#fff;--lg-rim2:rgba(60,60,67,.2);--lg-act:rgba(120,120,128,.2);
---lg-ink:rgba(28,28,30,.78);--lg-sh:rgba(0,0,0,.2);--lg-spec:rgba(255,255,255,.5);--lg-flash:rgba(255,255,255,.85);
---glow1:rgba(191,90,242,.30);--glow2:rgba(94,92,230,.16);color-scheme:light dark}
+--bg:#F4F1FB;--card:#fff;--label:#0E0B1D;--label2:rgba(42,30,77,.64);--label3:rgba(42,30,77,.34);--sep:rgba(42,30,77,.14);
+--acc:#5A3B8C;--blue:#007AFF;--red:#FF3B30;--green:#34C759;--orange:#FF9500;--acc1:#8B7CC7;--acc2:#5A3B8C;--fill:rgba(139,124,199,.16);
+--lg-tint:rgba(255,255,255,.55);--lg-edge2:rgba(42,30,77,.16);--lg-rim:#fff;--lg-rim2:rgba(42,30,77,.2);--lg-act:rgba(139,124,199,.22);
+--lg-ink:rgba(14,11,29,.78);--lg-sh:rgba(0,0,0,.2);--lg-spec:rgba(255,255,255,.5);--lg-flash:rgba(255,255,255,.85);
+--glow1:rgba(201,194,227,.75);--glow2:rgba(139,124,199,.30);color-scheme:light dark}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
---bg:#000;--card:#1C1C1E;--label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);--sep:rgba(84,84,88,.6);
---acc:#B58CFF;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--fill:rgba(120,120,128,.24);
---lg-tint:rgba(36,36,40,.58);--lg-edge2:rgba(255,255,255,.08);--lg-rim:rgba(255,255,255,.14);--lg-rim2:rgba(255,255,255,.04);--lg-act:rgba(255,255,255,.14);
---lg-ink:rgba(255,255,255,.88);--lg-sh:rgba(0,0,0,.34);--lg-spec:rgba(255,255,255,.05);--lg-flash:rgba(255,255,255,.26);--glow1:rgba(191,90,242,.42);--glow2:rgba(94,92,230,.26)}}
+--bg:#0E0B1D;--card:#2A1E4D;--label:#F4F1FB;--label2:rgba(201,194,227,.72);--label3:rgba(201,194,227,.38);--sep:rgba(201,194,227,.16);
+--acc:#9A8BD6;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--acc1:#8B7CC7;--acc2:#5A3B8C;--fill:rgba(58,58,82,.62);
+--lg-tint:rgba(42,30,77,.6);--lg-edge2:rgba(201,194,227,.12);--lg-rim:rgba(201,194,227,.22);--lg-rim2:rgba(201,194,227,.06);--lg-act:rgba(139,124,199,.28);
+--lg-ink:rgba(255,255,255,.88);--lg-sh:rgba(0,0,0,.34);--lg-spec:rgba(255,255,255,.05);--lg-flash:rgba(255,255,255,.26);--glow1:rgba(139,124,199,.50);--glow2:rgba(90,59,140,.55)}}
 :root[data-theme="dark"]{
---bg:#000;--card:#1C1C1E;--label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);--sep:rgba(84,84,88,.6);
---acc:#B58CFF;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--fill:rgba(120,120,128,.24);
---lg-tint:rgba(36,36,40,.58);--lg-edge2:rgba(255,255,255,.08);--lg-rim:rgba(255,255,255,.14);--lg-rim2:rgba(255,255,255,.04);--lg-act:rgba(255,255,255,.14);
---lg-ink:rgba(255,255,255,.88);--lg-sh:rgba(0,0,0,.34);--lg-spec:rgba(255,255,255,.05);--lg-flash:rgba(255,255,255,.26);--glow1:rgba(191,90,242,.42);--glow2:rgba(94,92,230,.26);color-scheme:dark}
+--bg:#0E0B1D;--card:#2A1E4D;--label:#F4F1FB;--label2:rgba(201,194,227,.72);--label3:rgba(201,194,227,.38);--sep:rgba(201,194,227,.16);
+--acc:#9A8BD6;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--acc1:#8B7CC7;--acc2:#5A3B8C;--fill:rgba(58,58,82,.62);
+--lg-tint:rgba(42,30,77,.6);--lg-edge2:rgba(201,194,227,.12);--lg-rim:rgba(201,194,227,.22);--lg-rim2:rgba(201,194,227,.06);--lg-act:rgba(139,124,199,.28);
+--lg-ink:rgba(255,255,255,.88);--lg-sh:rgba(0,0,0,.34);--lg-spec:rgba(255,255,255,.05);--lg-flash:rgba(255,255,255,.26);--glow1:rgba(139,124,199,.50);--glow2:rgba(90,59,140,.55);color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;touch-action:manipulation;background:var(--bg)}
 body{margin:0;font:400 1.0625rem/1.4 var(--font);background:transparent;color:var(--label);min-height:100vh;min-height:100dvh;
@@ -104,7 +104,7 @@ p{margin:.3rem 0 .7rem}
 .chip:active{opacity:.55}
 .chip::after{content:"";position:absolute;inset:-.1rem 0}
 .tag{display:inline-block;font-size:.75rem;font-weight:600;padding:.12rem .55rem;border-radius:999px;background:var(--fill);color:var(--label2);margin:0 .3rem .3rem 0}
-.tag.w1{background:rgba(52,199,89,.18);color:var(--green)}.tag.w2{background:rgba(10,132,255,.16);color:var(--acc)}
+.tag.w1{background:rgba(52,199,89,.18);color:var(--green)}.tag.w2{background:rgba(139,124,199,.22);color:var(--acc)}
 .tag.w3{background:rgba(255,149,0,.2);color:var(--orange)}.tag.w4{background:var(--fill)}
 .tag.ok{background:rgba(52,199,89,.18);color:var(--green)}.tag.no{background:rgba(255,59,48,.16);color:var(--red)}.tag.verify{background:rgba(255,149,0,.2);color:var(--orange)}
 .search{display:flex;align-items:center;gap:.5rem;background:var(--fill);border-radius:.8rem;padding:0 .8rem;margin:0 0 .7rem;min-height:2.75rem}
@@ -436,7 +436,7 @@ function vMarkets(){
 function vPlan(){
  var h='<h1 class="lt">Plan</h1><p class="sub">How the business works: build steps, hooks, selling, rules and cost.</p><div class="grp">';
  D.plan.forEach(function(s){
-  h+='<button class="row" data-do="open" data-v="plan" data-id="'+s.id+'"><span class="ic" style="--c1:#BF5AF2;--c2:#5E5CE6">'+svg(s.icon)+'</span><span class="grow"><div class="t1">'+esc(s.title)+'</div><div class="t2">'+esc(s.sub)+'</div></span>'+CHEV+'</button>';
+  h+='<button class="row" data-do="open" data-v="plan" data-id="'+s.id+'"><span class="ic" style="--c1:#8B7CC7;--c2:#5A3B8C">'+svg(s.icon)+'</span><span class="grow"><div class="t1">'+esc(s.title)+'</div><div class="t2">'+esc(s.sub)+'</div></span>'+CHEV+'</button>';
  });
  h+='</div><h2>Appearance</h2><div class="seg" role="group" aria-label="Appearance">'+[['auto','Auto'],['light','Light'],['dark','Dark']].map(function(t){return '<button aria-pressed="'+(S.theme===t[0])+'" data-do="theme" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
  h+='<div class="grp"><button class="row" data-do="export"><span class="grow"><div class="t1">Copy my review notes</div><div class="t2">Statuses, notes and checklists as text</div></span></button></div>';
@@ -469,7 +469,7 @@ function vNiche(id){
 }
 function vMarket(id){
  var m=MK[id],ps=D.personas.filter(function(p){return p.mkt===id});
- var h='<div class="hero" style="--c1:#BF5AF2;--c2:#5E5CE6">'+flag(m.id)+'<div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
+ var h='<div class="hero" style="--c1:#8B7CC7;--c2:#5A3B8C">'+flag(m.id)+'<div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
  h+='<div class="card">'+kv('Speak it as',m.speech)+kv('Voice accent',m.accent)+kv('Watch out for',m.watch)+kv('Natural filler words',m.fillers)+'</div>';
  h+='<h2>Local details to show</h2><div class="card"><ul class="l">'+m.local.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
  h+='<h2>AI label and sponsored posts</h2><div class="note">'+esc(m.ai)+'</div>';

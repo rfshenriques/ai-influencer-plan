@@ -12,7 +12,7 @@ const D=[[440,956,3],[420,912,3],[402,874,3],[430,932,3],[393,852,3],[390,844,3]
   const mask=Buffer.from(`<svg width="${s}" height="${s}"><rect width="${s}" height="${s}" rx="${rad}"/></svg>`);
   const icon=await sharp(await flat(512)).resize(s,s).composite([{input:mask,blend:'dest-in'}]).png().toBuffer();
   const f=`splash/${w}x${h}@${r}-${mode}.png`;
-  await sharp({create:{width:W,height:H,channels:3,background:mode==='dark'?'#000':'#F2F2F7'}}).composite([{input:icon,left:Math.round((W-s)/2),top:Math.round((H-s)/2)}]).png({compressionLevel:9,palette:true}).toFile(path.join(out,f));
+  await sharp({create:{width:W,height:H,channels:3,background:mode==='dark'?'#0E0B1D':'#F4F1FB'}}).composite([{input:icon,left:Math.round((W-s)/2),top:Math.round((H-s)/2)}]).png({compressionLevel:9,palette:true}).toFile(path.join(out,f));
   list.push({w,h,r,mode,f});
  }
  fs.writeFileSync(path.join(out,'splash/index.json'),JSON.stringify(list));
