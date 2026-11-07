@@ -80,8 +80,24 @@ function blocksHtml(bl){
   if(t==='steps')return '<div class="card"><ol class="s">'+b[1].map(function(x){return '<li><div class="st">'+esc(x[0])+'</div><div class="sd">'+esc(x[1])+'</div></li>'}).join('')+'</ol></div>';
   if(t==='cards')return b[1].map(function(x){return '<div class="card"><h3>'+esc(x[0])+'</h3><p style="margin:.2rem 0 0;color:var(--label2)">'+esc(x[1])+'</p></div>'}).join('');
   if(t==='prompt')return promptHtml(b[1],b[2]);
+  if(t==='src')return srcHtml(b[1]);
   return '';
  }).join('');
+}
+function srcHtml(a){return '<h2>Sources</h2><div class="card"><ul class="l">'+a.map(function(x){return '<li><a href="'+esc(x[1])+'" target="_blank" rel="noopener noreferrer">'+esc(x[0])+'</a></li>'}).join('')+'</ul></div>'}
+function resNicheHtml(r){
+ if(!r)return '';
+ var h='<h2>Research: what sells and how</h2>';
+ var sec=[['What sells',r.sells],['How to present it',r.present],['How to sell it',r.how],['Watch out',r.watch]];
+ sec.forEach(function(s){if(s[1]&&s[1].length)h+='<div class="card"><h3>'+s[0]+'</h3><ul class="l">'+s[1].map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'});
+ return h+srcHtml(r.src);
+}
+function resMarketHtml(r){
+ if(!r)return '';
+ var h='<h2>Research: this market</h2><div class="card">'+kv('Shop and selling',r.shop)+kv('Best fit',r.fit)+'</div>';
+ h+='<div class="card"><h3>Rules to follow</h3><ul class="l">'+r.rules.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+ h+='<div class="card"><h3>Audience and content</h3><ul class="l">'+r.culture.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+ return h+srcHtml(r.src);
 }
 function promptHtml(title,text){
  return '<div class="ph"><h3>'+esc(title)+'</h3><button class="btn sm sec" data-do="copy" data-i="'+reg(text)+'">Copy</button></div><div class="prompt">'+esc(text)+'</div>';
@@ -202,6 +218,7 @@ function vNiche(id){
  h+='<h2>First 10 clips</h2><div class="card"><ol class="s">'+n.clips.map(function(c){return '<li><div class="st">'+esc(c[1].replace('{dish}','local dish').replace('{cur}','local currency '))+'</div><div class="sd">'+esc(c[0].replace('{cur}',''))+'</div></li>'}).join('')+'</ol></div>';
  h+='<h2>Hook patterns</h2><div class="card"><ul class="l">'+n.hooks.map(function(x){return '<li>'+esc(x.replace('{c}','first clip title'))+'</li>'}).join('')+'</ul></div>';
  h+='<h2>What it sells</h2><div class="card"><p style="margin-top:0">'+esc(n.offer)+'</p><div class="kv"><div class="k">Product ladder</div><div class="v">'+n.ladder.map(esc).join(' → ')+'</div></div></div>';
+ h+=resNicheHtml(n.research);
  h+='<h2>Honesty and rules</h2><div class="note">'+esc(n.honesty)+'</div>';
  h+='<h2>What to measure</h2><div class="card"><ul class="l">'+n.kpis.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
  if(id==='lang'){
@@ -218,6 +235,7 @@ function vMarket(id){
  var m=MK[id],ps=D.personas.filter(function(p){return p.mkt===id});
  var h='<div class="hero" style="--c1:#8B7CC7;--c2:#5A3B8C">'+flag(m.id)+'<div class="big">'+esc(m.name)+'</div><p>Target city: '+esc(m.city)+' · prices in '+esc(m.cur)+'</p></div>';
  h+='<div class="card">'+kv('Speak it as',m.speech)+kv('Voice accent',m.accent)+kv('Watch out for',m.watch)+kv('Natural filler words',m.fillers)+'</div>';
+ h+=resMarketHtml(m.research);
  h+='<h2>Local details to show</h2><div class="card"><ul class="l">'+m.local.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
  h+='<h2>AI label and sponsored posts</h2><div class="note">'+esc(m.ai)+'</div>';
  h+='<h2>Sports betting here</h2><p>'+betTag(m)+'</p><div class="card"><p style="margin:0">'+esc(m.bet[1])+'</p></div>';
@@ -244,7 +262,8 @@ function pdKey(p,t,i){return p.id+':'+t+i}
 function isDone(p,t,i){return !!(S.pd&&S.pd[pdKey(p,t,i)])}
 function doneBtn(p,t,i,o){var on=isDone(p,t,i);return '<button class="btn sm sec dn2" data-do="pdone" data-k="'+pdKey(p,t,i)+'" data-o="'+o+'" aria-pressed="'+on+'">'+(on?'Done':'Mark as done')+'</button>'}
 function ul(a){return '<ul class="l">'+a.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'}
-function topicDone(p,n){return ['tp','ts','tr','tl'].filter(function(t){return isDone(p,t,n)}).length}
+var KW={food:['RECIPE','RECEITA'],shred:['PLAN','PLANO'],code:['TRICKS','TRUQUES'],design:['PALETTE','PALETA'],gadget:['LINK','LINK'],home:['LINK','LINK'],lang:['WORKBOOK','CADERNO']};
+ function topicDone(p,n){return ['tp','ts','tr','tl'].filter(function(t){return isDone(p,t,n)}).length}
 function calOf(){
  var c=[['Before launch',[['Day 0','i',-1],['Sun','t',0]]]];
  for(var w=0;w<4;w++){var b=3*w,r=[['Mon','r',b],['Tue','t',b+1],['Wed','r',b+1],['Fri','t',b+2],['Sat','r',b+2]];if(w<3)r.push(['Sun','t',b+3]);c.push(['Week '+(w+1),r])}
@@ -271,7 +290,7 @@ function topicHtml(p,x,n,L){
  h+='<h3 class="sm">On-screen text</h3><p class="pp">'+esc(sb(pk(x.ot,l),p))+'</p>';
  h+='<h3 class="sm">What we show or teach</h3><p class="pp">'+esc(sb(x.te,p))+'</p>';
  h+=doneBtn(p,'tr',n,n);
- h+=stepHead(4,'Reel-is-live story (same day)')+ul(['Frame 1: the reel cover with the text "New reel".','Frame 2: the problem in one line: '+sb(x.prob,p),'Frame 3: a link sticker or "link in bio" pointing to: '+(p.offer||'the product')+'.'])+promptHtml('Soft sell line ('+L+')',sb(pk(x.cta,l),p));
+ h+=stepHead(4,'Reel-is-live story (same day)')+ul(['Frame 1: the reel cover with the text "New reel".','Frame 2: the problem in one line: '+sb(x.prob,p),'Frame 3: a link sticker or "link in bio" pointing to: '+(p.offer||'the product')+'.'])+promptHtml('Soft sell line ('+L+')',sb(pk(x.cta,l),p))+promptHtml('Comment-to-DM line ('+L+', optional)',l==='pt'?'Comenta '+KW[p.bank||p.niche][1]+' e envio-te o link.':'Comment '+KW[p.bank||p.niche][0]+' and I will send you the link.')+'<p class="pp">Needs a DM automation tool (a few euros a month) so the link goes out by itself. Without it, reply by hand.</p>';
  h+=doneBtn(p,'tl',n,n)+'</div></details>';
  return h;
 }
@@ -347,6 +366,7 @@ function secHtml(p,n,m){
   h+=planHtml(p);
  }else if(s==='Sell'){
   h+='<div class="card">'+kv('Offer',p.offer||n.offer)+kv('Price range',p.price)+kv('Product ladder',n.ladder.join(' → '))+'</div>';
+  h+=resNicheHtml(n.research)+resMarketHtml(m.research);
   h+='<h2>How it sells without selling</h2><div class="card"><ul class="l"><li>About 60% value-first posts, 25% story posts, 15% soft call to action.</li><li>Show the result first, then let the offer appear as the next step.</li><li>One calm line: "The full plan is in my bio if you want it, no pressure."</li></ul></div>';
   h+='<h2>Descriptions for clip 1 (English draft)</h2>'+promptHtml('TikTok',p.desc.tt)+promptHtml('Instagram Reels',p.desc.ig)+promptHtml('YouTube Shorts title',p.desc.yt_title)+promptHtml('YouTube Shorts description',p.desc.yt);
   h+='<div class="note">Claude writes the finished versions in '+esc(m.lang)+'. Use the request in the Prompts tab.</div>';

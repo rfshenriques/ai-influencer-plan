@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generates data.json: markets, niches, personas, plan pages."""
 import json
+import research as RS
 import bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang
 
 # ---------------------------------------------------------------- markets
@@ -329,7 +330,7 @@ NICHE_OVR = {
  'design': dict(genders='A woman',
    what='One woman who teaches design for digital: spacing rules, colour palettes applied to a real site or app (start with one colour, add a second, the third makes it pop), type, contrast and before and afters, and sells a course.',
    offer='A design course (with UI kits and palettes).',
-   ladder=['Free: the tip in the reel', 'Low: palette and UI kit pack', 'Mid: the design course'], price=(19, 149),
+   ladder=['Free: the tip or palette in the reel', 'Low: a template or palette pack', 'Mid: the design course'], price=(9, 149),
    angles_w=['The spacing-and-palette teacher', 'The before/after redesigner', 'The Figma speed-runner', 'The design-for-digital teacher']),
  'gadget': dict(genders='A man',
    what='A Shopify store that sells the gadgets themselves. Each reel shows a problem most people have, the gadget that solves it working on camera, and sends people to the store.',
@@ -663,6 +664,22 @@ PLAN = [
  ]),
 ]
 
+for n in N: n['research'] = RS.NICHE.get(n['id'])
+for m in M: m['research'] = RS.MARKET.get(m['id'])
+
+PLAN.insert(0, dict(id='research', title='Research: what works now', sub='Algorithm, labels, what sells. Sources inside', icon='bolt', blocks=[
+  Pp('Collected on 7 Nov 2026 from web sources. Many are vendor or agency blogs, so treat the numbers as signals to test, not facts. Each niche and each language page has its own research section with sources.'),
+  H('What the platforms reward'), L(*RS.GLOBAL['algo']),
+  H('AI labels'), L(*RS.GLOBAL['labels']),
+  H('How people sell'), L(*RS.GLOBAL['sell']),
+  H('What this changes in our plan'),
+  L('Clips are 12 seconds because of cost. The research favours 15 to 30 seconds for products and 30 to 60 for reach. Options: stitch two clips, or use voiceover over b-roll, which was the best-performing hook type for food.',
+    'Food: weekly menus and budget meal prep replace three single-recipe topics. Recipes stay, but they are no longer the whole plan.',
+    'Every reel ends with a comment-a-keyword line, so the free resource goes out by DM and the paid product follows by email.',
+    'Tyler cannot use a transformation story. His credibility comes from the maths, the recipes and the tools.',
+    'Gadgets and home depend on a registered company in the selling country and on TikTok Shop status, which is unclear in Portugal and absent in the Nordics.'),
+  ('src', [list(x) for x in RS.GLOBAL['src']]),
+]))
 BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang)
 BANK = {k: dict(topics=m.TOPICS, intro=m.INT) for k, m in BANKS.items()}
 for k, v in BANK.items(): assert len(v['topics']) == 12, k
