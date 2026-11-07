@@ -233,7 +233,87 @@ function vMarket(id){
  });
  return h;
 }
-var SECS=['Overview','Look and voice','Content','Sell','Rules','Prompts','Checklist'];
+
+/* ---------- content plan ---------- */
+var CAL=[['Before launch',[['Day 0','p',0],['Day 0','p',1],['Day 0','p',2]]],
+ ['Week 1',[['Mon','r',0],['Tue','s',0],['Wed','r',1],['Thu','s',1],['Sat','r',2]]],
+ ['Week 2',[['Mon','r',3],['Tue','s',2],['Wed','r',4],['Thu','s',3],['Sat','r',5],['Sun','p',3]]],
+ ['Week 3',[['Mon','r',6],['Tue','s',4],['Wed','r',7],['Thu','s',5],['Sat','r',8],['Sun','p',4]]],
+ ['Week 4',[['Mon','r',9],['Tue','s',6],['Wed','r',10],['Thu','s',7],['Sat','r',11],['Sun','p',5]]]];
+function lgOf(p){return p.mkt==='pt'?'pt':'en'}
+function pk(x,l){return x&&typeof x==='object'&&!Array.isArray(x)&&(x.en!==undefined||x.pt!==undefined)?x[l]:x}
+function sb(s,p){return typeof s==='string'?s.replace(/\{name\}/g,p.name).replace(/\{city\}/g,MK[p.mkt].city).replace(/\{a\}/g,p.g==='w'?'a':'o').replace(/\{ora\}/g,p.g==='w'?'ora':'or'):s}
+function sbl(a,p){return Array.isArray(a)?a.map(function(x){return sb(x,p)}):sb(a,p)}
+function planOf(p){
+ var b=D.bank[p.niche];if(!p.plan||!b)return null;
+ var sh=b.reels.filter(function(r){return!r.g}),gd=b.reels.filter(function(r){return r.g===p.g}),R;
+ if(gd.length>=2)R=sh.slice(0,5).concat([gd[0]],sh.slice(5,8),[gd[1]],sh.slice(8,10));else R=sh.concat(gd).slice(0,12);
+ return {r:R,p:b.photos.filter(function(x){return!x.g||x.g===p.g}).slice(0,6),s:b.stories.filter(function(x){return!x.g||x.g===p.g}).slice(0,8)};
+}
+function pdKey(p,t,i){return p.id+':'+t+i}
+function isDone(p,t,i){return !!(S.pd&&S.pd[pdKey(p,t,i)])}
+function doneBtn(p,t,i){var on=isDone(p,t,i);return '<button class="btn sm sec dn2" data-do="pdone" data-k="'+pdKey(p,t,i)+'" aria-pressed="'+on+'">'+(on?'Done':'Mark as done')+'</button>'}
+function itemHead(n,title,sub,open,id,done){return '<summary><span class="dnum'+(done?' ok':'')+'">'+n+'</span><span class="grow"><div class="t1">'+esc(title)+'</div>'+(sub?'<div class="t2">'+esc(sub)+'</div>':'')+'</span>'+CHEV+'</summary>'}
+function ul(a){return '<ul class="l">'+a.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'}
+function reelHtml(p,r,i,L){
+ var l=lgOf(p),en='en',id='it-r'+i,open=nav.openItem==='r'+i;
+ var h='<details class="det" id="'+id+'"'+(open?' open':'')+'>'+itemHead(i+1,sb(r.t,p),sb(pk(r.h,l),p),open,id,isDone(p,'r',i));
+ h+='<div class="db">';
+ h+='<div><span class="tag">'+esc(r.k)+'</span><span class="tag">'+esc(r.tech)+'</span></div>';
+ h+=promptHtml('Hook ('+L+')',sb(pk(r.h,l),p));
+ if(l!=='en')h+='<div class="ref">English: '+esc(sb(pk(r.h,en),p))+'</div>';
+ h+='<h3 class="sm">Beats and movement</h3>'+ul(sbl(pk(r.sh,en),p));
+ h+='<h3 class="sm">On-screen text</h3>'+ul(sbl(pk(r.ot,l),p));
+ h+=promptHtml('Spoken script ('+L+')',sb(pk(r.s,l),p));
+ if(l!=='en')h+='<div class="ref">English: '+esc(sb(pk(r.s,en),p))+'</div>';
+ h+='<h3 class="sm">What we show or teach</h3><p class="pp">'+esc(sb(pk(r.te,en),p))+'</p>';
+ var se=r.se?pk(r.se,l):null;if(se)h+='<h3 class="sm">Soft sell line</h3><p class="pp">'+esc(sb(se,p))+'</p>';
+ h+=doneBtn(p,'r',i)+'</div></details>';
+ return h;
+}
+function photoHtml(p,x,i,L){
+ var l=lgOf(p),open=nav.openItem==='p'+i;
+ var h='<details class="det" id="it-p'+i+'"'+(open?' open':'')+'>'+itemHead(i+1,sb(x.t,p),null,open,'',isDone(p,'p',i));
+ h+='<div class="db"><h3 class="sm">What is in the frame</h3><p class="pp">'+esc(sb(x.img,p))+'</p><h3 class="sm">Why it is on the grid</h3><p class="pp">'+esc(sb(x.why,p))+'</p>';
+ h+=promptHtml('Caption ('+L+')',sb(pk(x.cap,l),p));
+ if(l!=='en')h+='<div class="ref">English: '+esc(sb(pk(x.cap,'en'),p))+'</div>';
+ h+=doneBtn(p,'p',i)+'</div></details>';
+ return h;
+}
+function storyHtml(p,x,i,L){
+ var l=lgOf(p),open=nav.openItem==='s'+i;
+ var h='<details class="det" id="it-s'+i+'"'+(open?' open':'')+'>'+itemHead(i+1,sb(x.t,p),x.go,open,'',isDone(p,'s',i));
+ h+='<div class="db"><h3 class="sm">Frames</h3>'+ul(sbl(x.fr,p))+'<h3 class="sm">Sticker or interaction</h3><p class="pp">'+esc(x.st)+'</p>';
+ if(x.q)h+=promptHtml('Question text ('+L+')',sb(pk(x.q,l)[0],p));
+ h+=doneBtn(p,'s',i)+'</div></details>';
+ return h;
+}
+function planHtml(p){
+ var pl=planOf(p),m=MK[p.mkt];
+ if(!pl)return '<div class="card"><h3>Not planned yet</h3><p style="margin:.2rem 0 0;color:var(--label2)">The full content plan (12 reels, 6 photos and 8 story sets, with scripts) is written for the pilot and Waves 1 and 2 in English (US) and Portuguese (Portugal). For this persona use the Content tab for its first 10 clips, and ask Claude to write the full plan when its wave starts.</p></div>';
+ var L=lgOf(p)==='pt'?'European Portuguese':'English',t=nav.pl||'Calendar',total=pl.r.length+pl.p.length+pl.s.length,done=0;
+ pl.r.forEach(function(_,i){if(isDone(p,'r',i))done++});pl.p.forEach(function(_,i){if(isDone(p,'p',i))done++});pl.s.forEach(function(_,i){if(isDone(p,'s',i))done++});
+ var h='<div class="seg" role="group" aria-label="Plan view">'+['Calendar','Reels','Photos','Stories'].map(function(s){return '<button aria-pressed="'+(t===s)+'" data-do="plt" data-v="'+s+'">'+s+'</button>'}).join('')+'</div>';
+ h+='<div class="bar" aria-hidden="true"><i style="width:'+Math.round(done/total*100)+'%"></i></div><div style="color:var(--label2);font-size:.875rem;margin:0 0 .8rem">'+done+' of '+total+' done</div>';
+ if(t==='Calendar'){
+  h+='<div class="note">Four weeks, 12 reels, 6 photos and 8 story sets. Reels also go to TikTok and YouTube Shorts; stories are Instagram. '+(lgOf(p)==='pt'?'Spoken lines and on-screen text are in European Portuguese with an English reference; directions are in English. A native speaker should check them before you generate.':'Everything is in English.')+'</div>';
+  CAL.forEach(function(w){
+   h+='<h2>'+w[0]+'</h2><div class="grp">'+w[1].map(function(e){
+    var arr=e[1]==='r'?pl.r:e[1]==='p'?pl.p:pl.s,it=arr[e[2]],tn=e[1]==='r'?'Reels':e[1]==='p'?'Photos':'Stories',kind=e[1]==='r'?'Reel':e[1]==='p'?'Photo':'Story set',d=isDone(p,e[1],e[2]);
+    return '<button class="row" data-do="plgo" data-v="'+tn+'" data-k="'+e[1]+e[2]+'"><span class="dnum'+(d?' ok':'')+'">'+e[0].slice(0,3)+'</span><span class="grow"><div class="t1">'+esc(sb(it.t,p))+'</div><div class="t2">'+kind+' '+(e[2]+1)+(e[1]==='r'?' · '+esc(it.k):'')+'</div></span>'+CHEV+'</button>'}).join('')+'</div>';
+  });
+  h+='<div class="note">Before filming: cook, build, test or measure it for real. Replace every [BRACKET] with something the team actually did and its real result. Numbers in scripts are examples.</div>';
+ }else if(t==='Reels'){
+  h+=pl.r.map(function(r,i){return reelHtml(p,r,i,L)}).join('');
+ }else if(t==='Photos'){
+  h+='<div class="note">The first three go up before launch so the grid is not empty. All photos use the same saved character, 4:5.</div>'+pl.p.map(function(x,i){return photoHtml(p,x,i,L)}).join('');
+ }else{
+  h+=pl.s.map(function(x,i){return storyHtml(p,x,i,L)}).join('');
+ }
+ return h;
+}
+
+var SECS=['Overview','Look and voice','Content','Content plan','Sell','Rules','Prompts','Checklist'];
 function vPersona(id){
  var p=PK[id],n=NK[p.niche],m=MK[p.mkt],st=pStatus(id);
  var h='<div style="display:flex;gap:1rem;align-items:center;margin:.3rem 0 1rem">'+avHtml(p,'lg')+'<div><h1 class="lt" style="margin:0">'+esc(p.name)+'</h1><div style="color:var(--label2)">'+esc(n.name)+' · '+flag(p.mkt,'s')+esc(m.name)+'</div></div></div>';
@@ -263,6 +343,8 @@ function secHtml(p,n,m){
    h+='<h2>30-episode plan</h2>'+D.epis.map(function(se,si){return '<div class="card"><h3>'+esc(se[0])+'</h3><ol class="s" style="counter-reset:s '+(si*10)+'">'+se[1].map(function(e){return '<li><div class="st">'+esc(e)+'</div></li>'}).join('')+'</ol></div>'}).join('');
    if(p.ph)h+='<h2>First phrases</h2><div class="card">'+kv('Hello',p.ph.hello[0]+'  '+p.ph.hello[1])+kv('Thank you',p.ph.thanks[0]+'  '+p.ph.thanks[1])+kv('Where is the station?',p.ph.station[0]+'  '+p.ph.station[1])+'<div style="color:var(--label2);font-size:.875rem">Approximate respellings. A native speaker must confirm.</div></div>';
   }
+ }else if(s==='Content plan'){
+  h+=planHtml(p);
  }else if(s==='Sell'){
   h+='<div class="card">'+kv('Offer',n.offer)+kv('Price range',p.price)+kv('Product ladder',n.ladder.join(' → '))+'</div>';
   h+='<h2>How it sells without selling</h2><div class="card"><ul class="l"><li>About 60% value-first posts, 25% story posts, 15% soft call to action.</li><li>Show the result first, then let the offer appear as the next step.</li><li>One calm line: "The full plan is in my bio if you want it, no pressure."</li></ul></div>';
@@ -366,6 +448,12 @@ document.addEventListener('click',function(e){
  }else if(a==='clear'){S.f[d.k]='all';save();refreshList();
  }else if(a==='sec'){
   nav.sec=d.v;var y2=scrollY;var pill=document.querySelector('.pills');var left=pill?pill.scrollLeft:0;renderView();var p2=document.querySelector('.pills');if(p2)p2.scrollLeft=left;scrollTo(0,Math.min(y2,200));
+ }else if(a==='plt'){
+  nav.pl=d.v;nav.openItem=null;renderView();scrollTo(0,Math.min(scrollY,200));
+ }else if(a==='plgo'){
+  nav.pl=d.v;nav.openItem=d.k;renderView();var el=document.getElementById('it-'+d.k);if(el)scrollTo(0,Math.max(0,el.getBoundingClientRect().top+scrollY-150));
+ }else if(a==='pdone'){
+  S.pd=S.pd||{};S.pd[d.k]=!S.pd[d.k];if(!S.pd[d.k])delete S.pd[d.k];save();var on=!!S.pd[d.k];el.setAttribute('aria-pressed',on);el.textContent=on?'Done':'Mark as done';var sm=el.closest('details');if(sm){var nm=sm.querySelector('.dnum');if(nm)nm.classList.toggle('ok',on)}
  }else if(a==='status'){
   S.st[d.id]=d.v;save();var y3=scrollY;renderView();scrollTo(0,y3);
  }else if(a==='ck'){

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generates data.json: markets, niches, personas, plan pages."""
 import json
+import bank_food, bank_code, bank_design, bank_gadget, bank_home, bank_lang
 
 # ---------------------------------------------------------------- markets
 M = [
@@ -473,6 +474,7 @@ PLAN = [
      ('Wave 2', 'Gadgets, Home finds and Language learning in the languages that worked.'),
      ('Wave 3', 'One betting persona only after a legal check in an allowed market, and only with real bets and real results.'),
      ('Wave 4', 'The remaining languages. Nordic ones last because voice quality is untested and they need native review.')),
+  Pp('Every Pilot, Wave 1 and Wave 2 persona in English (US) and Portuguese (Portugal) has a full four-week plan on its own page, under Content plan: 12 reels, 6 photos and 8 story sets with hooks, beats, scripts and captions. The other personas get theirs when their wave starts.'),
   H('Move on when'),
   L('After about 8 clips a persona, you can see which hooks and formats get views, and what each clip cost in credits.', 'Keep a persona if people follow and click. Change the angle before you spend more on it.', 'Do not judge in 7 days: the 7-day challenge account that was written off later had a video pass 250,000 views.'),
   H('Credits and cost'),
@@ -611,6 +613,10 @@ PLAN = [
  ]),
 ]
 
-out = dict(markets=M, niches=N, personas=P, plan=[{k: v for k, v in s.items()} for s in PLAN], epis=EPIS)
+BANKS = dict(food=bank_food, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang)
+BANK = {k: dict(reels=m.REELS, photos=m.PHOTOS, stories=m.STORIES) for k, m in BANKS.items()}
+for p in P:
+    p['plan'] = bool(p['wave'] <= 2 and p['mkt'] in ('us', 'pt') and p['niche'] in BANK)
+out = dict(markets=M, niches=N, personas=P, plan=[{k: v for k, v in s.items()} for s in PLAN], epis=EPIS, bank=BANK)
 json.dump(out, open('data.json', 'w'), ensure_ascii=False, separators=(',', ':'))
 print('personas', len(P), 'bytes', len(json.dumps(out, ensure_ascii=False)))
