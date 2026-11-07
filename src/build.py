@@ -51,7 +51,7 @@ shutil.copy('manifest.webmanifest', f'{OUT}/manifest.webmanifest')
 shutil.copy('sw.js', f'{OUT}/sw.js')
 shutil.copy('netlify.toml', f'{OUT}/netlify.toml')
 os.makedirs(f'{OUT}/src', exist_ok=True)
-for f in ['gen.py','bank_common.py','bank_food.py','bank_shred.py','bank_code.py','bank_design.py','bank_gadget.py','bank_home.py','bank_lang.py','build.py','app.css','app.js','make_icons.js','sw.js','manifest.webmanifest','netlify.toml']:
+for f in ['gen.py','bank_common.py','bank_glam.py','bank_food.py','bank_shred.py','bank_code.py','bank_design.py','bank_gadget.py','bank_home.py','bank_lang.py','build.py','app.css','app.js','make_icons.js','sw.js','manifest.webmanifest','netlify.toml']:
     shutil.copy(f, f'{OUT}/src/{f}')
 shutil.copy('icons/master.svg', f'{OUT}/src/master.svg')
 print('built', len(html)//1024, 'KB')

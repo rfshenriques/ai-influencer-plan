@@ -262,7 +262,7 @@ function pdKey(p,t,i){return p.id+':'+t+i}
 function isDone(p,t,i){return !!(S.pd&&S.pd[pdKey(p,t,i)])}
 function doneBtn(p,t,i,o){var on=isDone(p,t,i);return '<button class="btn sm sec dn2" data-do="pdone" data-k="'+pdKey(p,t,i)+'" data-o="'+o+'" aria-pressed="'+on+'">'+(on?'Done':'Mark as done')+'</button>'}
 function ul(a){return '<ul class="l">'+a.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'}
-var KW={food:['RECIPE','RECEITA'],shred:['PLAN','PLANO'],code:['TRICKS','TRUQUES'],design:['PALETTE','PALETA'],gadget:['LINK','LINK'],home:['LINK','LINK'],lang:['WORKBOOK','CADERNO']};
+var KW={food:['RECIPE','RECEITA'],shred:['PLAN','PLANO'],code:['TRICKS','TRUQUES'],design:['PALETTE','PALETA'],gadget:['LINK','LINK'],home:['LINK','LINK'],lang:['WORKBOOK','CADERNO'],glam:['PAGE','PÁGINA']};
  function topicDone(p,n){return ['tp','ts','tr','tl'].filter(function(t){return isDone(p,t,n)}).length}
 function calOf(){
  var c=[['Before launch',[['Day 0','i',-1],['Sun','t',0]]]];
@@ -275,6 +275,8 @@ function topicHtml(p,x,n,L){
  var h='<details class="det" id="it-t'+n+'"'+(open?' open':'')+'><summary><span class="dnum'+(d===4?' ok':'')+'">'+(n+1)+'</span><span class="grow"><div class="t1">'+esc(sb(x.t,p))+'</div><div class="t2">'+d+' of 4 steps done</div></span>'+CHEV+'</summary><div class="db">';
  h+='<h3 class="sm">The problem it solves</h3><p class="pp">'+esc(sb(x.prob,p))+'</p>';
  h+='<h3 class="sm">Where it leads</h3><p class="pp">'+esc(p.offer||'')+'</p>';
+ var wd=(bankOf(p).intro.world||[]).filter(function(w){return w.k===x.loc})[0];
+ if(wd)h+='<h3 class="sm">Location lock</h3><p class="pp"><b>'+esc(wd.t)+'.</b> Use the saved empty-room reference image and this exact description in every photo, story and reel of this topic.</p>'+promptHtml('Locked description',wd.d);
  h+=stepHead(1,'Teaser photo (the day before)')+'<p class="pp">'+esc(sb(pk(x.ph,en),p))+'</p>'+promptHtml('Caption ('+L+')',sb(pk(x.cap,l),p));
  if(l!==en)h+='<div class="ref">English: '+esc(sb(pk(x.cap,en),p))+'</div>';
  h+=doneBtn(p,'tp',n,n);
@@ -302,6 +304,8 @@ function setupHtml(p,b,L){
   return '<details class="det" id="it-i'+i+'"'+(nav.openItem==='i'+i?' open':'')+'><summary><span class="dnum'+(d?' ok':'')+'">'+(i+1)+'</span><span class="grow"><div class="t1">'+esc(sb(x.t,p))+'</div></span>'+CHEV+'</summary><div class="db"><h3 class="sm">What is in the frame</h3><p class="pp">'+esc(sb(x.img,p))+'</p><h3 class="sm">Why it is on the grid</h3><p class="pp">'+esc(sb(x.why,p))+'</p>'+promptHtml('Caption ('+L+')',sb(pk(x.cap,l),p))+(l!==en?'<div class="ref">English: '+esc(sb(pk(x.cap,en),p))+'</div>':'')+doneBtn(p,'ip',i,'i'+i)+'</div></details>'}).join('');
  var m=it.meet,dm=isDone(p,'im',0);
  h+='<h2>Intro story</h2><details class="det" id="it-m0"'+(nav.openItem==='m0'?' open':'')+'><summary><span class="dnum'+(dm?' ok':'')+'">1</span><span class="grow"><div class="t1">'+esc(sb(m.t,p))+'</div><div class="t2">'+esc(m.go)+'</div></span>'+CHEV+'</summary><div class="db"><h3 class="sm">Frames</h3>'+ul(m.fr.map(function(f){return sb(f,p)}))+'<h3 class="sm">Sticker</h3><p class="pp">'+esc(m.st)+'</p>'+(m.q?promptHtml('Question text ('+L+')',sb(pk(m.q,l),p)):'')+doneBtn(p,'im',0,'m0')+'</div></details>';
+ var wl2=it.world;
+ if(wl2&&wl2.length){h+='<h2>World bible: places that never change</h2><div class="note">Make each place once as an empty-room image with no person, save it, and use it as the reference image in every later generation together with the character sheet. A hotel room stays the same room for the whole trip, and her bedroom is the same bedroom in every reel, photo and story. Before posting, compare the new image with the reference: wall colour, bed, window, lamp, mirror.</div>'+wl2.map(function(w){return promptHtml(w.t,w.d)}).join('')}
  h+='<h2>How the product fits in</h2><div class="card"><ul class="l"><li>Product: '+esc(p.offer||'')+'</li><li>Bio line: '+esc(p.bio||'')+'</li><li>Every reel ends with one calm line that points to the product. The photo before it teases, the story before it asks a question, and the story on the day says the reel is live.</li><li>The first eleven topics help first. The twelfth shows the product itself.</li></ul></div>';
  return h;
 }

@@ -2,7 +2,7 @@
 """Generates data.json: markets, niches, personas, plan pages."""
 import json
 import research as RS
-import bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang
+import bank_glam, bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang
 
 # ---------------------------------------------------------------- markets
 M = [
@@ -313,6 +313,24 @@ N = [
   bio='AI language coach. One phrase per episode. Workbook below.',
   ),
 ]
+
+N.append(dict(id='glam', name='Glam and lifestyle', icon='eye', color=('#FF375F', '#BF5AF2'), genders='A woman (clearly an adult AI character)',
+  tagline='A glamorous lifestyle persona with a consistent world.',
+  what='A clearly labelled AI-generated adult woman who looks native to her market. Short reels, stories and photos of her days (home, café, gym, trips) at fashion and swimwear level. Every place is a fixed set that looks identical in every photo, story and reel. The link goes to her own page where the platform allows it.',
+  why='Lifestyle accounts grow on a place and a person people can follow. A fixed, believable world is what makes a character feel consistent, and consistency is what viewers come back for.',
+  series=[('A day in her room', 'Mornings and evenings in the same bedroom.'), ('Café and gym', 'The same café and the same gym.'), ('Trip arcs', 'One city for a week, with one hotel room that never changes.'), ('Your questions', 'She answers real comments.')],
+  pillars=['A fixed world that never changes', 'Outfits and routines', 'Trips told over several days', 'Replies to real comments'],
+  angles_w=['The glam traveller', 'The city girl with a morning routine', 'The fitness and style girl', 'The weekend-trip storyteller'], angles_m=[],
+  clips=[('Morning', 'Morning in my room'), ('Café', 'Coffee in the corner café'), ('Gym', 'Gym session, her way'), ('Trip', 'Packing for Paris'), ('Trip', 'The hotel room in Paris')],
+  hooks=['Place first: "This is my room, and this is how my day starts."', 'Open loop: "I leave for Paris tomorrow. What should I pack?"', 'Choice: "Two dresses, one coffee. Help me choose."'],
+  offer='Her own page on a platform that allows clearly labelled AI characters (Fanvue says it does, with ID verification; check the current wording).',
+  price=(0, 0), ladder=['Free: the reels, stories and photos', 'Low: the page subscription'],
+  honesty='She is an AI-generated adult character and says so: the Instagram "AI-generated profile" label, TikTok and YouTube AI labels, and a bio line. Never claim or imply she is real, no fake DMs or fake fans, no real person\'s likeness, nothing explicit, and nothing that could read as a minor. Public posts stay at fashion and swimwear level. Link to an adult-subscription page only where the platform allows it; TikTok bans promoting premium sexual content and Instagram restricts adult-service promotion. If a platform forbids it, do not link and do not hint at it.',
+  kpis=['Reach to non-followers', 'Follows per reel', 'Story replies and poll votes', 'Clicks to her page where allowed'],
+  tags=['#aigenerated', '#lifestyle', '#travelvlog', '#ootd', '#aiinfluencer'],
+  desc=dict(tt='{h} AI-generated character. {tags}', ig='{h} I am an AI-generated character. More of my days in my profile where allowed. {tags}', yt_title='{t}', yt='A day in the life of an AI-generated character. #Shorts {tags}'),
+  bio='AI-generated character. My days, my trips. My page below where allowed.',
+  ))
 NK = {n['id']: n for n in N}
 
 # ---- rework (7 Nov 2026): one persona per niche per language; own product per persona ----
@@ -348,13 +366,13 @@ NICHE_OVR = {
    honesty='Sell only items you ordered and tested yourself, with real footage and real before and after photos. State the real price and shipping time and honour returns (EU and UK: 14 days). No fake reviews, countdown timers or stock claims. Check product safety marks, VAT and each platform\'s rules for selling and ads.'),
 }
 for _k, _v in NICHE_OVR.items(): NK[_k].update(_v)
-PBIO = {('food', 'w'): 'AI creator. One healthy recipe per reel. Recipe book below.',
+PBIO = {('glam', 'w'): 'AI-generated character. My days and my trips. My page below where allowed.',('food', 'w'): 'AI creator. One healthy recipe per reel. Recipe book below.',
         ('food', 'm'): 'AI creator. Lose fat, keep the muscle. 7-day plan below.',
         ('code', 'm'): 'AI creator. Claude hacks and repo tests. AI tricks PDF below.',
         ('design', 'w'): 'AI creator. Design tips for apps and sites. Course below.',
         ('gadget', 'm'): 'AI creator. Gadgets that fix daily problems. Store below.',
         ('home', 'w'): 'AI creator. Home items that fix daily problems. Store below.'}
-POFFER = {('food', 'w'): 'Recipe book (link in bio)', ('food', 'm'): '7-day shred plan and recipe book (link in bio)', ('code', 'm'): 'AI tricks PDF (link in bio)',
+POFFER = {('glam', 'w'): 'Her own AI-labelled page, linked where the platform allows it',('food', 'w'): 'Recipe book (link in bio)', ('food', 'm'): '7-day shred plan and recipe book (link in bio)', ('code', 'm'): 'AI tricks PDF (link in bio)',
           ('design', 'w'): 'Design course (link in bio)', ('gadget', 'm'): 'The gadgets, in his Shopify store (link in bio)', ('home', 'w'): 'The home items, in her Shopify store (link in bio)'}
 BACK_TYLER = "{n} got tired of crash diets and guessing calories, and learned to lose fat while keeping muscle by tracking kcal, protein and water. {Sc} shows what to eat and what not to eat with the numbers on screen, does the maths live, and is clear that it is information, not medical advice. {Sc} is a creator, not a doctor."
 
@@ -368,7 +386,7 @@ OUT = {
  ('bet','m'): 'a casual jacket over a tee and jeans',
  ('gadget','w'): 'a denim jacket and a crossbody bag', ('gadget','m'): 'a utility jacket and jeans',
  ('home','w'): 'a soft cardigan and jeans', ('home','m'): 'a flannel shirt and work trousers',
- ('lang','w'): 'a smart-casual knit top and jeans', ('lang','m'): 'a smart-casual shirt and jeans',
+ ('glam','w'): 'a fitted summer dress and sunglasses', ('lang','w'): 'a smart-casual knit top and jeans', ('lang','m'): 'a smart-casual shirt and jeans',
 }
 CLIM = {'cold': ', with a warm coat and scarf in the cold season', 'mild': ', with a light jacket', 'warm': ', in light breathable fabrics'}
 SET = {
@@ -379,11 +397,12 @@ SET = {
  'gadget': 'at a table with a plain unbranded gadget box and a phone',
  'home': 'in a small tidy living room corner with a shelf',
  'lang': 'at a local café table with a notebook and a coffee',
+ 'glam': 'in a bright bedroom with white linen and a brass lamp, relaxed',
 }
 TONE = {
  'food': 'warm and encouraging', 'code': 'clear, curious and quick', 'design': 'calm and precise with dry humour',
  'bet': 'level-headed and measured, never hyped', 'gadget': 'curious, a little sceptical and honest',
- 'home': 'practical and cheerful', 'lang': 'patient, clear and smiling, slightly slower and articulate',
+ 'home': 'practical and cheerful', 'glam': 'warm, playful and a little flirty, always honest that she is AI', 'lang': 'patient, clear and smiling, slightly slower and articulate',
 }
 
 def pro(g):
@@ -396,6 +415,7 @@ BACK = {
  'bet': "{n} follows sport closely and prefers clear numbers over hype. {Sc} explains betting apps step by step, shows real bets and real results, and talks openly about losses. {Sc} always mentions limits and responsible gambling, and never promises profit.",
  'gadget': "{n} loves finding useful gadgets and tests them properly before saying anything. {Sc} and the team buy what they review, say what disappoints them and keep the verdict short. {Sc} is curious, a little sceptical and honest.",
  'home': "{n} enjoys making a home work better with small, practical changes. {Sc} and the team buy the items they review, test them in a real home and show honest before and afters. {Sc} is cheerful, practical and straight about what is not worth buying.",
+ 'glam': "{n} is an AI-generated character who shares her days: her room, her favourite café, her gym and trips. {Sc} is warm, playful and a little flirty, says openly that she is an AI character, and keeps every place looking exactly the same from post to post.",
  'lang': "{n} is a patient teacher who believes anyone can learn a few useful phrases in seconds. {Sc} speaks {L} natively, teaches one phrase per episode, repeats it slowly and then at natural speed, and keeps lessons short and warm.",
 }
 
@@ -411,6 +431,7 @@ PILOT = {('us', 'food', 'w'), ('us', 'code', 'm')}
 
 def wave_of(market, niche):
     if niche == 'bet': return 3
+    if niche == 'glam': return 1
     if market in ('us', 'pt'):
         return 1 if niche in ('food', 'code', 'design') else 2
     return 4
@@ -486,11 +507,13 @@ for _mid in R:
         _w, _m = R[_mid][_nid]
         R[_mid][_nid] = (_w, None) if _gg == 'w' else (None, _m)
 R['us']['food'] = ('Hannah', 'Tyler')
+for _m in R: R[_m]['glam'] = (None, None)
+R['us']['glam'] = ('Brooke', None); R['pt']['glam'] = ('Leonor', None)
 
 P = []
 idx = 0
 for m in M:
-    for nid in ['food', 'code', 'design', 'bet', 'gadget', 'home', 'lang']:
+    for nid in ['food', 'code', 'design', 'bet', 'gadget', 'home', 'lang', 'glam']:
         w, mn = R[m['id']][nid]
         if nid == 'lang':
             P.append(build_persona(m['id'], nid, mn, w, idx)); idx += 1
@@ -499,7 +522,7 @@ for m in M:
                 P.append(build_persona(m['id'], nid, 'w', w, idx)); idx += 1
             if mn:
                 P.append(build_persona(m['id'], nid, 'm', mn, idx)); idx += 1
-assert len(P) == 74, len(P)
+assert len(P) == 76, len(P)
 
 # episode plan for language niche
 EPIS = [
@@ -521,11 +544,11 @@ PLAN = [
  dict(id='waves', title='Launch plan: pilot first', sub='Two personas, four weeks, then decide', icon='flag', blocks=[
   Pp('A 12 s talking video costs about 3,850 credits, so this plan starts small. Run a pilot with two personas, learn what works and what it costs, and only then add more.'),
   CD(('Pilot · weeks 1 to 4', 'Hannah (Healthy food, English US) and Ethan (Coding and AI, English US). Each posts about 2 clips a week: 1 talking video and 1 cheap format. Record views, follows, link clicks and credits spent per clip.'),
-     ('Wave 1 · only if the pilot works', 'Tyler (weight loss food), Zoe (design) and the Portuguese Ines, Diogo and Catarina. Add 2 to 3 at a time, never all at once.'),
+     ('Wave 1 · only if the pilot works', 'Tyler (weight loss food), Zoe (design), Brooke (glam and lifestyle, clearly labelled AI) and the Portuguese Ines, Diogo, Catarina and Leonor. Add 2 to 3 at a time, never all at once.'),
      ('Wave 2', 'Mason and Maya with their Shopify stores, Lily for language learning, and Rui, Joana and Sara in Portuguese. Open the store only after you have ordered and tested the first products.'),
      ('Wave 3', 'One betting persona only after a legal check in an allowed market, and only with real bets and real results.'),
      ('Wave 4', 'The remaining languages. Nordic ones last because voice quality is untested and they need native review.')),
-  Pp('Every Pilot, Wave 1 and Wave 2 persona (13 in all) has a four-week plan on its own page, under Calendar, Topics and Setup: 12 connected topics, each with a teaser photo, a teaser story, the reel and a reel-is-live story that points to the product. The other personas get theirs when their wave starts.'),
+  Pp('Every Pilot, Wave 1 and Wave 2 persona (15 in all) has a four-week plan on its own page, under Calendar, Topics and Setup: 12 connected topics, each with a teaser photo, a teaser story, the reel and a reel-is-live story that points to the product. The other personas get theirs when their wave starts.'),
   H('Move on when'),
   L('After about 8 clips a persona, you can see which hooks and formats get views, and what each clip cost in credits.', 'Keep a persona if people follow and click. Change the angle before you spend more on it.', 'Do not judge in 7 days: the 7-day challenge account that was written off later had a video pass 250,000 views.'),
   H('Credits and cost'),
@@ -550,7 +573,7 @@ PLAN = [
   H('Budgets'),
   CD(('Setting up one persona', 'About 2,000 to 2,500 credits (estimate): character sheet, three photos with a few retries, and the 250 voice fee. Roughly $5 to $6 on Pro.'),
      ('Pilot: 2 personas, 4 weeks', 'Per persona per week: 1 talking video (3,850) and 1 cheap format (a photo with voiceover, about 250 to 750). About 17 talking videos and 17 cheap posts in the month would be about 65,000 credits without retries, or about 130,000 with them. Start with Wonder or Pro plus added credits, and cut to 1 talking video a week if the budget runs out.'),
-     ('Wave 1: 5 more personas', 'At 3 talking videos a week each, one persona is about 50,000 credits a month (estimate). Five personas is about 250,000, or about 350,000 with the two pilot personas: more than three Wonder plans. At 2 talking videos a week, about 235,000 for all seven. Add personas only as the budget and the results allow.')),
+     ('Wave 1: 7 more personas', 'At 3 talking videos a week each, one persona is about 50,000 credits a month (estimate). Seven personas is about 350,000, or about 450,000 with the two pilot personas: more than four Wonder plans. At 2 talking videos a week, about 300,000 for all nine. Add personas only as the budget and the results allow.')),
   H('Ways to spend less'),
   L('Preview in Draft 480p and upgrade only the winners within 7 days.', 'Use 6 second clips when a short line is enough: cost grows with length (estimate).', 'Mix formats: a photo with a slow push-in and a voiceover costs a fraction of a talking video.', 'Use 1K or 2K photos for references and 4K only for the final.', 'Try Kling 4.0 on Pro or Wonder while it is 50% off.', 'Make one video and post it on TikTok, Instagram and YouTube Shorts with three different captions.', 'Set a credit cap per persona per week and write down what each clip cost.'),
   H('Before you subscribe'),
@@ -649,7 +672,7 @@ PLAN = [
   L('Clearly an adult woman (25 or older in appearance), an invented face, no real person\'s likeness.', 'Warm, confident, flirty personality; everyday settings; natural movement and speech.', 'Clearly labelled as AI in the bio and with each platform\'s AI label.', 'Suggestive means styling, framing and personality at roughly PG-13 level.'),
   H('Keep out'),
   L('Anything that could read as a minor.', 'Deepfakes or content from other people\'s photos.', 'Claims she is a real woman, or fake private messages.', 'Explicit content: I will not write it, and image tools usually restrict it.'),
-  NT('Launch after Wave 1, once lifestyle content shows an audience, and only after reading the current rules of the subscription site and each posting platform.'),
+  NT('Brooke (US) and Leonor (Portugal) are now in Wave 1, with a 12-topic plan and a location bible. Read the current rules of the subscription site and each posting platform before the first link, and keep the AI label on.'),
  ]),
  dict(id='caveats', title='Honest expectations', sub='What the tutorials really showed', icon='scale', blocks=[
   L('The only real-money result: 23 workbook sales at $12 = $276 revenue, minus $19.52 payment fees and a $99 tool plan = $157.48 profit in a week, short of the author\'s $1,000 goal.', 'Both tutorials carry affiliate links and one is sponsored. Results shown are curated; real work includes retries and wasted credits.', 'Label every account as AI. Do not present generated people, testimonials or sponsored content as a real person\'s genuine experience.', 'Not covered by the tutorials: OpenArt\'s commercial terms, each platform\'s current rules for AI accounts, and tax rules.'),
@@ -680,7 +703,7 @@ PLAN.insert(0, dict(id='research', title='Research: what works now', sub='Algori
     'Gadgets and home depend on a registered company in the selling country and on TikTok Shop status, which is unclear in Portugal and absent in the Nordics.'),
   ('src', [list(x) for x in RS.GLOBAL['src']]),
 ]))
-BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang)
+BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang, glam=bank_glam)
 BANK = {k: dict(topics=m.TOPICS, intro=m.INT) for k, m in BANKS.items()}
 for k, v in BANK.items(): assert len(v['topics']) == 12, k
 def bank_key(p): return 'shred' if (p['niche'] == 'food' and p['g'] == 'm') else p['niche']
