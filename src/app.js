@@ -35,6 +35,7 @@ var IC={
  mic:'<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0013 0M12 18v3"/>',shield:'<path d="M12 3.5l7 2.5v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/>',
  lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/>',scale:'<path d="M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 005 0zM19 8l-2.5 6a3 3 0 005 0z"/>',calendar:'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.5 1.5M16.5 16.5L18 18M18 6l-1.5 1.5M7.5 16.5L6 18"/>',
+ chart:'<path d="M4 19.5h16M7 16v-5M12 16V6M17 16v-8"/>',heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/>',
  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',filter:'<path d="M4 7h16M7 12h10M10 17h4"/>'
 };
 function svg(n,sw){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.9)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
@@ -262,8 +263,8 @@ function pdKey(p,t,i){return p.id+':'+t+i}
 function isDone(p,t,i){return !!(S.pd&&S.pd[pdKey(p,t,i)])}
 function doneBtn(p,t,i,o){var on=isDone(p,t,i);return '<button class="btn sm sec dn2" data-do="pdone" data-k="'+pdKey(p,t,i)+'" data-o="'+o+'" aria-pressed="'+on+'">'+(on?'Done':'Mark as done')+'</button>'}
 function ul(a){return '<ul class="l">'+a.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'}
-var KW={food:['RECIPE','RECEITA'],shred:['PLAN','PLANO'],code:['TRICKS','TRUQUES'],design:['PALETTE','PALETA'],gadget:['LINK','LINK'],home:['LINK','LINK'],lang:['WORKBOOK','CADERNO'],glam:['PAGE','PÁGINA']};
- function topicDone(p,n){return ['tp','ts','tr','tl'].filter(function(t){return isDone(p,t,n)}).length}
+var KW={food:['RECIPE','RECEITA'],shred:['PLAN','PLANO'],code:['TRICKS','TRUQUES'],design:['PALETTE','PALETA'],gadget:['LINK','LINK'],home:['LINK','LINK'],lang:['WORKBOOK','CADERNO'],glam:['PAGE','PÁGINA'],wealth:['BUDGET','ORCAMENTO'],rel:['WORKBOOK','CADERNO'],self:['PLANNER','PLANEADOR']};
+ function topicDone(p,n){return ['tp','ts','tr','tl','tx'].filter(function(t){return isDone(p,t,n)}).length}
 function calOf(){
  var c=[['Before launch',[['Day 0','i',-1],['Sun','t',0]]]];
  for(var w=0;w<4;w++){var b=3*w,r=[['Mon','r',b],['Tue','t',b+1],['Wed','r',b+1],['Fri','t',b+2],['Sat','r',b+2]];if(w<3)r.push(['Sun','t',b+3]);c.push(['Week '+(w+1),r])}
@@ -272,7 +273,7 @@ function calOf(){
 function stepHead(n,t){return '<h3 class="sm">'+n+'. '+t+'</h3>'}
 function topicHtml(p,x,n,L){
  var l=lgOf(p),en='en',open=nav.openItem==='t'+n,d=topicDone(p,n);
- var h='<details class="det" id="it-t'+n+'"'+(open?' open':'')+'><summary><span class="dnum'+(d===4?' ok':'')+'">'+(n+1)+'</span><span class="grow"><div class="t1">'+esc(sb(x.t,p))+'</div><div class="t2">'+d+' of 4 steps done</div></span>'+CHEV+'</summary><div class="db">';
+ var h='<details class="det" id="it-t'+n+'"'+(open?' open':'')+'><summary><span class="dnum'+(d===5?' ok':'')+'">'+(n+1)+'</span><span class="grow"><div class="t1">'+esc(sb(x.t,p))+'</div><div class="t2">'+d+' of 5 steps done</div></span>'+CHEV+'</summary><div class="db">';
  h+='<h3 class="sm">The problem it solves</h3><p class="pp">'+esc(sb(x.prob,p))+'</p>';
  h+='<h3 class="sm">Where it leads</h3><p class="pp">'+esc(p.offer||'')+'</p>';
  var wd=(bankOf(p).intro.world||[]).filter(function(w){return w.k===x.loc})[0];
@@ -294,7 +295,11 @@ function topicHtml(p,x,n,L){
  h+='<h3 class="sm">What we show or teach</h3><p class="pp">'+esc(sb(x.te,p))+'</p>';
  h+=doneBtn(p,'tr',n,n);
  h+=stepHead(4,'Reel-is-live story (same day)')+ul(['Frame 1: the reel cover with the text "New reel".','Frame 2: the problem in one line: '+sb(x.prob,p),'Frame 3: a link sticker or "link in bio" pointing to: '+(p.offer||'the product')+'.'])+promptHtml('Soft sell line ('+L+')',sb(pk(x.cta,l),p))+promptHtml('Comment-to-DM line ('+L+', optional)',l==='pt'?'Comenta '+KW[p.bank||p.niche][1]+' e envio-te o link.':'Comment '+KW[p.bank||p.niche][0]+' and I will send you the link.')+'<p class="pp">Needs a DM automation tool (a few euros a month) so the link goes out by itself. Without it, reply by hand.</p>';
- h+=doneBtn(p,'tl',n,n)+'</div></details>';
+ h+=doneBtn(p,'tl',n,n);
+ h+=stepHead(5,'Extra posts (feed, 2 to 3 a day)')+'<p class="pp">These reuse what you already made, so they cost no new credits. Post the carousel on the reel day and the silent re-cut on the next teaser day.</p>';
+ h+='<h3 class="sm">Recap carousel (reel day, after the reel)</h3>'+ul(['Slide 1: the hook line on a plain card: '+sb(says[0],p),'Slide 2: the problem: '+sb(x.prob,p),'Slide 3: the idea in one line: '+sb(says[1],p),'Slide 4: the payoff: '+sb(says[2],p),'Slide 5: a save reminder and the line: '+sb(pk(x.cta,l),p)])+promptHtml('Carousel caption ('+L+')',sb(pk(x.ot,l),p)+' · '+sb(pk(x.cta,l),p));
+ h+='<h3 class="sm">Silent re-cut (the next teaser day)</h3>'+ul(['8 to 10 seconds, no speech. Cut the same photos or b-roll from the reel to an in-app trending sound.','Card 1 (the pain): '+sb(says[0],p),'Card 2 (the payoff): '+sb(pk(x.ot,l),p),'Turn the AI-generated label on. Check the Generate button before making any new silent clip: its price is not known.']);
+ h+=doneBtn(p,'tx',n,n)+'</div></details>';
  return h;
 }
 function setupHtml(p,b,L){
@@ -313,19 +318,19 @@ function setupHtml(p,b,L){
 function planHtml(p){
  var b=planOf(p);
  if(!b)return '<div class="card"><h3>Not planned yet</h3><p style="margin:.2rem 0 0;color:var(--label2)">The connected content plan (12 topics with teaser photo, teaser story, reel and reel-is-live story) is written for the pilot, Wave 1 and Wave 2 in English (US) and Portuguese (Portugal). Other personas get theirs when their wave starts.</p></div>';
- var L=lgOf(p)==='pt'?'European Portuguese':'English',t=nav.pl||'Calendar',total=4+48,done=0;
+ var L=lgOf(p)==='pt'?'European Portuguese':'English',t=nav.pl||'Calendar',total=4+60,done=0;
  b.intro.photos.forEach(function(_,i){if(isDone(p,'ip',i))done++});if(isDone(p,'im',0))done++;
  b.topics.forEach(function(_,n){done+=topicDone(p,n)});
  var h='<div class="seg" role="group" aria-label="Plan view">'+['Calendar','Topics','Setup'].map(function(s){return '<button aria-pressed="'+(t===s)+'" data-do="plt" data-v="'+s+'">'+s+'</button>'}).join('')+'</div>';
  h+='<div class="bar" aria-hidden="true"><i style="width:'+Math.round(done/total*100)+'%"></i></div><div style="color:var(--label2);font-size:.875rem;margin:0 0 .8rem">'+done+' of '+total+' done</div>';
  if(t==='Calendar'){
-  h+='<div class="note">Four weeks, 12 connected topics. Each topic: a teaser photo and story the day before, then the reel and a reel-is-live story. Reels also go to TikTok and YouTube Shorts; stories are Instagram. '+(lgOf(p)==='pt'?'Spoken lines and on-screen text are in European Portuguese with an English reference; directions are in English.':'')+'</div>';
+  h+='<div class="note"><b>Rhythm: 2 to 3 posts a day.</b> A reel day is the reel and a recap carousel, plus stories. A teaser day is the teaser photo and a silent re-cut of the last reel, plus stories. When an account has momentum, add a third feed post: a reply to a comment. Four weeks, 12 connected topics. Each topic: a teaser photo and story the day before, then the reel and a reel-is-live story. Reels also go to TikTok and YouTube Shorts; stories are Instagram. '+(lgOf(p)==='pt'?'Spoken lines and on-screen text are in European Portuguese with an English reference; directions are in English.':'')+'</div>';
   calOf().forEach(function(w){
    h+='<h2>'+w[0]+'</h2><div class="grp">'+w[1].map(function(e){
     var k=e[1],n=e[2],tn=k==='i'?'Setup':'Topics',title,sub,d;
     if(k==='i'){title='Intro photos and the Meet story';sub='Three photos and the intro story';d=isDone(p,'im',0)}
     else{var x=b.topics[n];title=sb(x.t,p);
-     if(k==='t'){sub='Teaser photo and teaser story';d=isDone(p,'tp',n)&&isDone(p,'ts',n)}else{sub='Reel and reel-is-live story';d=isDone(p,'tr',n)&&isDone(p,'tl',n)}}
+     if(k==='t'){sub='Teaser photo, teaser story'+(n>0?' and a silent re-cut of the last reel':'');d=isDone(p,'tp',n)&&isDone(p,'ts',n)}else{sub='Reel, reel-is-live story and recap carousel';d=isDone(p,'tr',n)&&isDone(p,'tl',n)&&isDone(p,'tx',n)}}
     return '<button class="row" data-do="plgo" data-v="'+tn+'" data-k="'+(k==='i'?'i0':'t'+n)+'"><span class="dnum'+(d?' ok':'')+'">'+e[0].slice(0,3)+'</span><span class="grow"><div class="t1">'+esc(title)+'</div><div class="t2">'+esc(sub)+'</div></span>'+CHEV+'</button>'}).join('')+'</div>';
   });
   h+='<div class="note">Before filming: cook, build, test or measure it for real. Replace every [BRACKET] with something the team actually did and its real result. Numbers in scripts are examples. For products you sell, use only items you have ordered and tested.</div>';

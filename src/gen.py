@@ -2,7 +2,7 @@
 """Generates data.json: markets, niches, personas, plan pages."""
 import json
 import research as RS
-import bank_glam, bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang
+import bank_glam, bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang, bank_wealth, bank_rel, bank_self
 
 # ---------------------------------------------------------------- markets
 M = [
@@ -331,6 +331,60 @@ N.append(dict(id='glam', name='Glam and lifestyle', icon='eye', color=('#FF375F'
   desc=dict(tt='{h} AI-generated character. {tags}', ig='{h} I am an AI-generated character. More of my days in my profile where allowed. {tags}', yt_title='{t}', yt='A day in the life of an AI-generated character. #Shorts {tags}'),
   bio='AI-generated character. My days, my trips. My page below where allowed.',
   ))
+N.append(dict(id='wealth', name='Wealth and money', icon='chart', color=('#FFD60A', '#FF9F0A'), genders='A man',
+  tagline='Money basics with the maths shown on screen. Education only.',
+  what='One man who explains money with the calculation on screen: budget splits, an emergency fund, compound interest, subscription audits, debt payoff, a payslip explained and realistic side hustles. He never names a stock, fund, coin or broker, never promises a return and never claims a portfolio. He sells a $9 budget tracker PDF.',
+  why='Wealth is one of the four core niches in the 21-day video, with constant demand, and money tools (trackers, calculators) are natural low-price digital products. It is also the most regulated niche, so it stays strictly educational.',
+  series=[('One number, one lesson', 'A single calculation shown on screen.'), ('The 48-hour challenge', 'A small money challenge viewers can try this weekend.'), ('Where does it go?', 'A normal pay cheque split on screen.'), ('Side hustle reality check', 'What a side hustle really takes in hours and costs.')],
+  pillars=['The maths on screen', 'Habits, not tips', 'Realistic side hustles with real costs', 'Clear limits: education, not advice'],
+  angles_w=[], angles_m=['The budget-split explainer', 'The subscription auditor', 'The calculator guy', 'The side-hustle reality checker'],
+  clips=[('Budget', 'Where a normal pay cheque goes'), ('Calculator', 'What 100 a month becomes in ten years'), ('Audit', 'The subscriptions you forgot'), ('Challenge', 'Save 100 in 48 hours'), ('Education', 'The emergency fund, explained'),
+         ('Debt', 'Two ways to pay off a debt'), ('Payslip', 'Your payslip, explained'), ('Side hustle', 'A side hustle after costs'), ('Mistake', 'The money mistake in your twenties'), ('Series', 'A budget in parts (Part 1)')],
+  hooks=['"{c}" Put the number on screen in the first second.', 'Contrarian: "Budgeting is not the problem. This is."', 'Number: "Three numbers decide your month."'],
+  offer='A $9 budget tracker and money-basics PDF, later a bigger plan.',
+  price=(9, 49), ladder=['Free: the one-page budget sheet by DM', 'Low: the $9 budget tracker PDF', 'Mid: a debt and savings plan', 'High: a mini course (later)'],
+  honesty='Education only. No named stocks, funds, crypto coins or brokers, no promised or implied returns, no broker or exchange affiliate links, no CFD, forex or crypto promotion, no fake income or portfolio screenshots, no urgency. He is an AI and never claims to have invested or earned. Say "general information, not advice". EU and UK rules treat a public view on an asset as a recommendation, so do not give one. Check the market page before launch.',
+  kpis=['Saves and shares per reel', 'Completion rate', 'Comments asking for the sheet', 'Tracker sales'],
+  tags=['#budgeting', '#moneytips', '#savingmoney', '#personalfinance', '#aiinfluencer'],
+  desc=dict(tt='{h} Which number surprised you? {tags}', ig='{h} Save this for payday. The free budget sheet is a DM away. General information, not financial advice. (AI creator.) {tags}', yt_title='{t}', yt='In this Short: one money calculation worked out on screen. General information, not financial advice. I am an AI creator. #Shorts {tags}'),
+  bio='AI creator. Money maths on screen. Budget tracker below.',
+  ))
+N.append(dict(id='rel', name='Relationships and dating', icon='heart', color=('#FF6482', '#FF2D55'), genders='A woman',
+  tagline='Dating and communication, one situation per reel.',
+  what='One woman who explains one relationship situation per reel: red and green flags, what to say instead, first dates, boundaries, communication and recovering after a breakup. She gives general information, says it is not therapy, and invents no personal stories. She sells a $9 conversation and boundaries workbook PDF.',
+  why='Relationships are one of the four core niches in the 21-day video. Red-flag and save-worthy scripts are the best performers in the creator guides, and a workbook is a natural low-price product.',
+  series=[('Red flag or green flag?', 'A situation, a verdict and a reason.'), ('Say this instead', 'The sentence that replaces the fight.'), ('First date, simply', 'Dates and conversation starters.'), ('After the breakup', 'Practical steps, no medical claims.')],
+  pillars=['One situation per reel', 'The exact words to say', 'Boundaries and respect', 'Recovering after a breakup'],
+  angles_w=['The red-flag translator', 'The say-this-instead coach', 'The first-date simplifier', 'The boundaries explainer'], angles_m=[],
+  clips=[('Red flag', 'He only texts at night'), ('Script', 'Say this instead of "we need to talk"'), ('Green flag', 'Three green flags people miss'), ('Date', 'The first date that is not an interview'), ('Boundary', 'How to say no kindly'),
+         ('Breakup', 'The first week after a breakup'), ('Texting', 'Slow replies: what it means and what it does not'), ('Attachment', 'Attachment styles in 30 seconds, and their limits'), ('Dating app', 'A bio that sounds like you'), ('Series', 'Red flag or green flag (Part 1)')],
+  hooks=['"{c}" Put the situation on screen in the first second.', 'Contrarian: "That is not a red flag. This is."', 'Number: "Three things to say instead."'],
+  offer='A $9 conversation and boundaries workbook PDF.',
+  price=(9, 39), ladder=['Free: the conversation cards by DM', 'Low: the $9 workbook PDF', 'Mid: a 7-day reset challenge', 'High: a mini course (later)'],
+  honesty='General information, not therapy. She is an AI and has no real relationships, so no personal stories as if they happened, no fake DMs or fake fans. No manipulation tactics, no jealousy games, no advice about controlling a partner, no diagnosis of anyone by "attachment style". Name sensitive topics gently and point to a professional or a local helpline for abuse, crisis or mental-health issues. Do not name or promote dating apps, and never hide a link.',
+  kpis=['Saves and shares', 'Comments with their own situation', 'Completion rate', 'Workbook sales'],
+  tags=['#dating', '#relationshiptips', '#redflags', '#communication', '#aiinfluencer'],
+  desc=dict(tt='{h} Red flag or green flag? Tell me below. {tags}', ig='{h} Save it for the next time it happens. The conversation cards are a DM away. General information, not therapy. (AI creator.) {tags}', yt_title='{t}', yt='In this Short: one relationship situation and what to say. General information, not therapy. I am an AI creator. #Shorts {tags}'),
+  bio='AI creator. Dating and communication, one situation at a time. Workbook below.',
+  ))
+N.append(dict(id='self', name='Self-improvement', icon='bolt', color=('#64D2FF', '#0A84FF'), genders='A man',
+  tagline='One named framework or routine per reel, shown on screen.',
+  what='One man who explains one framework or routine per reel (2-minute rule, Eisenhower matrix, a 30-minute weekly review, a 60-second reset) with a diagram on screen, then sets a two-day challenge. As an AI he never claims a personal 90-day experiment. He sells a $9 habit and weekly planner PDF.',
+  why='Self-improvement is one of the four core niches in the video. Frameworks are easy to show visually, are saved and shared, and planners and trackers are natural low-price products.',
+  series=[('The framework', 'One named method drawn on screen.'), ('The two-day challenge', 'A tiny challenge viewers can try.'), ('The routine, timed', 'A step-by-step routine with clock times.'), ('Reframe', 'A common struggle seen differently.')],
+  pillars=['One framework per reel', 'Routines with times', 'Reframing without hype', 'Limits: not therapy or medical advice'],
+  angles_w=[], angles_m=['The framework explainer', 'The weekly-review coach', 'The two-day-challenge guy', 'The calm-reset teacher'],
+  clips=[('Framework', 'The 2-minute rule'), ('Matrix', 'The Eisenhower matrix'), ('Routine', 'A 30-minute weekly review'), ('Reset', 'A 60-second reset'), ('Contrarian', 'Why motivation is a bad plan'),
+         ('Challenge', 'The two-day phone challenge'), ('Planning', 'Plan tomorrow in five minutes'), ('Focus', 'The 25-minute focus block'), ('Reframe', 'Procrastination is not laziness'), ('Series', 'A better morning in parts (Part 1)')],
+  hooks=['"{c}" Draw it on screen in the first second.', 'Contrarian: "Motivation is not the problem. This is."', 'Number: "Five minutes, one page, a calmer tomorrow."'],
+  offer='A $9 habit tracker and weekly planner PDF.',
+  price=(9, 39), ladder=['Free: the one-page tracker by DM', 'Low: the $9 habit and weekly planner PDF', 'Mid: a 14-day focus challenge', 'High: a mini course (later)'],
+  honesty='Frameworks and routines only. He is an AI, so no personal "I did this for 90 days" claims and no made-up results. No therapy, medical or mental-health claims; for anxiety or low mood, point to a professional. No hype, no "get rich" framing. Keep every number as an example.',
+  kpis=['Saves and shares', 'Completion rate', 'Comments with a keyword', 'Planner sales'],
+  tags=['#productivity', '#habits', '#selfimprovement', '#focus', '#aiinfluencer'],
+  desc=dict(tt='{h} Try it for two days and tell me. {tags}', ig='{h} Save it for Sunday evening. The one-page tracker is a DM away. General information, not therapy. (AI creator.) {tags}', yt_title='{t}', yt='In this Short: one framework, drawn on screen, and a two-day challenge. I am an AI creator. #Shorts {tags}'),
+  bio='AI creator. One framework per reel. Planner below.',
+  ))
 NK = {n['id']: n for n in N}
 
 # ---- rework (7 Nov 2026): one persona per niche per language; own product per persona ----
@@ -351,29 +405,29 @@ NICHE_OVR = {
    ladder=['Free: the tip or palette in the reel', 'Low: a template or palette pack', 'Mid: the design course'], price=(9, 149),
    angles_w=['The spacing-and-palette teacher', 'The before/after redesigner', 'The Figma speed-runner', 'The design-for-digital teacher']),
  'gadget': dict(genders='A man',
-   what='A Shopify store that sells the gadgets themselves. Each reel shows a problem most people have, the gadget that solves it working on camera, and sends people to the store.',
-   offer='A $9 buyer\'s guide PDF first, then the gadgets themselves in the persona\'s Shopify store.', price=(9, 60),
+   what='Each reel shows a problem most people have and the gadget that solves it working on camera, with its honest downside. It starts with a $9 buyer\'s guide PDF; a Shopify store with the gadgets themselves comes later, only if the account grows.',
+   offer='A $9 buyer\'s guide PDF first. A Shopify store with the gadgets comes later, if the account grows.', price=(9, 60),
    ladder=['Free: the reel and the demo', 'Starter: a $9 buyer\'s guide PDF', 'Low: a small gadget', 'Mid: the better version or a bundle'],
    series=[('Problem, gadget, proof', 'One everyday problem, the gadget that fixes it, shown working.'), ('Under {cur}30', 'Cheap gadgets that solve a real problem.'), ('Does it really work?', 'A direct test of a gadget, downsides included.'), ('Setup in 30 seconds', 'How to start using the gadget.')],
-   pillars=['A problem most people have', 'The gadget solving it on camera', 'Honest limits and downsides', 'Where to get it (the store)'],
+   pillars=['A problem most people have', 'The gadget solving it on camera', 'Honest limits and downsides', 'Where to get it (the guide)'],
    honesty='Sell only products you ordered and tested yourself, with real footage. State the real price and shipping time and honour returns (EU and UK: 14 days). No fake reviews, countdown timers or stock claims. Check product safety marks, VAT and each platform\'s rules for selling and ads.'),
  'home': dict(genders='A woman',
-   what='A Shopify store that sells home items. Each reel shows a problem most homes have, the item that solves it working in a real room, and sends people to the store.',
-   offer='A $9 home finds guide PDF first, then the home items themselves in the persona\'s Shopify store.', price=(9, 50),
+   what='Each reel shows a problem most homes have and the item that solves it working in a real room, with its honest downside. It starts with a $9 home finds guide PDF; a Shopify store with the items comes later, only if the account grows.',
+   offer='A $9 home finds guide PDF first. A Shopify store with the items comes later, if the account grows.', price=(9, 50),
    ladder=['Free: the reel and the demo', 'Starter: a $9 home finds guide PDF', 'Low: a small item', 'Mid: a set or bundle'],
    series=[('Problem, item, proof', 'One home problem, the item that fixes it, shown working in a real room.'), ('Under {cur}20', 'Cheap home items that solve a real problem.'), ('Before / After room', 'A small space improved with a real item.'), ('Does it really work?', 'A direct test of a hyped item, downsides included.')],
-   pillars=['A problem most homes have', 'The item solving it in a real room', 'Before and after of the space', 'Honest limits and where to get it (the store)'],
+   pillars=['A problem most homes have', 'The item solving it in a real room', 'Before and after of the space', 'Honest limits and where to get it (the guide)'],
    honesty='Sell only items you ordered and tested yourself, with real footage and real before and after photos. State the real price and shipping time and honour returns (EU and UK: 14 days). No fake reviews, countdown timers or stock claims. Check product safety marks, VAT and each platform\'s rules for selling and ads.'),
 }
 for _k, _v in NICHE_OVR.items(): NK[_k].update(_v)
-PBIO = {('glam', 'w'): 'AI-generated character. My days and my trips. My page below where allowed.',('food', 'w'): 'AI creator. One healthy recipe per reel. Recipe book below.',
+PBIO = {('wealth', 'm'): 'AI creator. Money maths on screen. Budget tracker below.', ('rel', 'w'): 'AI creator. Dating and communication, one situation at a time. Workbook below.', ('self', 'm'): 'AI creator. One framework per reel. Planner below.',('glam', 'w'): 'AI-generated character. My days and my trips. My page below where allowed.',('food', 'w'): 'AI creator. One healthy recipe per reel. Recipe book below.',
         ('food', 'm'): 'AI creator. Lose fat, keep the muscle. 7-day plan below.',
         ('code', 'm'): 'AI creator. Claude hacks and repo tests. AI tricks PDF below.',
         ('design', 'w'): 'AI creator. Design tips for apps and sites. Course below.',
         ('gadget', 'm'): 'AI creator. Gadgets that fix daily problems. Store below.',
         ('home', 'w'): 'AI creator. Home items that fix daily problems. Store below.'}
-POFFER = {('glam', 'w'): 'Her own AI-labelled page, linked where the platform allows it',('food', 'w'): 'Recipe book (link in bio)', ('food', 'm'): '7-day shred plan and recipe book (link in bio)', ('code', 'm'): 'AI tricks PDF (link in bio)',
-          ('design', 'w'): 'Design course (link in bio)', ('gadget', 'm'): 'The gadgets, in his Shopify store (link in bio)', ('home', 'w'): 'The home items, in her Shopify store (link in bio)'}
+POFFER = {('wealth', 'm'): 'Budget tracker PDF (link in bio)', ('rel', 'w'): 'Conversation and boundaries workbook PDF (link in bio)', ('self', 'm'): 'Habit and weekly planner PDF (link in bio)',('glam', 'w'): 'Her own AI-labelled page, linked where the platform allows it',('food', 'w'): 'Recipe book (link in bio)', ('food', 'm'): '7-day shred plan and recipe book (link in bio)', ('code', 'm'): 'AI tricks PDF (link in bio)',
+          ('design', 'w'): 'Design course (link in bio)', ('gadget', 'm'): 'Buyer\'s guide PDF (link in bio); store later', ('home', 'w'): 'Home finds guide PDF (link in bio); store later'}
 BACK_TYLER = "{n} is a creator who explains fat loss with numbers: kcal, protein and water worked out on screen, what to eat and what not to eat, and simple recipes. {Sc} has no personal transformation story and does not claim one. {Sc} is clear that it is general information, not medical advice, and that {n} is an AI creator."
 
 # ---------------------------------------------------------------- persona building helpers
@@ -386,7 +440,7 @@ OUT = {
  ('bet','m'): 'a casual jacket over a tee and jeans',
  ('gadget','w'): 'a denim jacket and a crossbody bag', ('gadget','m'): 'a utility jacket and jeans',
  ('home','w'): 'a soft cardigan and jeans', ('home','m'): 'a flannel shirt and work trousers',
- ('glam','w'): 'a fitted summer dress and sunglasses', ('lang','w'): 'a smart-casual knit top and jeans', ('lang','m'): 'a smart-casual shirt and jeans',
+ ('glam','w'): 'a fitted summer dress and sunglasses', ('wealth','m'): 'a plain button-up shirt with the sleeves rolled and a watch', ('rel','w'): 'a soft knit top and simple jewellery', ('self','m'): 'a plain tee and a light overshirt', ('lang','w'): 'a smart-casual knit top and jeans', ('lang','m'): 'a smart-casual shirt and jeans',
 }
 CLIM = {'cold': ', with a warm coat and scarf in the cold season', 'mild': ', with a light jacket', 'warm': ', in light breathable fabrics'}
 SET = {
@@ -398,10 +452,14 @@ SET = {
  'home': 'in a small tidy living room corner with a shelf',
  'lang': 'at a local café table with a notebook and a coffee',
  'glam': 'in a bright bedroom with white linen and a brass lamp, relaxed',
+ 'wealth': 'at a tidy desk with a laptop showing a simple budget spreadsheet and a notebook',
+ 'rel': 'on a sofa with a mug in a calm living room, relaxed and attentive',
+ 'self': 'at a clean desk with a paper planner, a timer and a glass of water',
 }
 TONE = {
  'food': 'warm and encouraging', 'code': 'clear, curious and quick', 'design': 'calm and precise with dry humour',
  'bet': 'level-headed and measured, never hyped', 'gadget': 'curious, a little sceptical and honest',
+ 'wealth': 'calm, clear and numerate, never hyped', 'rel': 'warm, direct and kind, never judging', 'self': 'steady, clear and encouraging, no hype',
  'home': 'practical and cheerful', 'glam': 'warm, playful and a little flirty, always honest that she is AI', 'lang': 'patient, clear and smiling, slightly slower and articulate',
 }
 
@@ -415,6 +473,9 @@ BACK = {
  'bet': "{n} follows sport closely and prefers clear numbers over hype. {Sc} explains betting apps step by step, shows real bets and real results, and talks openly about losses. {Sc} always mentions limits and responsible gambling, and never promises profit.",
  'gadget': "{n} loves finding useful gadgets and tests them properly before saying anything. {Sc} and the team buy what they review, say what disappoints them and keep the verdict short. {Sc} is curious, a little sceptical and honest.",
  'home': "{n} enjoys making a home work better with small, practical changes. {Sc} and the team buy the items they review, test them in a real home and show honest before and afters. {Sc} is cheerful, practical and straight about what is not worth buying.",
+ 'wealth': "{n} likes making money maths simple. {Sc} works out the numbers on screen, explains where a normal pay cheque goes and what small habits add up to, and says clearly that it is general information, not advice. {Sc} is an AI creator, never names a stock or a coin, and has no portfolio story to sell.",
+ 'rel': "{n} explains dating and communication one situation at a time: what a behaviour might mean, what to say instead, and how to set a boundary kindly. {Sc} gives general information, not therapy, and is an AI creator, so {Sc} tells no personal love stories.",
+ 'self': "{n} explains one framework or routine per video, draws it on screen and sets a small two-day challenge. {Sc} is steady and encouraging, gives general information, not therapy, and is an AI creator, so {Sc} never claims a personal 90-day experiment.",
  'glam': "{n} is an AI-generated character who shares her days: her room, her favourite café, her gym and trips. {Sc} is warm, playful and a little flirty, says openly that she is an AI character, and keeps every place looking exactly the same from post to post.",
  'lang': "{n} is a patient teacher who believes anyone can learn a few useful phrases in seconds. {Sc} speaks {L} natively, teaches one phrase per episode, repeats it slowly and then at natural speed, and keeps lessons short and warm.",
 }
@@ -432,6 +493,8 @@ PILOT = {('us', 'food', 'w'), ('us', 'code', 'm')}
 def wave_of(market, niche):
     if niche == 'bet': return 3
     if niche == 'glam': return 1
+    if niche in ('self', 'rel'): return 1 if market in ('us', 'pt') else 4
+    if niche == 'wealth': return 2 if market in ('us', 'pt') else 4
     if market in ('us', 'pt'):
         return 1 if niche in ('food', 'code', 'design') else 2
     return 4
@@ -501,7 +564,7 @@ def build_persona(mid, nid, g, name, idx):
                 bio=PBIO.get((nid, g), n['bio']), offer=POFFER.get((nid, g), n['offer']), backstory=backstory, voice=voice, photo=photo, sheet=sheet, video=vp, ask=ask,
                 clips=cl, hooks=hooks, desc=dd, rules=rules, check=check, ph=sample_ph, weather=weather, hair=hair, outfit=outfit, setting=setting)
 
-PICK = {'food': 'w', 'code': 'm', 'design': 'w', 'gadget': 'm', 'home': 'w'}
+PICK = {'food': 'w', 'code': 'm', 'design': 'w', 'gadget': 'm', 'home': 'w'}  # new niches are set explicitly below
 for _mid in R:
     for _nid, _gg in PICK.items():
         _w, _m = R[_mid][_nid]
@@ -510,10 +573,16 @@ R['us']['food'] = ('Hannah', 'Tyler')
 for _m in R: R[_m]['glam'] = (None, None)
 R['us']['glam'] = ('Brooke', None); R['pt']['glam'] = ('Leonor', None)
 
+_W = dict(us='Jordan', uk='Liam', es='Alejandro', br='Bruno', pt='Nuno', fr='Nicolas', it='Francesco', de='Maximilian', fi='Mikko', dk='Christian', no='Lars')
+_R = dict(us='Natalie', uk='Sophie', es='Carmen', br='Beatriz', pt='Filipa', fr='Clemence', it='Francesca', de='Katharina', fi='Sanna', dk='Freja', no='Emilie')
+_S = dict(us='Austin', uk='Jamie', es='Hugo', br='Caio', pt='Goncalo', fr='Julien', it='Andrea', de='Paul', fi='Aleksi', dk='Villads', no='Mathias')
+for _m in R:
+    R[_m]['wealth'] = (None, _W[_m]); R[_m]['rel'] = (_R[_m], None); R[_m]['self'] = (None, _S[_m])
+
 P = []
 idx = 0
 for m in M:
-    for nid in ['food', 'code', 'design', 'bet', 'gadget', 'home', 'lang', 'glam']:
+    for nid in ['food', 'code', 'design', 'bet', 'gadget', 'home', 'lang', 'glam', 'wealth', 'rel', 'self']:
         w, mn = R[m['id']][nid]
         if nid == 'lang':
             P.append(build_persona(m['id'], nid, mn, w, idx)); idx += 1
@@ -522,7 +591,7 @@ for m in M:
                 P.append(build_persona(m['id'], nid, 'w', w, idx)); idx += 1
             if mn:
                 P.append(build_persona(m['id'], nid, 'm', mn, idx)); idx += 1
-assert len(P) == 76, len(P)
+assert len(P) == 109, len(P)
 
 # episode plan for language niche
 EPIS = [
@@ -544,11 +613,11 @@ PLAN = [
  dict(id='waves', title='Launch plan: pilot first', sub='Two personas, four weeks, then decide', icon='flag', blocks=[
   Pp('A 12 s talking video costs about 3,850 credits, so this plan starts small. Run a pilot with two personas, learn what works and what it costs, and only then add more.'),
   CD(('Pilot · weeks 1 to 4', 'Hannah (Healthy food, English US) and Ethan (Coding and AI, English US). Each posts about 2 clips a week: 1 talking video and 1 cheap format. Record views, follows, link clicks and credits spent per clip.'),
-     ('Wave 1 · only if the pilot works', 'Tyler (weight loss food), Zoe (design), Brooke (glam and lifestyle, clearly labelled AI) and the Portuguese Ines, Diogo, Catarina and Leonor. Add 2 to 3 at a time, never all at once.'),
-     ('Wave 2', 'Mason and Maya with their Shopify stores, Lily for language learning, and Rui, Joana and Sara in Portuguese. Open the store only after you have ordered and tested the first products.'),
+     ('Wave 1 · only if the pilot works', 'Tyler (weight loss food), Zoe (design), Brooke (glam and lifestyle, clearly labelled AI), Natalie (relationships), Austin (self-improvement) and the Portuguese Ines, Diogo, Catarina, Leonor, Filipa and Goncalo. Add 2 to 3 at a time, never all at once.'),
+     ('Wave 2', 'Mason and Maya with their $9 guide PDFs (a Shopify store only later, if the account grows), Lily for language learning, Rui, Joana and Sara in Portuguese, and the wealth personas Jordan and Nuno (education only, after the finance-rules check). Order and test the first products before you review them.'),
      ('Wave 3', 'One betting persona only after a legal check in an allowed market, and only with real bets and real results.'),
      ('Wave 4', 'The remaining languages. Nordic ones last because voice quality is untested and they need native review.')),
-  Pp('Every Pilot, Wave 1 and Wave 2 persona (15 in all) has a four-week plan on its own page, under Calendar, Topics and Setup: 12 connected topics, each with a teaser photo, a teaser story, the reel and a reel-is-live story that points to the product. The other personas get theirs when their wave starts.'),
+  Pp('Every Pilot, Wave 1 and Wave 2 persona (21 in all) has a four-week plan on its own page, under Calendar, Topics and Setup: 12 connected topics, each with a teaser photo, a teaser story, the reel and a reel-is-live story that points to the product. The other personas get theirs when their wave starts.'),
   H('Move on when'),
   L('After about 8 clips a persona, you can see which hooks and formats get views, and what each clip cost in credits.', 'Keep a persona if people follow and click. Change the angle before you spend more on it.', 'Do not judge in 7 days: the 7-day challenge account that was written off later had a video pass 250,000 views.'),
   H('Credits and cost'),
@@ -573,7 +642,8 @@ PLAN = [
   H('Budgets'),
   CD(('Setting up one persona', 'About 2,000 to 2,500 credits (estimate): character sheet, three photos with a few retries, and the 250 voice fee. Roughly $5 to $6 on Pro.'),
      ('Pilot: 2 personas, 4 weeks', 'Per persona per week: 1 talking video (3,850) and 1 cheap format (a photo with voiceover, about 250 to 750). About 17 talking videos and 17 cheap posts in the month would be about 65,000 credits without retries, or about 130,000 with them. Start with Wonder or Pro plus added credits, and cut to 1 talking video a week if the budget runs out.'),
-     ('Wave 1: 7 more personas', 'At 3 talking videos a week each, one persona is about 50,000 credits a month (estimate). Seven personas is about 350,000, or about 450,000 with the two pilot personas: more than four Wonder plans. At 2 talking videos a week, about 300,000 for all nine. Add personas only as the budget and the results allow.')),
+     ('Wave 1: 11 more personas', 'At 3 talking videos a week each, one persona is about 50,000 credits a month (estimate). Eleven personas is about 550,000, or about 650,000 with the two pilot personas: more than six Wonder plans. At 2 talking videos a week, about 430,000 for all thirteen. Add personas only as the budget and the results allow.'),
+     ('Posting 2 to 3 times a day', 'The plan has two feed posts on every posting day (a reel plus a recap carousel, or a teaser photo plus a silent re-cut), plus stories, and a third feed post once an account has momentum. The extra posts reuse the same photos and clips, so they cost no new credits. The price of a brand-new silent clip is not known: read the Generate button before you make one. At 12 or more reels a month per persona, the credits above are the limit, not the posting.')),
   H('Ways to spend less'),
   L('Preview in Draft 480p and upgrade only the winners within 7 days.', 'Use 6 second clips when a short line is enough: cost grows with length (estimate).', 'Mix formats: a photo with a slow push-in and a voiceover costs a fraction of a talking video.', 'Use 1K or 2K photos for references and 4K only for the final.', 'Try Kling 4.0 on Pro or Wonder while it is 50% off.', 'Make one video and post it on TikTok, Instagram and YouTube Shorts with three different captions.', 'Set a credit cap per persona per week and write down what each clip cost.'),
   H('Before you subscribe'),
@@ -717,10 +787,10 @@ PLAN.insert(1, dict(id='video21', title='Lessons: the 21-day video', sub='What t
   Pp('From the full video "I blew up an AI influencer on Instagram to prove it is not luck" (transcript and frames). The numbers are what the creator reported.'),
   H('Niches: the core four'), L(*RS.VIDEO['core']),
   H('Where our personas fit'),
-  CD(('Fits the core four', 'Tyler (weight loss and getting lean), Hannah and Ines (healthy food, a health niche), Brooke and Leonor (glow-up style and routine series).'),
+  CD(('Fits the core four', 'Tyler (weight loss and getting lean), Hannah and Ines (healthy food, a health niche), Brooke and Leonor (glow-up style and routine series), Natalie and Filipa (relationships), Austin and Goncalo (self-improvement), Jordan and Nuno (wealth, education only).'),
      ('Not core four, but close to the AI-influencer pattern in his list', 'Ethan and Diogo (AI and coding hacks, digital product), Zoe and Catarina (design, digital product), Lily and Sara (language learning, digital product).'),
      ('Different business model', 'Mason, Rui, Maya and Joana sell physical goods through a Shopify store. His model, and most of his tracked accounts, use digital products or affiliate links with no inventory.'),
-     ('Missing on purpose', 'Wealth, relationships and self-improvement. Wealth is regulated (finance promotion rules). Relationships and self-improvement are open to add.')),
+     ('Added after the video', 'Relationships, self-improvement and wealth are now niches, with one persona each per market. Wealth is the regulated one (UK, EU and Portugal rules on finance promotion): it is strictly education, in Wave 2, with no named products and no returns. Each sells a $9 PDF first.')),
   H('How a reel is built'), L(*RS.VIDEO['story']),
   H('More, better, new'), L(*RS.VIDEO['mbn']),
   H('What he actually got'), L(*RS.VIDEO['numbers']),
@@ -735,11 +805,11 @@ PLAN.insert(1, dict(id='video21', title='Lessons: the 21-day video', sub='What t
     'Bios carry search keywords and point to the product. Handles sound like a person; the AI label stays on.',
     'Expect about 5,000 views per early post and slow money: his real result was about $2,000 and 21,000 followers in 21 days from 8 million views. Plan on that, not on $90,000.',
     'Add a silent two-clip "before and after" reel format: two 8 second clips, no speech, text on screen, an in-app trending sound. It costs less than a talking video.',
-    'Posting more often is needed (viral AI accounts post several times a day). That is a credits decision: see the Credits and cost page.',
+    'Posting is now 2 to 3 times a day: on a reel day, the reel plus a recap carousel; on a teaser day, the teaser photo plus a silent re-cut of the last reel; plus stories. The extras reuse the same photos and clips, so they need no new credits.',
     'Keep an email list or a second platform, because an account can be suspended without warning.'),
   NT('Watch for the tracked list and the claims: the video is from a creator who also sells courses, and part of the numbers are his own.'),
 ]))
-BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang, glam=bank_glam)
+BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang, glam=bank_glam, wealth=bank_wealth, rel=bank_rel, self=bank_self)
 BANK = {k: dict(topics=m.TOPICS, intro=m.INT) for k, m in BANKS.items()}
 for k, v in BANK.items(): assert len(v['topics']) == 12, k
 def bank_key(p): return 'shred' if (p['niche'] == 'food' and p['g'] == 'm') else p['niche']

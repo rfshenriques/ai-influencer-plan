@@ -31,3 +31,17 @@ def B(t, prob, tech, ph, cap, q, beats, ot, te, cta):
 
 def INTRO(photos, meet):
     return dict(photos=photos, meet=meet)
+
+def Y(s):
+    """'English || Portuguese' string to an X pair."""
+    en, pt = s.split(' || ')
+    return X(en.strip(), pt.strip())
+
+def T(title, prob, tech, ph, tease, poll, b1, b2, b3, ot, te, cta):
+    """Compact topic. Each b is (visual EN, 'EN || PT' spoken line)."""
+    return B(title, prob, tech, ph, Y(tease), Y(poll), [(v, Y(l)) for v, l in (b1, b2, b3)], Y(ot), te, cta)
+
+def INTRO3(photos, meet_frames, meet_goal, meet_q):
+    """photos: three (title, img, why, 'EN || PT' caption); meet_frames: three EN frames; meet_q 'EN || PT'."""
+    return INTRO([P(a, b, c, Y(d)) for a, b, c, d in photos],
+                 S('Meet {name}', meet_frames, 'Follow reminder sticker', meet_goal, Y(meet_q)))
