@@ -352,15 +352,15 @@ NICHE_OVR = {
    angles_w=['The spacing-and-palette teacher', 'The before/after redesigner', 'The Figma speed-runner', 'The design-for-digital teacher']),
  'gadget': dict(genders='A man',
    what='A Shopify store that sells the gadgets themselves. Each reel shows a problem most people have, the gadget that solves it working on camera, and sends people to the store.',
-   offer='The gadgets themselves, sold in the persona\'s Shopify store.', price=(12, 60),
-   ladder=['Free: the reel and the demo', 'Low: a small gadget', 'Mid: the better version or a bundle'],
+   offer='A $9 buyer\'s guide PDF first, then the gadgets themselves in the persona\'s Shopify store.', price=(9, 60),
+   ladder=['Free: the reel and the demo', 'Starter: a $9 buyer\'s guide PDF', 'Low: a small gadget', 'Mid: the better version or a bundle'],
    series=[('Problem, gadget, proof', 'One everyday problem, the gadget that fixes it, shown working.'), ('Under {cur}30', 'Cheap gadgets that solve a real problem.'), ('Does it really work?', 'A direct test of a gadget, downsides included.'), ('Setup in 30 seconds', 'How to start using the gadget.')],
    pillars=['A problem most people have', 'The gadget solving it on camera', 'Honest limits and downsides', 'Where to get it (the store)'],
    honesty='Sell only products you ordered and tested yourself, with real footage. State the real price and shipping time and honour returns (EU and UK: 14 days). No fake reviews, countdown timers or stock claims. Check product safety marks, VAT and each platform\'s rules for selling and ads.'),
  'home': dict(genders='A woman',
    what='A Shopify store that sells home items. Each reel shows a problem most homes have, the item that solves it working in a real room, and sends people to the store.',
-   offer='The home items themselves, sold in the persona\'s Shopify store.', price=(10, 50),
-   ladder=['Free: the reel and the demo', 'Low: a small item', 'Mid: a set or bundle'],
+   offer='A $9 home finds guide PDF first, then the home items themselves in the persona\'s Shopify store.', price=(9, 50),
+   ladder=['Free: the reel and the demo', 'Starter: a $9 home finds guide PDF', 'Low: a small item', 'Mid: a set or bundle'],
    series=[('Problem, item, proof', 'One home problem, the item that fixes it, shown working in a real room.'), ('Under {cur}20', 'Cheap home items that solve a real problem.'), ('Before / After room', 'A small space improved with a real item.'), ('Does it really work?', 'A direct test of a hyped item, downsides included.')],
    pillars=['A problem most homes have', 'The item solving it in a real room', 'Before and after of the space', 'Honest limits and where to get it (the store)'],
    honesty='Sell only items you ordered and tested yourself, with real footage and real before and after photos. State the real price and shipping time and honour returns (EU and UK: 14 days). No fake reviews, countdown timers or stock claims. Check product safety marks, VAT and each platform\'s rules for selling and ads.'),
@@ -702,6 +702,42 @@ PLAN.insert(0, dict(id='research', title='Research: what works now', sub='Algori
     'Decided: Tyler has no transformation story. His credibility comes from the maths, the recipes and the tools.',
     'Gadgets and home depend on a registered company in the selling country and on TikTok Shop status, which is unclear in Portugal and absent in the Nordics.'),
   ('src', [list(x) for x in RS.GLOBAL['src']]),
+]))
+
+JSON_PROMPT = """{
+  "subject": "[age]-year-old [nationality] woman, [hair], [expression], [outfit]",
+  "environment": "[the locked place description from the world bible]",
+  "lighting": "natural window light from the left, soft shadows",
+  "mood": "[tired and self-conscious | confident and relaxed]",
+  "camera": "eye level, 9:16 vertical, handheld phone look",
+  "style": "hyperrealistic, 4K, natural skin texture with imperfections, fine hair strands visible, no studio polish"
+}
+Generate 4 variations. Keep the best one as the start frame for video."""
+PLAN.insert(1, dict(id='video21', title='Lessons: the 21-day video', sub='What the video says and what we change', icon='steps', blocks=[
+  Pp('From the full video "I blew up an AI influencer on Instagram to prove it is not luck" (transcript and frames). The numbers are what the creator reported.'),
+  H('Niches: the core four'), L(*RS.VIDEO['core']),
+  H('Where our personas fit'),
+  CD(('Fits the core four', 'Tyler (weight loss and getting lean), Hannah and Ines (healthy food, a health niche), Brooke and Leonor (glow-up style and routine series).'),
+     ('Not core four, but close to the AI-influencer pattern in his list', 'Ethan and Diogo (AI and coding hacks, digital product), Zoe and Catarina (design, digital product), Lily and Sara (language learning, digital product).'),
+     ('Different business model', 'Mason, Rui, Maya and Joana sell physical goods through a Shopify store. His model, and most of his tracked accounts, use digital products or affiliate links with no inventory.'),
+     ('Missing on purpose', 'Wealth, relationships and self-improvement. Wealth is regulated (finance promotion rules). Relationships and self-improvement are open to add.')),
+  H('How a reel is built'), L(*RS.VIDEO['story']),
+  H('More, better, new'), L(*RS.VIDEO['mbn']),
+  H('What he actually got'), L(*RS.VIDEO['numbers']),
+  H('Funnel and product'), L(*RS.VIDEO['funnel']),
+  H('How he made the content'), L(*RS.VIDEO['make']),
+  PR('Character image prompt (structured)', JSON_PROMPT),
+  H('Risks he ran into'), L(*RS.VIDEO['risks']),
+  H('What we will not copy'), L(*RS.VIDEO['wont']),
+  H('What this changes in our plan'),
+  L('Every reel is built as hook, pain and desire, payoff. Beat 3 in each topic is now the payoff.',
+    'Every persona gets a $9 to $27 starter PDF as its first product, written with AI in about 20 minutes and sold on a one-page store. Bigger products come later. Gadget and home personas get a buyer\'s guide PDF as the first rung before the store.',
+    'Bios carry search keywords and point to the product. Handles sound like a person; the AI label stays on.',
+    'Expect about 5,000 views per early post and slow money: his real result was about $2,000 and 21,000 followers in 21 days from 8 million views. Plan on that, not on $90,000.',
+    'Add a silent two-clip "before and after" reel format: two 8 second clips, no speech, text on screen, an in-app trending sound. It costs less than a talking video.',
+    'Posting more often is needed (viral AI accounts post several times a day). That is a credits decision: see the Credits and cost page.',
+    'Keep an email list or a second platform, because an account can be suspended without warning.'),
+  NT('Watch for the tracked list and the claims: the video is from a creator who also sells courses, and part of the numbers are his own.'),
 ]))
 BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang, glam=bank_glam)
 BANK = {k: dict(topics=m.TOPICS, intro=m.INT) for k, m in BANKS.items()}
