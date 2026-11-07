@@ -285,6 +285,7 @@ function topicHtml(p,x,n,L){
  h+=doneBtn(p,'ts',n,n);
  var bs=x.b,says=bs.map(function(b){return pk(b[1],l)}),saysEn=bs.map(function(b){return pk(b[1],en)}),T=['0 to 3 s','3 to 9 s','9 to 12 s'];
  h+=stepHead(3,'The reel (day of posting)')+'<div><span class="tag">'+esc(x.tech)+'</span></div>';
+ h+='<p class="pp"><b>Format:</b> 20 to 25 seconds. Film beat 1 as the 12 second talking clip. Make beats 2 and 3 as b-roll, 3 or 4 photos with a slow push-in (4K photo about 245 credits each), over the same saved voice. Estimated cost about 4,600 to 4,900 credits, against about 7,700 for two talking clips.</p>';
  h+=promptHtml('Hook, first line ('+L+')',sb(says[0],p));
  h+='<h3 class="sm">Show and say at the same time</h3><ol class="s" style="counter-reset:s 0">'+bs.map(function(b,k){return '<li><div class="st">'+T[k]+'</div><div class="sd"><b>Show:</b> '+esc(sb(pk(b[0],en),p))+'</div><div class="sd"><b>Say:</b> '+esc(sb(says[k],p))+'</div></li>'}).join('')+'</ol>';
  h+=promptHtml('Full spoken script ('+L+')',sb(says.join(' '),p));

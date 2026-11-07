@@ -374,7 +374,7 @@ PBIO = {('glam', 'w'): 'AI-generated character. My days and my trips. My page be
         ('home', 'w'): 'AI creator. Home items that fix daily problems. Store below.'}
 POFFER = {('glam', 'w'): 'Her own AI-labelled page, linked where the platform allows it',('food', 'w'): 'Recipe book (link in bio)', ('food', 'm'): '7-day shred plan and recipe book (link in bio)', ('code', 'm'): 'AI tricks PDF (link in bio)',
           ('design', 'w'): 'Design course (link in bio)', ('gadget', 'm'): 'The gadgets, in his Shopify store (link in bio)', ('home', 'w'): 'The home items, in her Shopify store (link in bio)'}
-BACK_TYLER = "{n} got tired of crash diets and guessing calories, and learned to lose fat while keeping muscle by tracking kcal, protein and water. {Sc} shows what to eat and what not to eat with the numbers on screen, does the maths live, and is clear that it is information, not medical advice. {Sc} is a creator, not a doctor."
+BACK_TYLER = "{n} is a creator who explains fat loss with numbers: kcal, protein and water worked out on screen, what to eat and what not to eat, and simple recipes. {Sc} has no personal transformation story and does not claim one. {Sc} is clear that it is general information, not medical advice, and that {n} is an AI creator."
 
 # ---------------------------------------------------------------- persona building helpers
 HAIR_W = ['shoulder-length dark brown hair with a few flyaway strands', 'long wavy light-brown hair loosely tied back', 'a short bob with natural texture', 'medium-length hair in a messy low bun', 'curly hair worn naturally', 'long straight hair tucked behind one ear']
@@ -696,10 +696,10 @@ PLAN.insert(0, dict(id='research', title='Research: what works now', sub='Algori
   H('AI labels'), L(*RS.GLOBAL['labels']),
   H('How people sell'), L(*RS.GLOBAL['sell']),
   H('What this changes in our plan'),
-  L('Clips are 12 seconds because of cost. The research favours 15 to 30 seconds for products and 30 to 60 for reach. Options: stitch two clips, or use voiceover over b-roll, which was the best-performing hook type for food.',
+  L('Decided: reels run 20 to 25 seconds. Beat 1 is the 12 second talking clip, and beats 2 and 3 are b-roll (4K photos with a slow push-in) over the same voice. Estimated cost about 4,600 to 4,900 credits a reel, against about 7,700 for two talking clips. Voiceover over b-roll was the best-performing food hook.',
     'Food: weekly menus and budget meal prep replace three single-recipe topics. Recipes stay, but they are no longer the whole plan.',
     'Every reel ends with a comment-a-keyword line, so the free resource goes out by DM and the paid product follows by email.',
-    'Tyler cannot use a transformation story. His credibility comes from the maths, the recipes and the tools.',
+    'Decided: Tyler has no transformation story. His credibility comes from the maths, the recipes and the tools.',
     'Gadgets and home depend on a registered company in the selling country and on TikTok Shop status, which is unclear in Portugal and absent in the Nordics.'),
   ('src', [list(x) for x in RS.GLOBAL['src']]),
 ]))
