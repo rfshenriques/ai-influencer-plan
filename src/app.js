@@ -235,80 +235,80 @@ function vMarket(id){
 }
 
 /* ---------- content plan ---------- */
-var CAL=[['Before launch',[['Day 0','p',0],['Day 0','p',1],['Day 0','p',2]]],
- ['Week 1',[['Mon','r',0],['Tue','s',0],['Wed','r',1],['Thu','s',1],['Sat','r',2]]],
- ['Week 2',[['Mon','r',3],['Tue','s',2],['Wed','r',4],['Thu','s',3],['Sat','r',5],['Sun','p',3]]],
- ['Week 3',[['Mon','r',6],['Tue','s',4],['Wed','r',7],['Thu','s',5],['Sat','r',8],['Sun','p',4]]],
- ['Week 4',[['Mon','r',9],['Tue','s',6],['Wed','r',10],['Thu','s',7],['Sat','r',11],['Sun','p',5]]]];
 function lgOf(p){return p.mkt==='pt'?'pt':'en'}
 function pk(x,l){return x&&typeof x==='object'&&!Array.isArray(x)&&(x.en!==undefined||x.pt!==undefined)?x[l]:x}
 function sb(s,p){return typeof s==='string'?s.replace(/\{name\}/g,p.name).replace(/\{city\}/g,MK[p.mkt].city).replace(/\{a\}/g,p.g==='w'?'a':'o').replace(/\{ora\}/g,p.g==='w'?'ora':'or'):s}
-function sbl(a,p){return Array.isArray(a)?a.map(function(x){return sb(x,p)}):sb(a,p)}
-function planOf(p){
- var b=D.bank[p.niche];if(!p.plan||!b)return null;
- var sh=b.reels.filter(function(r){return!r.g}),gd=b.reels.filter(function(r){return r.g===p.g}),R;
- if(gd.length>=2)R=sh.slice(0,5).concat([gd[0]],sh.slice(5,8),[gd[1]],sh.slice(8,10));else R=sh.concat(gd).slice(0,12);
- return {r:R,p:b.photos.filter(function(x){return!x.g||x.g===p.g}).slice(0,6),s:b.stories.filter(function(x){return!x.g||x.g===p.g}).slice(0,8)};
-}
+function bankOf(p){return D.bank[p.bank||p.niche]}
+function planOf(p){var b=bankOf(p);return p.plan&&b?b:null}
 function pdKey(p,t,i){return p.id+':'+t+i}
 function isDone(p,t,i){return !!(S.pd&&S.pd[pdKey(p,t,i)])}
-function doneBtn(p,t,i){var on=isDone(p,t,i);return '<button class="btn sm sec dn2" data-do="pdone" data-k="'+pdKey(p,t,i)+'" aria-pressed="'+on+'">'+(on?'Done':'Mark as done')+'</button>'}
-function itemHead(n,title,sub,open,id,done){return '<summary><span class="dnum'+(done?' ok':'')+'">'+n+'</span><span class="grow"><div class="t1">'+esc(title)+'</div>'+(sub?'<div class="t2">'+esc(sub)+'</div>':'')+'</span>'+CHEV+'</summary>'}
+function doneBtn(p,t,i,o){var on=isDone(p,t,i);return '<button class="btn sm sec dn2" data-do="pdone" data-k="'+pdKey(p,t,i)+'" data-o="'+o+'" aria-pressed="'+on+'">'+(on?'Done':'Mark as done')+'</button>'}
 function ul(a){return '<ul class="l">'+a.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'}
-function reelHtml(p,r,i,L){
- var l=lgOf(p),en='en',id='it-r'+i,open=nav.openItem==='r'+i;
- var h='<details class="det" id="'+id+'"'+(open?' open':'')+'>'+itemHead(i+1,sb(r.t,p),sb(pk(r.h,l),p),open,id,isDone(p,'r',i));
- h+='<div class="db">';
- h+='<div><span class="tag">'+esc(r.k)+'</span><span class="tag">'+esc(r.tech)+'</span></div>';
- h+=promptHtml('Hook ('+L+')',sb(pk(r.h,l),p));
- if(l!=='en')h+='<div class="ref">English: '+esc(sb(pk(r.h,en),p))+'</div>';
- h+='<h3 class="sm">Beats and movement</h3>'+ul(sbl(pk(r.sh,en),p));
- h+='<h3 class="sm">On-screen text</h3>'+ul(sbl(pk(r.ot,l),p));
- h+=promptHtml('Spoken script ('+L+')',sb(pk(r.s,l),p));
- if(l!=='en')h+='<div class="ref">English: '+esc(sb(pk(r.s,en),p))+'</div>';
- h+='<h3 class="sm">What we show or teach</h3><p class="pp">'+esc(sb(pk(r.te,en),p))+'</p>';
- var se=r.se?pk(r.se,l):null;if(se)h+='<h3 class="sm">Soft sell line</h3><p class="pp">'+esc(sb(se,p))+'</p>';
- h+=doneBtn(p,'r',i)+'</div></details>';
+function topicDone(p,n){return ['tp','ts','tr','tl'].filter(function(t){return isDone(p,t,n)}).length}
+function calOf(){
+ var c=[['Before launch',[['Day 0','i',-1],['Sun','t',0]]]];
+ for(var w=0;w<4;w++){var b=3*w,r=[['Mon','r',b],['Tue','t',b+1],['Wed','r',b+1],['Fri','t',b+2],['Sat','r',b+2]];if(w<3)r.push(['Sun','t',b+3]);c.push(['Week '+(w+1),r])}
+ return c;
+}
+function stepHead(n,t){return '<h3 class="sm">'+n+'. '+t+'</h3>'}
+function topicHtml(p,x,n,L){
+ var l=lgOf(p),en='en',open=nav.openItem==='t'+n,d=topicDone(p,n);
+ var h='<details class="det" id="it-t'+n+'"'+(open?' open':'')+'><summary><span class="dnum'+(d===4?' ok':'')+'">'+(n+1)+'</span><span class="grow"><div class="t1">'+esc(sb(x.t,p))+'</div><div class="t2">'+d+' of 4 steps done</div></span>'+CHEV+'</summary><div class="db">';
+ h+='<h3 class="sm">The problem it solves</h3><p class="pp">'+esc(sb(x.prob,p))+'</p>';
+ h+='<h3 class="sm">Where it leads</h3><p class="pp">'+esc(p.offer||'')+'</p>';
+ h+=stepHead(1,'Teaser photo (the day before)')+'<p class="pp">'+esc(sb(pk(x.ph,en),p))+'</p>'+promptHtml('Caption ('+L+')',sb(pk(x.cap,l),p));
+ if(l!==en)h+='<div class="ref">English: '+esc(sb(pk(x.cap,en),p))+'</div>';
+ h+=doneBtn(p,'tp',n,n);
+ h+=stepHead(2,'Teaser story (the day before)')+ul(['Frame 1: a close crop of the teaser photo with the text "Tomorrow: '+sb(x.t,p)+'".','Frame 2: a poll or quiz sticker with the question below.','Frame 3: a countdown sticker for the reel tomorrow.'])+promptHtml('Sticker question ('+L+')',sb(pk(x.q,l),p));
+ if(l!==en)h+='<div class="ref">English: '+esc(sb(pk(x.q,en),p))+'</div>';
+ h+=doneBtn(p,'ts',n,n);
+ var bs=x.b,says=bs.map(function(b){return pk(b[1],l)}),saysEn=bs.map(function(b){return pk(b[1],en)}),T=['0 to 3 s','3 to 9 s','9 to 12 s'];
+ h+=stepHead(3,'The reel (day of posting)')+'<div><span class="tag">'+esc(x.tech)+'</span></div>';
+ h+=promptHtml('Hook, first line ('+L+')',sb(says[0],p));
+ h+='<h3 class="sm">Show and say at the same time</h3><ol class="s" style="counter-reset:s 0">'+bs.map(function(b,k){return '<li><div class="st">'+T[k]+'</div><div class="sd"><b>Show:</b> '+esc(sb(pk(b[0],en),p))+'</div><div class="sd"><b>Say:</b> '+esc(sb(says[k],p))+'</div></li>'}).join('')+'</ol>';
+ h+=promptHtml('Full spoken script ('+L+')',sb(says.join(' '),p));
+ if(l!==en)h+='<div class="ref">English: '+esc(sb(saysEn.join(' '),p))+'</div>';
+ h+='<h3 class="sm">On-screen text</h3><p class="pp">'+esc(sb(pk(x.ot,l),p))+'</p>';
+ h+='<h3 class="sm">What we show or teach</h3><p class="pp">'+esc(sb(x.te,p))+'</p>';
+ h+=doneBtn(p,'tr',n,n);
+ h+=stepHead(4,'Reel-is-live story (same day)')+ul(['Frame 1: the reel cover with the text "New reel".','Frame 2: the problem in one line: '+sb(x.prob,p),'Frame 3: a link sticker or "link in bio" pointing to: '+(p.offer||'the product')+'.'])+promptHtml('Soft sell line ('+L+')',sb(pk(x.cta,l),p));
+ h+=doneBtn(p,'tl',n,n)+'</div></details>';
  return h;
 }
-function photoHtml(p,x,i,L){
- var l=lgOf(p),open=nav.openItem==='p'+i;
- var h='<details class="det" id="it-p'+i+'"'+(open?' open':'')+'>'+itemHead(i+1,sb(x.t,p),null,open,'',isDone(p,'p',i));
- h+='<div class="db"><h3 class="sm">What is in the frame</h3><p class="pp">'+esc(sb(x.img,p))+'</p><h3 class="sm">Why it is on the grid</h3><p class="pp">'+esc(sb(x.why,p))+'</p>';
- h+=promptHtml('Caption ('+L+')',sb(pk(x.cap,l),p));
- if(l!=='en')h+='<div class="ref">English: '+esc(sb(pk(x.cap,'en'),p))+'</div>';
- h+=doneBtn(p,'p',i)+'</div></details>';
- return h;
-}
-function storyHtml(p,x,i,L){
- var l=lgOf(p),open=nav.openItem==='s'+i;
- var h='<details class="det" id="it-s'+i+'"'+(open?' open':'')+'>'+itemHead(i+1,sb(x.t,p),x.go,open,'',isDone(p,'s',i));
- h+='<div class="db"><h3 class="sm">Frames</h3>'+ul(sbl(x.fr,p))+'<h3 class="sm">Sticker or interaction</h3><p class="pp">'+esc(x.st)+'</p>';
- if(x.q)h+=promptHtml('Question text ('+L+')',sb(pk(x.q,l)[0],p));
- h+=doneBtn(p,'s',i)+'</div></details>';
+function setupHtml(p,b,L){
+ var l=lgOf(p),en='en',it=b.intro,h='';
+ h+='<div class="note">Post these before the first reel so the page is not empty. They use the same saved character, 4:5.</div>';
+ h+='<h2>Intro photos</h2>'+it.photos.map(function(x,i){
+  var d=isDone(p,'ip',i);
+  return '<details class="det" id="it-i'+i+'"'+(nav.openItem==='i'+i?' open':'')+'><summary><span class="dnum'+(d?' ok':'')+'">'+(i+1)+'</span><span class="grow"><div class="t1">'+esc(sb(x.t,p))+'</div></span>'+CHEV+'</summary><div class="db"><h3 class="sm">What is in the frame</h3><p class="pp">'+esc(sb(x.img,p))+'</p><h3 class="sm">Why it is on the grid</h3><p class="pp">'+esc(sb(x.why,p))+'</p>'+promptHtml('Caption ('+L+')',sb(pk(x.cap,l),p))+(l!==en?'<div class="ref">English: '+esc(sb(pk(x.cap,en),p))+'</div>':'')+doneBtn(p,'ip',i,'i'+i)+'</div></details>'}).join('');
+ var m=it.meet,dm=isDone(p,'im',0);
+ h+='<h2>Intro story</h2><details class="det" id="it-m0"'+(nav.openItem==='m0'?' open':'')+'><summary><span class="dnum'+(dm?' ok':'')+'">1</span><span class="grow"><div class="t1">'+esc(sb(m.t,p))+'</div><div class="t2">'+esc(m.go)+'</div></span>'+CHEV+'</summary><div class="db"><h3 class="sm">Frames</h3>'+ul(m.fr.map(function(f){return sb(f,p)}))+'<h3 class="sm">Sticker</h3><p class="pp">'+esc(m.st)+'</p>'+(m.q?promptHtml('Question text ('+L+')',sb(pk(m.q,l),p)):'')+doneBtn(p,'im',0,'m0')+'</div></details>';
+ h+='<h2>How the product fits in</h2><div class="card"><ul class="l"><li>Product: '+esc(p.offer||'')+'</li><li>Bio line: '+esc(p.bio||'')+'</li><li>Every reel ends with one calm line that points to the product. The photo before it teases, the story before it asks a question, and the story on the day says the reel is live.</li><li>The first eleven topics help first. The twelfth shows the product itself.</li></ul></div>';
  return h;
 }
 function planHtml(p){
- var pl=planOf(p),m=MK[p.mkt];
- if(!pl)return '<div class="card"><h3>Not planned yet</h3><p style="margin:.2rem 0 0;color:var(--label2)">The full content plan (12 reels, 6 photos and 8 story sets, with scripts) is written for the pilot and Waves 1 and 2 in English (US) and Portuguese (Portugal). For this persona use the Content tab for its first 10 clips, and ask Claude to write the full plan when its wave starts.</p></div>';
- var L=lgOf(p)==='pt'?'European Portuguese':'English',t=nav.pl||'Calendar',total=pl.r.length+pl.p.length+pl.s.length,done=0;
- pl.r.forEach(function(_,i){if(isDone(p,'r',i))done++});pl.p.forEach(function(_,i){if(isDone(p,'p',i))done++});pl.s.forEach(function(_,i){if(isDone(p,'s',i))done++});
- var h='<div class="seg" role="group" aria-label="Plan view">'+['Calendar','Reels','Photos','Stories'].map(function(s){return '<button aria-pressed="'+(t===s)+'" data-do="plt" data-v="'+s+'">'+s+'</button>'}).join('')+'</div>';
+ var b=planOf(p);
+ if(!b)return '<div class="card"><h3>Not planned yet</h3><p style="margin:.2rem 0 0;color:var(--label2)">The connected content plan (12 topics with teaser photo, teaser story, reel and reel-is-live story) is written for the pilot, Wave 1 and Wave 2 in English (US) and Portuguese (Portugal). Other personas get theirs when their wave starts.</p></div>';
+ var L=lgOf(p)==='pt'?'European Portuguese':'English',t=nav.pl||'Calendar',total=4+48,done=0;
+ b.intro.photos.forEach(function(_,i){if(isDone(p,'ip',i))done++});if(isDone(p,'im',0))done++;
+ b.topics.forEach(function(_,n){done+=topicDone(p,n)});
+ var h='<div class="seg" role="group" aria-label="Plan view">'+['Calendar','Topics','Setup'].map(function(s){return '<button aria-pressed="'+(t===s)+'" data-do="plt" data-v="'+s+'">'+s+'</button>'}).join('')+'</div>';
  h+='<div class="bar" aria-hidden="true"><i style="width:'+Math.round(done/total*100)+'%"></i></div><div style="color:var(--label2);font-size:.875rem;margin:0 0 .8rem">'+done+' of '+total+' done</div>';
  if(t==='Calendar'){
-  h+='<div class="note">Four weeks, 12 reels, 6 photos and 8 story sets. Reels also go to TikTok and YouTube Shorts; stories are Instagram. '+(lgOf(p)==='pt'?'Spoken lines and on-screen text are in European Portuguese with an English reference; directions are in English. A native speaker should check them before you generate.':'Everything is in English.')+'</div>';
-  CAL.forEach(function(w){
+  h+='<div class="note">Four weeks, 12 connected topics. Each topic: a teaser photo and story the day before, then the reel and a reel-is-live story. Reels also go to TikTok and YouTube Shorts; stories are Instagram. '+(lgOf(p)==='pt'?'Spoken lines and on-screen text are in European Portuguese with an English reference; directions are in English.':'')+'</div>';
+  calOf().forEach(function(w){
    h+='<h2>'+w[0]+'</h2><div class="grp">'+w[1].map(function(e){
-    var arr=e[1]==='r'?pl.r:e[1]==='p'?pl.p:pl.s,it=arr[e[2]],tn=e[1]==='r'?'Reels':e[1]==='p'?'Photos':'Stories',kind=e[1]==='r'?'Reel':e[1]==='p'?'Photo':'Story set',d=isDone(p,e[1],e[2]);
-    return '<button class="row" data-do="plgo" data-v="'+tn+'" data-k="'+e[1]+e[2]+'"><span class="dnum'+(d?' ok':'')+'">'+e[0].slice(0,3)+'</span><span class="grow"><div class="t1">'+esc(sb(it.t,p))+'</div><div class="t2">'+kind+' '+(e[2]+1)+(e[1]==='r'?' · '+esc(it.k):'')+'</div></span>'+CHEV+'</button>'}).join('')+'</div>';
+    var k=e[1],n=e[2],tn=k==='i'?'Setup':'Topics',title,sub,d;
+    if(k==='i'){title='Intro photos and the Meet story';sub='Three photos and the intro story';d=isDone(p,'im',0)}
+    else{var x=b.topics[n];title=sb(x.t,p);
+     if(k==='t'){sub='Teaser photo and teaser story';d=isDone(p,'tp',n)&&isDone(p,'ts',n)}else{sub='Reel and reel-is-live story';d=isDone(p,'tr',n)&&isDone(p,'tl',n)}}
+    return '<button class="row" data-do="plgo" data-v="'+tn+'" data-k="'+(k==='i'?'i0':'t'+n)+'"><span class="dnum'+(d?' ok':'')+'">'+e[0].slice(0,3)+'</span><span class="grow"><div class="t1">'+esc(title)+'</div><div class="t2">'+esc(sub)+'</div></span>'+CHEV+'</button>'}).join('')+'</div>';
   });
-  h+='<div class="note">Before filming: cook, build, test or measure it for real. Replace every [BRACKET] with something the team actually did and its real result. Numbers in scripts are examples.</div>';
- }else if(t==='Reels'){
-  h+=pl.r.map(function(r,i){return reelHtml(p,r,i,L)}).join('');
- }else if(t==='Photos'){
-  h+='<div class="note">The first three go up before launch so the grid is not empty. All photos use the same saved character, 4:5.</div>'+pl.p.map(function(x,i){return photoHtml(p,x,i,L)}).join('');
+  h+='<div class="note">Before filming: cook, build, test or measure it for real. Replace every [BRACKET] with something the team actually did and its real result. Numbers in scripts are examples. For products you sell, use only items you have ordered and tested.</div>';
+ }else if(t==='Topics'){
+  h+=b.topics.map(function(x,n){return topicHtml(p,x,n,L)}).join('');
  }else{
-  h+=pl.s.map(function(x,i){return storyHtml(p,x,i,L)}).join('');
+  h+=setupHtml(p,b,L);
  }
  return h;
 }
@@ -346,7 +346,7 @@ function secHtml(p,n,m){
  }else if(s==='Content plan'){
   h+=planHtml(p);
  }else if(s==='Sell'){
-  h+='<div class="card">'+kv('Offer',n.offer)+kv('Price range',p.price)+kv('Product ladder',n.ladder.join(' → '))+'</div>';
+  h+='<div class="card">'+kv('Offer',p.offer||n.offer)+kv('Price range',p.price)+kv('Product ladder',n.ladder.join(' → '))+'</div>';
   h+='<h2>How it sells without selling</h2><div class="card"><ul class="l"><li>About 60% value-first posts, 25% story posts, 15% soft call to action.</li><li>Show the result first, then let the offer appear as the next step.</li><li>One calm line: "The full plan is in my bio if you want it, no pressure."</li></ul></div>';
   h+='<h2>Descriptions for clip 1 (English draft)</h2>'+promptHtml('TikTok',p.desc.tt)+promptHtml('Instagram Reels',p.desc.ig)+promptHtml('YouTube Shorts title',p.desc.yt_title)+promptHtml('YouTube Shorts description',p.desc.yt);
   h+='<div class="note">Claude writes the finished versions in '+esc(m.lang)+'. Use the request in the Prompts tab.</div>';
@@ -453,7 +453,7 @@ document.addEventListener('click',function(e){
  }else if(a==='plgo'){
   nav.pl=d.v;nav.openItem=d.k;renderView();var el=document.getElementById('it-'+d.k);if(el)scrollTo(0,Math.max(0,el.getBoundingClientRect().top+scrollY-150));
  }else if(a==='pdone'){
-  S.pd=S.pd||{};S.pd[d.k]=!S.pd[d.k];if(!S.pd[d.k])delete S.pd[d.k];save();var on=!!S.pd[d.k];el.setAttribute('aria-pressed',on);el.textContent=on?'Done':'Mark as done';var sm=el.closest('details');if(sm){var nm=sm.querySelector('.dnum');if(nm)nm.classList.toggle('ok',on)}
+  S.pd=S.pd||{};S.pd[d.k]=!S.pd[d.k];if(!S.pd[d.k])delete S.pd[d.k];save();var y5=scrollY;if(d.o)nav.openItem=d.o;renderView();scrollTo(0,y5);
  }else if(a==='status'){
   S.st[d.id]=d.v;save();var y3=scrollY;renderView();scrollTo(0,y3);
  }else if(a==='ck'){

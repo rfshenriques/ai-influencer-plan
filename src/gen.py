@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generates data.json: markets, niches, personas, plan pages."""
 import json
-import bank_food, bank_code, bank_design, bank_gadget, bank_home, bank_lang
+import bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang
 
 # ---------------------------------------------------------------- markets
 M = [
@@ -314,6 +314,49 @@ N = [
 ]
 NK = {n['id']: n for n in N}
 
+# ---- rework (7 Nov 2026): one persona per niche per language; own product per persona ----
+NICHE_OVR = {
+ 'food': dict(genders='A woman (healthy recipes) and, in the US, a man (weight loss and getting lean)',
+   what='Two personas in the US. The woman cooks one healthy recipe per reel (cakes, pies, burgers, lettuce wraps) and points to her recipe book. The man covers weight loss and getting lean: recipes, what to eat and what not to eat with kcal, and calculators for kcal, protein and water, pointing to his recipe book and 7-day plan. Other languages get one woman doing the healthy recipes. Wellness lives inside this niche.',
+   offer='Hannah: a recipe book. Tyler: a 7-day shred plan and a recipe book.',
+   ladder=['Free: the recipe or the trick in the reel', 'Low: the recipe book', 'Mid: the 7-day plan (Tyler) or recipe book bundle'],
+   angles_m=['The cut-and-keep-the-muscle cook', 'The what-to-eat-and-what-not coach', 'The kcal, protein and water calculator guy', 'The 7-day shred planner']),
+ 'code': dict(genders='A man',
+   what='One man who teaches AI and coding hacks with Claude, tests trending GitHub repos and says whether they really work, builds apps on camera, and sells a PDF or short book of AI tricks.',
+   offer='A PDF or short book of AI tricks (Claude workflows, prompts, repo tests), plus optional prompt packs.',
+   ladder=['Free: the trick in the reel', 'Low: the AI tricks PDF', 'Mid: prompt and workflow pack', 'High: mini course'], price=(9, 39),
+   angles_m=['The Claude hacks guy', 'The does-this-repo-really-work tester', 'The weekend app builder', 'The workflow automator']),
+ 'design': dict(genders='A woman',
+   what='One woman who teaches design for digital: spacing rules, colour palettes applied to a real site or app (start with one colour, add a second, the third makes it pop), type, contrast and before and afters, and sells a course.',
+   offer='A design course (with UI kits and palettes).',
+   ladder=['Free: the tip in the reel', 'Low: palette and UI kit pack', 'Mid: the design course'], price=(19, 149),
+   angles_w=['The spacing-and-palette teacher', 'The before/after redesigner', 'The Figma speed-runner', 'The design-for-digital teacher']),
+ 'gadget': dict(genders='A man',
+   what='A Shopify store that sells the gadgets themselves. Each reel shows a problem most people have, the gadget that solves it working on camera, and sends people to the store.',
+   offer='The gadgets themselves, sold in the persona\'s Shopify store.', price=(12, 60),
+   ladder=['Free: the reel and the demo', 'Low: a small gadget', 'Mid: the better version or a bundle'],
+   series=[('Problem, gadget, proof', 'One everyday problem, the gadget that fixes it, shown working.'), ('Under {cur}30', 'Cheap gadgets that solve a real problem.'), ('Does it really work?', 'A direct test of a gadget, downsides included.'), ('Setup in 30 seconds', 'How to start using the gadget.')],
+   pillars=['A problem most people have', 'The gadget solving it on camera', 'Honest limits and downsides', 'Where to get it (the store)'],
+   honesty='Sell only products you ordered and tested yourself, with real footage. State the real price and shipping time and honour returns (EU and UK: 14 days). No fake reviews, countdown timers or stock claims. Check product safety marks, VAT and each platform\'s rules for selling and ads.'),
+ 'home': dict(genders='A woman',
+   what='A Shopify store that sells home items. Each reel shows a problem most homes have, the item that solves it working in a real room, and sends people to the store.',
+   offer='The home items themselves, sold in the persona\'s Shopify store.', price=(10, 50),
+   ladder=['Free: the reel and the demo', 'Low: a small item', 'Mid: a set or bundle'],
+   series=[('Problem, item, proof', 'One home problem, the item that fixes it, shown working in a real room.'), ('Under {cur}20', 'Cheap home items that solve a real problem.'), ('Before / After room', 'A small space improved with a real item.'), ('Does it really work?', 'A direct test of a hyped item, downsides included.')],
+   pillars=['A problem most homes have', 'The item solving it in a real room', 'Before and after of the space', 'Honest limits and where to get it (the store)'],
+   honesty='Sell only items you ordered and tested yourself, with real footage and real before and after photos. State the real price and shipping time and honour returns (EU and UK: 14 days). No fake reviews, countdown timers or stock claims. Check product safety marks, VAT and each platform\'s rules for selling and ads.'),
+}
+for _k, _v in NICHE_OVR.items(): NK[_k].update(_v)
+PBIO = {('food', 'w'): 'AI creator. One healthy recipe per reel. Recipe book below.',
+        ('food', 'm'): 'AI creator. Lose fat, keep the muscle. 7-day plan below.',
+        ('code', 'm'): 'AI creator. Claude hacks and repo tests. AI tricks PDF below.',
+        ('design', 'w'): 'AI creator. Design tips for apps and sites. Course below.',
+        ('gadget', 'm'): 'AI creator. Gadgets that fix daily problems. Store below.',
+        ('home', 'w'): 'AI creator. Home items that fix daily problems. Store below.'}
+POFFER = {('food', 'w'): 'Recipe book (link in bio)', ('food', 'm'): '7-day shred plan and recipe book (link in bio)', ('code', 'm'): 'AI tricks PDF (link in bio)',
+          ('design', 'w'): 'Design course (link in bio)', ('gadget', 'm'): 'The gadgets, in his Shopify store (link in bio)', ('home', 'w'): 'The home items, in her Shopify store (link in bio)'}
+BACK_TYLER = "{n} got tired of crash diets and guessing calories, and learned to lose fat while keeping muscle by tracking kcal, protein and water. {Sc} shows what to eat and what not to eat with the numbers on screen, does the maths live, and is clear that it is information, not medical advice. {Sc} is a creator, not a doctor."
+
 # ---------------------------------------------------------------- persona building helpers
 HAIR_W = ['shoulder-length dark brown hair with a few flyaway strands', 'long wavy light-brown hair loosely tied back', 'a short bob with natural texture', 'medium-length hair in a messy low bun', 'curly hair worn naturally', 'long straight hair tucked behind one ear']
 HAIR_M = ['short dark hair with a natural messy texture', 'short light-brown hair and a few days of stubble', 'medium-length wavy hair pushed back', 'a short fade with natural texture', 'short curly hair', 'a light beard and short tidy hair']
@@ -382,11 +425,11 @@ def build_persona(mid, nid, g, name, idx):
     hair = (HAIR_W if g == 'w' else HAIR_M)[(mi + idx) % 6]
     outfit = OUT[(nid, g)]
     weather = {'cold':'For outdoor shots add a warm coat and scarf.','mild':'For outdoor shots add a light jacket.','warm':'Keep fabrics light and breathable.'}[m['climate']]
-    setting = SET[nid]
+    setting = SET[nid] if (nid, g) != ('food', 'm') else 'in a bright home kitchen with a food scale and a shaker on the counter'
     learner = (LEARNER['en'] + ' (with a second set of captions in Portuguese later)') if mid in ('us', 'uk') else 'English'
     langname = m['lang']
     gw = 'woman' if g == 'w' else 'man'
-    backstory = BACK[nid].format(n=name, Sc=p['Sc'], P=p['P'], L=langname)
+    backstory = (BACK_TYLER if (nid, g) == ('food', 'm') else BACK[nid]).format(n=name, Sc=p['Sc'], P=p['P'], L=langname)
     voice = f"{age} years old, from {m['city']}, {m['accent']}, {'medium pitch' if g=='w' else 'medium-low pitch'}, {TONE[nid]}, relaxed conversational pace like talking to a friend, slightly casual and unpolished, not an announcer, not a sales voice."
     photo = (f"Photorealistic candid phone photo of a {age}-year-old {gw} who could plausibly be from {m['city']}, with {hair}, wearing {outfit}, {setting}. "
              f"Natural skin texture with real imperfections, no beauty-filter gloss, slightly imperfect framing as if a friend took it, soft natural light. Full body, vertical 4:5, 4K.")
@@ -433,8 +476,15 @@ def build_persona(mid, nid, g, name, idx):
     pid = f"{mid}-{nid}" + ('' if nid == 'lang' else '-' + g)
     return dict(id=pid, name=name, g=g, mkt=mid, niche=nid, age=age, angle=angle, wave=wave,
                 price=price_str(n, m), learner=learner if nid == 'lang' else None,
-                bio=n['bio'], backstory=backstory, voice=voice, photo=photo, sheet=sheet, video=vp, ask=ask,
+                bio=PBIO.get((nid, g), n['bio']), offer=POFFER.get((nid, g), n['offer']), backstory=backstory, voice=voice, photo=photo, sheet=sheet, video=vp, ask=ask,
                 clips=cl, hooks=hooks, desc=dd, rules=rules, check=check, ph=sample_ph, weather=weather, hair=hair, outfit=outfit, setting=setting)
+
+PICK = {'food': 'w', 'code': 'm', 'design': 'w', 'gadget': 'm', 'home': 'w'}
+for _mid in R:
+    for _nid, _gg in PICK.items():
+        _w, _m = R[_mid][_nid]
+        R[_mid][_nid] = (_w, None) if _gg == 'w' else (None, _m)
+R['us']['food'] = ('Hannah', 'Tyler')
 
 P = []
 idx = 0
@@ -448,7 +498,7 @@ for m in M:
                 P.append(build_persona(m['id'], nid, 'w', w, idx)); idx += 1
             if mn:
                 P.append(build_persona(m['id'], nid, 'm', mn, idx)); idx += 1
-assert len(P) == 128, len(P)
+assert len(P) == 74, len(P)
 
 # episode plan for language niche
 EPIS = [
@@ -470,11 +520,11 @@ PLAN = [
  dict(id='waves', title='Launch plan: pilot first', sub='Two personas, four weeks, then decide', icon='flag', blocks=[
   Pp('A 12 s talking video costs about 3,850 credits, so this plan starts small. Run a pilot with two personas, learn what works and what it costs, and only then add more.'),
   CD(('Pilot · weeks 1 to 4', 'Hannah (Healthy food, English US) and Ethan (Coding and AI, English US). Each posts about 2 clips a week: 1 talking video and 1 cheap format. Record views, follows, link clicks and credits spent per clip.'),
-     ('Wave 1 · only if the pilot works', 'The other healthy food, coding and design personas in English (US) and Portuguese (Portugal). Add 2 to 4 at a time, never all at once.'),
-     ('Wave 2', 'Gadgets, Home finds and Language learning in the languages that worked.'),
+     ('Wave 1 · only if the pilot works', 'Tyler (weight loss food), Zoe (design) and the Portuguese Ines, Diogo and Catarina. Add 2 to 3 at a time, never all at once.'),
+     ('Wave 2', 'Mason and Maya with their Shopify stores, Lily for language learning, and Rui, Joana and Sara in Portuguese. Open the store only after you have ordered and tested the first products.'),
      ('Wave 3', 'One betting persona only after a legal check in an allowed market, and only with real bets and real results.'),
      ('Wave 4', 'The remaining languages. Nordic ones last because voice quality is untested and they need native review.')),
-  Pp('Every Pilot, Wave 1 and Wave 2 persona in English (US) and Portuguese (Portugal) has a full four-week plan on its own page, under Content plan: 12 reels, 6 photos and 8 story sets with hooks, beats, scripts and captions. The other personas get theirs when their wave starts.'),
+  Pp('Every Pilot, Wave 1 and Wave 2 persona (13 in all) has a four-week plan on its own page, under Calendar, Topics and Setup: 12 connected topics, each with a teaser photo, a teaser story, the reel and a reel-is-live story that points to the product. The other personas get theirs when their wave starts.'),
   H('Move on when'),
   L('After about 8 clips a persona, you can see which hooks and formats get views, and what each clip cost in credits.', 'Keep a persona if people follow and click. Change the angle before you spend more on it.', 'Do not judge in 7 days: the 7-day challenge account that was written off later had a video pass 250,000 views.'),
   H('Credits and cost'),
@@ -499,7 +549,7 @@ PLAN = [
   H('Budgets'),
   CD(('Setting up one persona', 'About 2,000 to 2,500 credits (estimate): character sheet, three photos with a few retries, and the 250 voice fee. Roughly $5 to $6 on Pro.'),
      ('Pilot: 2 personas, 4 weeks', 'Per persona per week: 1 talking video (3,850) and 1 cheap format (a photo with voiceover, about 250 to 750). About 17 talking videos and 17 cheap posts in the month would be about 65,000 credits without retries, or about 130,000 with them. Start with Wonder or Pro plus added credits, and cut to 1 talking video a week if the budget runs out.'),
-     ('Wave 1: 12 personas', 'At 3 talking videos a week each this is about 600,000 credits a month, nearly six Wonder plans. Not realistic. Add personas only as the budget and the results allow.')),
+     ('Wave 1: 5 more personas', 'At 3 talking videos a week each, one persona is about 50,000 credits a month (estimate). Five personas is about 250,000, or about 350,000 with the two pilot personas: more than three Wonder plans. At 2 talking videos a week, about 235,000 for all seven. Add personas only as the budget and the results allow.')),
   H('Ways to spend less'),
   L('Preview in Draft 480p and upgrade only the winners within 7 days.', 'Use 6 second clips when a short line is enough: cost grows with length (estimate).', 'Mix formats: a photo with a slow push-in and a voiceover costs a fraction of a talking video.', 'Use 1K or 2K photos for references and 4K only for the final.', 'Try Kling 4.0 on Pro or Wonder while it is 50% off.', 'Make one video and post it on TikTok, Instagram and YouTube Shorts with three different captions.', 'Set a credit cap per persona per week and write down what each clip cost.'),
   H('Before you subscribe'),
@@ -613,10 +663,13 @@ PLAN = [
  ]),
 ]
 
-BANKS = dict(food=bank_food, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang)
-BANK = {k: dict(reels=m.REELS, photos=m.PHOTOS, stories=m.STORIES) for k, m in BANKS.items()}
+BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang)
+BANK = {k: dict(topics=m.TOPICS, intro=m.INT) for k, m in BANKS.items()}
+for k, v in BANK.items(): assert len(v['topics']) == 12, k
+def bank_key(p): return 'shred' if (p['niche'] == 'food' and p['g'] == 'm') else p['niche']
 for p in P:
-    p['plan'] = bool(p['wave'] <= 2 and p['mkt'] in ('us', 'pt') and p['niche'] in BANK)
+    p['plan'] = bool(p['wave'] <= 2 and p['mkt'] in ('us', 'pt') and bank_key(p) in BANK)
+    p['bank'] = bank_key(p)
 out = dict(markets=M, niches=N, personas=P, plan=[{k: v for k, v in s.items()} for s in PLAN], epis=EPIS, bank=BANK)
 json.dump(out, open('data.json', 'w'), ensure_ascii=False, separators=(',', ':'))
 print('personas', len(P), 'bytes', len(json.dumps(out, ensure_ascii=False)))

@@ -22,3 +22,12 @@ def S(t, frames, sticker, goal, q=None, g=None):
     if q: d['q'] = q
     if g: d['g'] = g
     return d
+
+def B(t, prob, tech, ph, cap, q, beats, ot, te, cta):
+    """Connected topic. One problem, one teaser photo + story the day before, one reel, one reel-is-live story, one product link.
+    beats = three (visual EN, spoken X) tuples for 0-3 s, 3-9 s, 9-12 s: what is shown and what is said at the same time.
+    ph = teaser photo (EN), cap = its caption X, q = teaser story poll question X, ot = on-screen text X, te = what we teach (EN), cta = soft sell line X."""
+    return dict(t=t, prob=prob, tech=tech, ph=ph, cap=cap, q=q, b=beats, ot=ot, te=te, cta=cta)
+
+def INTRO(photos, meet):
+    return dict(photos=photos, meet=meet)
