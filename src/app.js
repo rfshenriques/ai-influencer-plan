@@ -68,7 +68,7 @@ function betTag(m){var b=m.bet[0];return '<span class="tag '+b+'">'+(b==='ok'?'B
 var nav={tab:'personas',stack:[],sec:'Overview'},scrolls=[];
 var cur=function(){return nav.stack[nav.stack.length-1]||{v:nav.tab}};
 var navbg=document.querySelector('.nav-bg'),root=document.getElementById('root'),top=document.getElementById('top'),tabbar=document.getElementById('tabbar'),toastEl=document.getElementById('toast');
-var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['plan','Plan','plan']];
+var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['make','Make','bolt'],['plan','Plan','plan']];
 
 /* ---------- views ---------- */
 function blocksHtml(bl){
@@ -197,6 +197,77 @@ function vMarkets(){
  });
  return h+'</div>';
 }
+
+/* ---------- Make: one production line, filled for the chosen persona and topic ---------- */
+function mkState(){
+ var plan=D.personas.filter(function(p){return p.plan});
+ S.mk=S.mk||{};
+ if(!S.mk.p||!PK[S.mk.p])S.mk.p=(plan[0]||D.personas[0]).id;
+ S.mk.t=+S.mk.t||0;
+ return S.mk;
+}
+function mkFill(t,m){return String(t||'').replace(/\[\[VISUAL\]\]/g,m.visual||'').replace(/\[\[LINE\]\]/g,m.line||'').replace(/\[\[SECS\]\]/g,m.secs||8).replace(/\[\[EXTRA\]\]/g,m.extra||'').replace(/\s{2,}/g,' ').trim()}
+function mkWords(s){return s.trim().split(/\s+/).filter(Boolean).length}
+function mkStress(line){
+ var ws=line.split(/(\s+)/),best=-1,len=0;
+ ws.forEach(function(w,i){var c=w.replace(/[^A-Za-zÀ-ÿ]/g,'');if(c.length>len&&c.length>=6&&c===c.toLowerCase()){len=c.length;best=i}});
+ if(best<0)return line;
+ ws[best]=ws[best].replace(/[A-Za-zÀ-ÿ]+/,function(w){return w.toUpperCase()});return ws.join('');
+}
+var MKF={en:['See you soon.','Anyway, that is the idea.','Anyway, that is it for today, see you soon.'],pt:['Até já.','Enfim, é essa a ideia.','Enfim, é isto por hoje, até já.']};
+function mkBeat(p,x,i){
+ var l=lgOf(p),b=x.b[i],vis=sb(pk(b[0],'en'),p),texts=[];
+ vis=vis.replace(/\s*(On screen|Text|Downside card|Label)s?:\s*"([^"]*)"\.?/g,function(_,k,t){texts.push(t);return ''}).trim();
+ var line=sb(pk(b[1],l),p),est=mkWords(line)/2.5,L=[4,6,8,10].filter(function(v){return v>=est})[0]||10,gap=L-est,fill='';
+ if(gap>=1.2){var ok=MKF[l].filter(function(f){return mkWords(f)<=gap*2.5});fill=ok.length?ok[ok.length-1]:''}
+ return {visual:vis,texts:texts,line:mkStress(line)+(fill?' '+fill:''),plain:line,est:est,secs:L,fill:fill};
+}
+function mkNoTopic(p){return {visual:'(describe what is on screen, for example: '+p.clips[0].title+')',line:'[write the spoken line in '+p.speak+']',secs:8}}
+function vMake(){
+ var st=mkState(),p=PK[st.p],b=bankOf(p),topics=planOf(p)?b.topics:null;
+ if(topics&&st.t>=topics.length)st.t=0;
+ var x=topics?topics[st.t]:null,l=lgOf(p),L=l==='pt'?'European Portuguese':'English';
+ var h='<h1 class="lt">Make</h1><p class="sub">The production line, step by step. Pick a persona and a topic and every prompt below is filled in. Tap Copy and paste it in Higgsfield.</p>';
+ h+='<div class="mksel"><label for="mkp">Persona</label><select id="mkp" data-do="mkp">';
+ [[0,'Pilot'],[1,'Wave 1'],[2,'Wave 2'],[3,'Wave 3'],[4,'Later waves']].forEach(function(w){
+  var ps=D.personas.filter(function(q){return q.wave===w[0]});if(!ps.length)return;
+  h+='<optgroup label="'+w[1]+'">'+ps.map(function(q){return '<option value="'+q.id+'"'+(q.id===p.id?' selected':'')+'>'+esc(q.name+' · '+NK[q.niche].name+' · '+MK[q.mkt].name)+'</option>'}).join('')+'</optgroup>';
+ });
+ h+='</select>';
+ if(x){h+='<label for="mkt">Topic</label><select id="mkt" data-do="mkt">'+topics.map(function(t,i){return '<option value="'+i+'"'+(i===st.t?' selected':'')+'>'+(i+1)+'. '+esc(sb(t.t,p))+'</option>'}).join('')+'</select>'}
+ h+='</div>';
+ if(!x)h+='<div class="note">'+esc(p.name)+' has no topic bank yet (its wave has not started). The prompts use placeholders for the line and the scene. Write the line with Claude first.</div>';
+ else h+='<div class="note">Lines and visuals are in '+L+'. Steps 1 to 4 are done once per persona; steps 5 to 10 are repeated for each topic.</div>';
+ var STEPS=D.make,pre=['','Persona','Persona','Persona','Persona','Topic','Topic','Topic','Topic','Topic','Topic'];
+ STEPS.forEach(function(s,si){
+  var topicLevel=si>=5,key=topicLevel?si*100+(st.t||0):si,open=!!(nav.mkOpen&&nav.mkOpen[s.id]);
+  var dn=isDone(p,'mk',key),h2='<details class="det" id="mk-'+s.id+'" data-mk="'+s.id+'"'+(open?' open':'')+'><summary><span class="dnum'+(dn?' ok':'')+'">'+(si===0?'0':si)+'</span><span class="grow"><div class="t1">'+esc(s.title)+'</div><div class="t2">'+esc(s.sub)+' · '+esc(s.credits)+(topicLevel&&x?' · topic '+(st.t+1):'')+'</div></span>'+CHEV+'</summary><div class="db">';
+  s.blocks.forEach(function(bl){
+   var t=bl[0];
+   if(t==='p')h2+='<p class="pp">'+esc(bl[1])+'</p>';
+   else if(t==='h')h2+='<h3 class="sm">'+esc(bl[1])+'</h3>';
+   else if(t==='list')h2+=ul(bl[1]);
+   else if(t==='warn')h2+='<div class="note">'+esc(bl[1])+'</div>';
+   else if(t==='prompt'){var tx=p[bl[2]]||'';h2+=promptHtml(bl[1],mkFill(tx,x?mkBeatFor(p,x,0):mkNoTopic(p)))}
+   else if(t==='lockprompt'){var m0=x?mkBeatFor(p,x,0):mkNoTopic(p);h2+=promptHtml(bl[1],mkFill(p.video,m0))}
+   else if(t==='beats'){
+    [0,1,2].forEach(function(i){
+     var m=x?mkBeatFor(p,x,i):mkNoTopic(p),tl=['Clip 1 · hook','Clip 2 · pain and desire','Clip 3 · payoff'][i];
+     h2+=promptHtml(tl+' · '+m.secs+' s',mkFill(p.video,m));
+     if(x){h2+='<div class="ref">Spoken line without the stress letters: '+esc(m.plain)+'. Estimated speaking time '+m.est.toFixed(1)+' s'+(m.fill?'; the last sentence is a throwaway to cut in the edit':'')+'.'+(m.texts.length?' Add in the edit: '+esc(m.texts.join(' / '))+'.':'')+'</div>'}
+    });
+   }
+   else if(t==='scenes'){
+    [['A. New position',''],['B. Another corner of the same room','Use another corner of the same room, with the same furniture and the same lighting.'],['C. Closer framing','Closer framing from the chest up, same position and same room.']].forEach(function(v){h2+=promptHtml(v[0],mkFill(p.scene,{extra:v[1]}))});
+   }
+  });
+  h2+=doneBtn(p,'mk',key,'mk'+s.id);
+  h+=h2+'</div></details>';
+ });
+ return h;
+}
+function mkBeatFor(p,x,i){return mkBeat(p,x,i)}
+
 function vPlan(){
  var h='<h1 class="lt">Plan</h1><p class="sub">How the business works: build steps, hooks, selling, rules and cost.</p><div class="grp">';
  D.plan.forEach(function(s){
@@ -386,13 +457,16 @@ function secHtml(p,n,m){
   h+='<div class="note">Checked 5 Nov 2026 from web sources. Not legal advice. Verify locally before launch.</div>';
  }else if(s==='Prompts'){
   h+='<p style="color:var(--label2)">Ready to paste. Brackets and details are already filled for '+esc(p.name)+'.</p>';
-  h+=promptHtml('1. First photo (OpenArt Image)',p.photo);
-  h+=promptHtml('2. Voice description (Design a voice)',p.voice);
-  h+=promptHtml('3. Backstory (paste in the character)',p.backstory);
-  h+=promptHtml('4. Character sheet (16:9, with @'+p.name+')',p.sheet);
-  h+=promptHtml('5. First video (Seedance 2.5)',p.video);
-  h+=promptHtml('6. Ask Claude for native hooks and descriptions',p.ask);
-  h+='<div class="note">Settings: GPT Image 2.5, 4:5, 4K, quality High, Auto Polish off. Video: Seedance 2.5, 9:16, 1080p, 12 s, audio on. Run the phonetic step for any brand name before the final line.</div>';
+  h+='<div class="note">The full step-by-step with these prompts filled for any topic is in the Make tab.</div>';
+  h+=promptHtml('1. Reference photo brief (shoot it on your iPhone)',p.ref);
+  h+=promptHtml('2. Avatar image (Nano Banana Pro, attach the reference photo)',p.photo);
+  h+=promptHtml('3. Voice description',p.voice);
+  h+=promptHtml('4. Backstory',p.backstory);
+  h+=promptHtml('5. Character sheet (16:9, attach the avatar)',p.sheet);
+  h+=promptHtml('6. Locked video prompt (replace the three [[ ]] marks)',p.video);
+  h+=promptHtml('7. Scene-change image (attach the avatar)',p.scene);
+  h+=promptHtml('8. Ask Claude for native hooks and descriptions',p.ask);
+  h+='<div class="note">Settings: Nano Banana Pro for images, 9:16. Video: Gemini Omni Flash (native 720p, audio on), 9:16. Keep the AI-generated profile label on. Run the phonetic step for any brand name before the final line.</div>';
  }else if(s==='Checklist'){
   var ck=S.ck[id]||[];
   h+='<div class="grp">'+p.check.map(function(c,i){var on=ck.indexOf(i)>=0;return '<button class="check'+(on?' on':'')+'" data-do="ck" data-id="'+id+'" data-i="'+i+'" aria-pressed="'+on+'"><span class="box">'+svg('check',3)+'</span><span class="tx">'+esc(c)+'</span></button>'}).join('')+'</div>';
@@ -404,11 +478,11 @@ function secHtml(p,n,m){
 /* ---------- render ---------- */
 function titleOf(c){
  if(c.v==='persona')return PK[c.id].name;if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
- return ({personas:'Personas',niches:'Niches',markets:'Languages',plan:'Plan'})[c.v]||'';
+ return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',plan:'Plan'})[c.v]||'';
 }
 function viewHtml(c){
  copyStore=[];
- switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();
+ switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();case'make':return vMake();
   case'persona':return vPersona(c.id);case'niche':return vNiche(c.id);case'market':return vMarket(c.id);case'plan-page':return vPlanPage(c.id);}
  return '';
 }
@@ -497,6 +571,13 @@ document.addEventListener('click',function(e){
   copy(lines.length?lines.join('\n'):'No review notes yet.');
  }
 });
+document.addEventListener('change',function(e){
+ var el=e.target,a=el.dataset&&el.dataset.do;
+ if(a==='mkp'||a==='mkt'){
+  var st=mkState();if(a==='mkp'){st.p=el.value;st.t=0}else st.t=+el.value;save();var y=scrollY;renderView();scrollTo(0,y);
+ }
+});
+document.addEventListener('toggle',function(e){var d=e.target;if(d&&d.dataset&&d.dataset.mk){nav.mkOpen=nav.mkOpen||{};nav.mkOpen[d.dataset.mk]=d.open}},true);
 document.addEventListener('input',function(e){
  if(e.target.id==='q'){nav.q=e.target.value;refreshList()}
  else if(e.target.id==='nt'){S.nt[e.target.dataset.id]=e.target.value;save()}

@@ -2,6 +2,7 @@
 """Generates data.json: markets, niches, personas, plan pages."""
 import json
 import research as RS
+import make_guide as MG
 import bank_glam, bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang, bank_wealth, bank_rel, bank_self
 
 # ---------------------------------------------------------------- markets
@@ -501,6 +502,86 @@ def wave_of(market, niche):
 
 LEARNER = {'en': 'Spanish'}
 
+
+# ---- realism kit (from the AI UGC video): real-iPhone reference, one-shot avatar, locked 3-part video prompt ----
+ACC_POOL = {
+ 'w': ['small gold hoop earrings and a thin necklace', 'one white wireless earbud in one ear only and a ring on the right hand', 'a claw hair clip, a thin bracelet and small stud earrings', 'a silver chain necklace and a simple watch on the left wrist', 'round glasses with a thin frame and tiny hoop earrings'],
+ 'm': ['a thin silver chain and a simple watch on the left wrist', 'one wireless earbud in one ear only and a leather bracelet', 'a beaded bracelet and a small stud earring', 'round glasses with a thin frame and a watch', 'a thin chain and a plain ring'],
+}
+FEAT_POOL = ['a few freckles across the nose', 'slightly uneven eyebrows', 'a small mole on the right cheek', 'faint laugh lines and light shadows under the eyes', 'a slightly asymmetric smile', 'a faint scar through the left eyebrow', 'a few flyaway hairs and a visible hairline', 'natural redness around the nose']
+EYE_POOL = ['hazel', 'dark brown', 'light brown', 'grey-green', 'amber']
+BGADD = ['a green plant on a shelf', 'a warm lamp switched on in the background', 'a framed print slightly off-centre on the wall', 'a green plant by the window and a mug on a shelf']
+MIC = {
+ 'food': 'a small clip-on wireless microphone on the collar',
+ 'code': 'a compact wireless microphone clipped to the hoodie',
+ 'design': 'a small clip-on microphone on the neckline',
+ 'bet': 'a small clip-on microphone on the collar',
+ 'gadget': 'a small wireless microphone clipped to the shirt',
+ 'home': 'a small clip-on microphone on the neckline',
+ 'lang': 'a small clip-on microphone on the collar',
+ 'glam': 'a phone held at arm length close to the face, no microphone visible',
+ 'wealth': 'a small clip-on microphone on the shirt collar',
+ 'rel': 'a small clip-on microphone on the neckline of the top',
+ 'self': 'a small clip-on microphone on the collar',
+}
+REFB = {
+ 'food': 'Stand at a kitchen counter with a window to your side. Phone at chest height, 1x lens, vertical. Both hands visible holding a bowl or a board. A few groceries on the counter and something in the background (a shelf, a plant).',
+ 'code': 'Sit at a desk with a laptop and a lamp. Phone at eye level on a stack of books, 1x lens, vertical, about an arm and a half away. Hands resting near the keyboard. A shelf and a plant behind you.',
+ 'design': 'Sit at a desk by a window with a notebook and a screen. Phone at eye level, 1x lens, vertical. One hand holding a pencil. A moodboard or pinned prints on the wall behind.',
+ 'bet': 'Sit on a sofa with the phone at eye level, 1x lens, vertical. Hands relaxed, a drink on the table. Soft lamp light, a TV or shelf behind.',
+ 'gadget': 'Sit at a table with a gadget in one hand, phone at chest height, 1x lens, vertical. Window light from the side. A clean shelf behind.',
+ 'home': 'Stand in a room with the item in frame, phone at chest height, 1x lens, vertical. Window light from the side. A visible piece of furniture and a plant behind.',
+ 'lang': 'Sit at a table with a coffee and a notebook, phone at eye level, 1x lens, vertical. Window light, a bookshelf or a map behind.',
+ 'glam': 'Stand by a bright window in a bedroom or hotel room, phone at chest height, 1x lens, vertical. Soft daylight, a bed or a dressing table behind. The same room for every photo of this storyline.',
+ 'wealth': 'Sit at a tidy desk with a laptop and a notebook. Phone at eye level, 1x lens, vertical. A window or a lamp to one side. A shelf behind.',
+ 'rel': 'Sit on a sofa with a mug, phone at eye level, 1x lens, vertical. Lamp or window light, a blanket and a shelf behind.',
+ 'self': 'Sit at a clean desk with a paper planner and a glass of water. Phone at eye level, 1x lens, vertical. Window light to one side. A shelf behind.',
+}
+SCN = {
+ 'food': 'standing at the stove with a pan in one hand, leaning slightly toward the camera',
+ 'code': 'leaning back in the chair, one hand pointing at the laptop screen',
+ 'design': 'turned slightly toward a second screen, pencil in hand, looking back at the camera',
+ 'bet': 'leaning forward on the sofa, elbows on the knees',
+ 'gadget': 'holding the gadget up to the camera with both hands',
+ 'home': 'standing next to the item with one hand on it',
+ 'lang': 'leaning on the table with the notebook open in front',
+ 'glam': 'sitting on the edge of the bed, relaxed, looking at the camera',
+ 'wealth': 'leaning toward the camera with a notebook in one hand',
+ 'rel': 'curled up on the sofa, leaning toward the camera',
+ 'self': 'standing next to the desk with the planner in one hand',
+}
+
+def realism_kit(m, n, nid, g, name, age, hair, outfit, setting, gw, voice, langname, mi, idx):
+    k = nid if nid in MIC else 'food'
+    acc = ACC_POOL[g][(mi + idx) % len(ACC_POOL[g])]
+    feat = FEAT_POOL[(mi * 2 + idx) % len(FEAT_POOL)]
+    eye = EYE_POOL[(mi + idx * 2) % len(EYE_POOL)]
+    bgadd = BGADD[(mi + idx) % len(BGADD)]
+    mic = MIC[k]
+    ref = (f"Reference photo brief (shoot it yourself on your iPhone). {REFB[k]} "
+           f"Use the normal Photo mode, not Portrait mode, with no filter and no beauty mode, and flash off. Light must be soft window light: check that the forehead, nose and cheeks are not blown out to pure white. "
+           f"No captions or text in the frame. Wear something close to this: {outfit}. Take 10 shots with small changes in head and hand position and keep the best 2. "
+           f"The person in the photo can be you or a friend who agreed in writing. The face will be replaced completely in the next step, and what we keep is the framing, the light, the room layout and the real camera grain.")
+    avatar = (f"Use the attached photo only for these things: the framing, the camera height, the lighting, the room layout and the natural grain and noise of a real iPhone photo. "
+              f"Create a completely new person. The person must be clearly a different person from the one in the photo, with a different face shape, nose, jaw, eyebrows, lips and {eye} eyes, so that it is impossible they are the same person. "
+              f"New person: a {age}-year-old {gw} who could plausibly be from {m['city']}, with {hair}, wearing {outfit}. Accessories: {acc}. Distinctive natural details: {feat}. "
+              f"Setting: {setting}; keep the layout of the room in the photo and add {bgadd}. Audio logic: {mic}, clearly visible. "
+              f"Realism rules: it must look like an unedited photo from a real iPhone. Visible skin pores, fine lines, flyaway hairs, slight sensor noise and grain, uneven natural skin tone, soft highlights on the forehead that keep detail and are not blown out, a slightly asymmetric face. "
+              f"No beauty filter, no airbrushing, no glossy or waxy skin, no studio lighting, no HDR look, no perfect teeth, no text, no captions, no watermark. Vertical 9:16. Make all of these changes in this one prompt and generate again until it looks right, do not edit the result in several steps.")
+    sheet = (f"Three-panel character sheet of the person in the attached image, in 16:9 on a plain 18% gray background. Far left: full-body front view of the outfit with the head completely out of frame, cut off at the neck. "
+             f"Middle: full-body rear view. Right: close-up of the face looking straight at the camera. Same person, same outfit ({outfit}), same hair ({hair}), same accessories ({acc}), same distinctive details ({feat}), natural skin texture with visible pores, soft even lighting, no props, no beauty filter.")
+    video = (f"PART 1, scene. Static locked-off shot, UGC iPhone footage, vertical 9:16, 720p. {setting[0].upper() + setting[1:]}. [[VISUAL]] "
+             f"{name} is a {age}-year-old {gw}, wearing {outfit}, {acc}, with {mic}. {name} does not move the camera at any point and keeps eye contact with the camera. The mouth moves naturally and matches the words. "
+             f"{name}'s energy: {TONE[nid]}, expressive like a real creator talking to a friend, not an announcer. "
+             f"\n\nPART 2, dialogue. {name} says in {langname} ({m['accent']}): \"[[LINE]]\" "
+             f"\n\nPART 3, fixed rules. Same face, hair, outfit, accessories, microphone and background as the attached image for the whole clip. Natural blinking and micro-expressions. Skin keeps its pores and grain, not glossy and not waxy. "
+             f"One continuous take, no jump cuts, no zoom, no camera shake, no music, no sound effects, no background voices, no subtitles, no on-screen text, no logos. Hands move naturally with five fingers each. Clip length: [[SECS]] seconds.")
+    scene = (f"Use the attached avatar image as the identity reference: same person, same face, same hair, same outfit, same accessories, same room. Change only the position: {name} is now {SCN[k]}. "
+             f"Keep the real iPhone photo look: visible skin pores, grain, no beauty filter, no glossy skin, soft natural light, vertical 9:16. [[EXTRA]]")
+    motion = (f"Use the attached avatar image as the character and the attached video only for the movement. {name} repeats the movement of the video: {SCN[k]}, in the same room as the avatar image. "
+              f"Same face, hair, outfit and accessories as the avatar image. Real iPhone footage look, visible skin pores, grain, no beauty filter, no glossy skin, natural light. Vertical 9:16, 720p, about 15 seconds, no speech, no music, no on-screen text.")
+    return dict(acc=acc, feat=feat, mic=mic, ref=ref, avatar=avatar, sheet=sheet, video=video, scene=scene, motion=motion)
+
 def build_persona(mid, nid, g, name, idx):
     m = MK[mid]; n = NK[nid]; p = pro(g)
     angles = n['angles_w'] if g == 'w' and n['angles_w'] else n['angles_m']
@@ -520,6 +601,8 @@ def build_persona(mid, nid, g, name, idx):
              f"Natural skin texture with real imperfections, no beauty-filter gloss, slightly imperfect framing as if a friend took it, soft natural light. Full body, vertical 4:5, 4K.")
     sheet = (f"Three-panel character sheet of @{name} in 16:9 on a plain 18% gray background. Far left: full-body front view of the outfit with the head completely out of frame, cut off at the neck. "
              f"Middle: full-body rear view. Right: close-up of the face looking straight at the camera. Same person, same outfit ({outfit}), same hair ({hair}), natural skin texture, soft even lighting, no props.")
+    kit = realism_kit(m, n, nid, g, name, age, hair, outfit, setting, gw, voice, langname, mi, idx)
+    photo, sheet, vp = kit['avatar'], kit['sheet'], kit['video']
     # clips
     cl = []
     for i, (kind, title) in enumerate(n['clips']):
@@ -527,10 +610,6 @@ def build_persona(mid, nid, g, name, idx):
         cl.append(dict(n=i + 1, kind=kind.replace('{cur}', m['cur']), title=t))
     first = cl[0]
     hooks = [h.replace('{c}', first['title']) for h in n['hooks']]
-    # video prompt
-    vp = (f"@{name} 12 seconds, vertical 9:16, 1080p, audio on. {name} is {setting.replace('in a','in a')}, wearing {outfit}, talking to the camera like telling a friend. "
-          f"Hook in the first second: {first['title']}. Second by second: 0 to 3 s the hook line and the key visual; 3 to 9 s the main point shown on screen; 9 to 12 s a calm closing line. "
-          f"Spoken in {langname} as a native creator would say it, short and casual (ask Claude to write the exact line). Same face, hair and outfit for the whole clip. No music, no background voices, no subtitles, no on-screen text.")
     ask = (f"Use the ai-influencer-builder skill. Persona: {name} ({gw}), niche {n['name']}, language {langname}, city {m['city']}, angle: {angle}. "
            f"For clip 1 ({first['title']}) write three native-language hooks, the spoken line, and the TikTok, Instagram Reels and YouTube Shorts descriptions in {langname}. "
            f"Ask me the phonetic spelling for any brand or foreign word before finalizing.")
@@ -549,9 +628,8 @@ def build_persona(mid, nid, g, name, idx):
     if mid in ('fi', 'dk', 'no'): rules.append(('Voice quality', 'Nordic voice quality is untested. Launch last and test heavily.'))
     if nid == 'lang': rules.append(('Pronunciation', 'Every episode is checked by a native speaker. Phonetic respellings on screen are approximate.'))
     # checklist
-    check = ['Chose the face from the first photo', 'Named and saved the character in OpenArt', 'Voice designed and tested with a normal sentence',
-             'Character sheet added', 'Three photos in different outfits and places', 'Native speaker checked three sample clips',
-             'Account created with AI label and bio', 'First 8 clips posted over 4 weeks (mix of formats)', 'Reviewed the numbers and the credits spent']
+    check = ['Shot the reference photo on your iPhone (or a friend, with written consent)', 'Built the avatar image in one prompt and kept the most real-looking one', 'Character sheet made and saved with the avatar', 'Voice description tested on one clip',
+             'Locked the video prompt on one test clip', 'Native speaker checked three sample clips', 'Account created with the AI-generated profile label on', 'First 8 reels posted over 4 weeks', 'Reviewed the numbers and the credits spent']
     sample_ph = None
     if nid == 'lang':
         ph = m['ph']
@@ -562,7 +640,8 @@ def build_persona(mid, nid, g, name, idx):
     return dict(id=pid, name=name, g=g, mkt=mid, niche=nid, age=age, angle=angle, wave=wave,
                 price=price_str(n, m), learner=learner if nid == 'lang' else None,
                 bio=PBIO.get((nid, g), n['bio']), offer=POFFER.get((nid, g), n['offer']), backstory=backstory, voice=voice, photo=photo, sheet=sheet, video=vp, ask=ask,
-                clips=cl, hooks=hooks, desc=dd, rules=rules, check=check, ph=sample_ph, weather=weather, hair=hair, outfit=outfit, setting=setting)
+                clips=cl, hooks=hooks, desc=dd, rules=rules, check=check, ph=sample_ph, weather=weather, hair=hair, outfit=outfit, setting=setting,
+                acc=kit['acc'], feat=kit['feat'], mic=kit['mic'], ref=kit['ref'], scene=kit['scene'], motion=kit['motion'], city=m['city'], accent=m['accent'], speak=langname)
 
 PICK = {'food': 'w', 'code': 'm', 'design': 'w', 'gadget': 'm', 'home': 'w'}  # new niches are set explicitly below
 for _mid in R:
@@ -809,6 +888,31 @@ PLAN.insert(1, dict(id='video21', title='Lessons: the 21-day video', sub='What t
     'Keep an email list or a second platform, because an account can be suspended without warning.'),
   NT('Watch for the tracked list and the claims: the video is from a creator who also sells courses, and part of the numbers are his own.'),
 ]))
+
+PLAN.insert(2, dict(id='realism', title='Realism: lessons from the AI UGC video', sub='Real photo, one-shot avatar, locked prompt, label on', icon='steps', blocks=[
+  Pp('From a second video (transcript and frames): how its creator makes AI UGC look natural. Instagram\'s "AI-generated profile" label stays on for every persona: realism here means natural-looking, not hidden.'),
+  H('What changes in our plan'),
+  CD(('1. A real iPhone photo is the base', 'The video says an AI-only face has no pores or grain and looks waxy once it moves. So each persona starts from a reference photo you shoot on your iPhone, and the face is replaced completely. Half of the effort goes here.'),
+     ('2. One prompt builds the avatar', 'All changes at once (new face, hair, outfit, accessories, background, microphone, imperfections), then regenerate. Editing the same image again and again brings the plastic look back. Use Nano Banana Pro, not GPT Image 2.x, because the video says it makes faces too perfect.'),
+     ('3. Small odd details make it believable', 'One earbud instead of two, a watch, a small mole, a lamp or a plant behind. Models average everything, so outliers help.'),
+     ('4. The audio must make sense', 'A visible small microphone, or the phone held close, so that the clear voice fits the picture.'),
+     ('5. A locked three-part prompt', 'Scene, dialogue, fixed rules. Tune it on one line, then change only the dialogue. State the camera movement, or the model drifts.'),
+     ('6. Pacing and stress', 'Capital letters change which word the voice stresses. If a line falls between two clip lengths, take the longer clip and add a short throwaway sentence to cut later.'),
+     ('7. The time split', 'About 50% on the reference and avatar, 25% on the prompt, 25% on making the clips. Rushing the start gives the fake look.')),
+  H('What we do not copy'),
+  L('He downloads a stranger\'s TikTok clip and changes the face. We shoot our own photo, or use a friend with written consent, or a licensed photo that allows AI edits.',
+    'His examples include a hair-loss drug and a TRT clinic, and he warns that it is illegal to deepfake a medical professional. We never show an AI person as a doctor or give medical claims.',
+    'Realistic testimonials ("I tried it") are made for ads. Our personas never claim an experience they did not have.',
+    'He does not talk about labels. We keep the "AI-generated profile" label on, add "(AI creator)" to the first caption of each topic, and keep the file metadata so platforms can see it.'),
+  H('Tools'),
+  L('The video uses Nano Banana Pro for the avatar and Gemini Omni for the video, which it calls the best model for UGC in September 2026, and says it will change. Higgsfield lists Gemini Omni Flash (720p native, 8 s default, native audio, Portuguese included). I could not confirm that it is the same model, or its credit price. Test it on one clip.',
+    'Higgsfield costs from your screen: character sheet 8 credits, video swap 112, motion transfer 63. A Nano Banana Pro image is 2 credits on one vendor page. Read the Generate button.'),
+  NT('Everything is in the new Make tab, in order, with each prompt filled for the persona and topic you pick.'),
+  ST(('Open Make', 'Choose a persona and a topic at the top.'), ('Follow steps 1 to 10', 'Reference, avatar, sheet and voice, locked prompt, clips, scene, check, edit, publish, learn.')),
+  H('Sources'),
+  Pp('Video transcript attached by the user (AI UGC workflow, September 2026). Higgsfield Gemini Omni Flash page; TechCrunch on Instagram\'s AI-generated profile label (31 Aug 2026).'),
+]))
+
 BANKS = dict(food=bank_food, shred=bank_shred, code=bank_code, design=bank_design, gadget=bank_gadget, home=bank_home, lang=bank_lang, glam=bank_glam, wealth=bank_wealth, rel=bank_rel, self=bank_self)
 BANK = {k: dict(topics=m.TOPICS, intro=m.INT) for k, m in BANKS.items()}
 for k, v in BANK.items(): assert len(v['topics']) == 12, k
@@ -816,6 +920,6 @@ def bank_key(p): return 'shred' if (p['niche'] == 'food' and p['g'] == 'm') else
 for p in P:
     p['plan'] = bool(p['wave'] <= 2 and p['mkt'] in ('us', 'pt') and bank_key(p) in BANK)
     p['bank'] = bank_key(p)
-out = dict(markets=M, niches=N, personas=P, plan=[{k: v for k, v in s.items()} for s in PLAN], epis=EPIS, bank=BANK)
+out = dict(markets=M, niches=N, personas=P, plan=[{k: v for k, v in s.items()} for s in PLAN], epis=EPIS, bank=BANK, make=MG.MAKE)
 json.dump(out, open('data.json', 'w'), ensure_ascii=False, separators=(',', ':'))
 print('personas', len(P), 'bytes', len(json.dumps(out, ensure_ascii=False)))
