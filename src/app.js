@@ -223,48 +223,57 @@ function mkBeat(p,x,i){
  return {visual:vis,texts:texts,line:mkStress(line)+(fill?' '+fill:''),plain:line,est:est,secs:L,fill:fill};
 }
 function mkNoTopic(p){return {visual:'(describe what is on screen, for example: '+p.clips[0].title+')',line:'[write the spoken line in '+p.speak+']',secs:8}}
+function mkKey(si,t){return si>=5?si*100+t:si}
+function mkNext(p){ // first step not done for this persona (topic 1 or the chosen topic)
+ var st=mkState(),t=st.p===p.id?st.t:0;
+ for(var i=0;i<D.make.length;i++){if(!isDone(p,'mk',mkKey(i,t)))return i}
+ return D.make.length-1;
+}
 function vMake(){
- var st=mkState(),p=PK[st.p],b=bankOf(p),topics=planOf(p)?b.topics:null;
+ var st=mkState(),p=PK[st.p],b=bankOf(p),topics=planOf(p)?b.topics:null,STEPS=D.make,N=STEPS.length-1;
  if(topics&&st.t>=topics.length)st.t=0;
- var x=topics?topics[st.t]:null,l=lgOf(p),L=l==='pt'?'European Portuguese':'English';
- var h='<h1 class="lt">Make</h1><p class="sub">The production line, step by step. Pick a persona and a topic and every prompt below is filled in. Tap Copy and paste it in Higgsfield.</p>';
- h+='<div class="mksel"><label for="mkp">Persona</label><select id="mkp" data-do="mkp">';
+ st.s=Math.max(0,Math.min(N,+st.s||0));
+ var si=st.s,s=STEPS[si],x=topics?topics[st.t]:null,l=lgOf(p),key=mkKey(si,st.t||0),dn=isDone(p,'mk',key);
+ var h='<h1 class="lt">Make</h1>';
+ h+='<details class="mkwho"><summary><span class="grow"><div class="t2">Working on</div><div class="t1">'+esc(p.name)+' · '+esc(NK[p.niche].name)+(x?' · topic '+(st.t+1):'')+'</div></span><span class="chg">Change</span></summary><div class="mksel"><label for="mkp">Persona</label><select id="mkp" data-do="mkp">';
  [[0,'Pilot'],[1,'Wave 1'],[2,'Wave 2'],[3,'Wave 3'],[4,'Later waves']].forEach(function(w){
   var ps=D.personas.filter(function(q){return q.wave===w[0]});if(!ps.length)return;
   h+='<optgroup label="'+w[1]+'">'+ps.map(function(q){return '<option value="'+q.id+'"'+(q.id===p.id?' selected':'')+'>'+esc(q.name+' · '+NK[q.niche].name+' · '+MK[q.mkt].name)+'</option>'}).join('')+'</optgroup>';
  });
  h+='</select>';
- if(x){h+='<label for="mkt">Topic</label><select id="mkt" data-do="mkt">'+topics.map(function(t,i){return '<option value="'+i+'"'+(i===st.t?' selected':'')+'>'+(i+1)+'. '+esc(sb(t.t,p))+'</option>'}).join('')+'</select>'}
- h+='</div>';
- if(!x)h+='<div class="note">'+esc(p.name)+' has no topic bank yet (its wave has not started). The prompts use placeholders for the line and the scene. Write the line with Claude first.</div>';
- else h+='<div class="note">Lines and visuals are in '+L+'. Steps 1 to 4 are done once per persona; steps 5 to 10 are repeated for each topic.</div>';
- var STEPS=D.make,pre=['','Persona','Persona','Persona','Persona','Topic','Topic','Topic','Topic','Topic','Topic'];
- STEPS.forEach(function(s,si){
-  var topicLevel=si>=5,key=topicLevel?si*100+(st.t||0):si,open=!!(nav.mkOpen&&nav.mkOpen[s.id]);
-  var dn=isDone(p,'mk',key),h2='<details class="det" id="mk-'+s.id+'" data-mk="'+s.id+'"'+(open?' open':'')+'><summary><span class="dnum'+(dn?' ok':'')+'">'+(si===0?'0':si)+'</span><span class="grow"><div class="t1">'+esc(s.title)+'</div><div class="t2">'+esc(s.sub)+' · '+esc(s.credits)+(topicLevel&&x?' · topic '+(st.t+1):'')+'</div></span>'+CHEV+'</summary><div class="db">';
-  s.blocks.forEach(function(bl){
-   var t=bl[0];
-   if(t==='p')h2+='<p class="pp">'+esc(bl[1])+'</p>';
-   else if(t==='h')h2+='<h3 class="sm">'+esc(bl[1])+'</h3>';
-   else if(t==='list')h2+=ul(bl[1]);
-   else if(t==='warn')h2+='<div class="note">'+esc(bl[1])+'</div>';
-   else if(t==='prompt'){var tx=p[bl[2]]||'';h2+=promptHtml(bl[1],mkFill(tx,x?mkBeatFor(p,x,0):mkNoTopic(p)))}
-   else if(t==='lockprompt'){var m0=x?mkBeatFor(p,x,0):mkNoTopic(p);h2+=promptHtml(bl[1],mkFill(p.video,m0))}
-   else if(t==='beats'){
-    [0,1,2].forEach(function(i){
-     var m=x?mkBeatFor(p,x,i):mkNoTopic(p),tl=['Clip 1 · hook','Clip 2 · pain and desire','Clip 3 · payoff'][i];
-     h2+=promptHtml(tl+' · '+m.secs+' s',mkFill(p.video,m));
-     if(x){h2+='<div class="ref">Spoken line without the stress letters: '+esc(m.plain)+'. Estimated speaking time '+m.est.toFixed(1)+' s'+(m.fill?'; the last sentence is a throwaway to cut in the edit':'')+'.'+(m.texts.length?' Add in the edit: '+esc(m.texts.join(' / '))+'.':'')+'</div>'}
-    });
-   }
-   else if(t==='scenes'){
-    [['A. New position',''],['B. Another corner of the same room','Use another corner of the same room, with the same furniture and the same lighting.'],['C. Closer framing','Closer framing from the chest up, same position and same room.']].forEach(function(v){h2+=promptHtml(v[0],mkFill(p.scene,{extra:v[1]}))});
-   }
-  });
-  h2+=doneBtn(p,'mk',key,'mk'+s.id);
-  h+=h2+'</div></details>';
+ if(x)h+='<label for="mkt">Topic</label><select id="mkt" data-do="mkt">'+topics.map(function(t,i){return '<option value="'+i+'"'+(i===st.t?' selected':'')+'>'+(i+1)+'. '+esc(sb(t.t,p))+'</option>'}).join('')+'</select>';
+ h+='</div></details>';
+ if(!x)h+='<div class="note">'+esc(p.name)+' has no topic list yet, so clip prompts use placeholders.</div>';
+ // progress
+ var doneN=STEPS.filter(function(_,i){return isDone(p,'mk',mkKey(i,st.t||0))}).length;
+ h+='<div class="mkprog"><div class="mkpl"><b>'+(si===0?'Setup':'Step '+si+' of '+N)+'</b><span>'+doneN+' of '+STEPS.length+' done</span></div><div class="bar"><i style="width:'+Math.round(doneN/STEPS.length*100)+'%"></i></div><div class="dots">'+
+  STEPS.map(function(_,i){var d=isDone(p,'mk',mkKey(i,st.t||0));return '<button class="dot'+(d?' on':'')+(i===si?' cur':'')+'" data-do="mkgo" data-s="'+i+'" aria-label="Step '+i+'">'+i+'</button>'}).join('')+'</div></div>';
+ // the step
+ h+='<section class="mkcard"><div class="mkhead"><span class="mknum'+(dn?' ok':'')+'">'+(si||'0')+'</span><div><h2 class="mkt">'+esc(s.title)+'</h2><div class="mkcr">'+esc(s.credits)+'</div></div></div><p class="mkgoal">'+esc(s.goal)+'</p>';
+ h+='<h3 class="mkh">Do this</h3><div class="grp mkdo">'+s.do.map(function(d,j){var k=p.id+':'+key+':'+j,on=!!(S.mc&&S.mc[k]);return '<button class="check'+(on?' on':'')+'" data-do="mkc" data-k="'+k+'" aria-pressed="'+on+'"><span class="box">'+svg('check',3)+'</span><span class="tx">'+esc(d)+'</span></button>'}).join('')+'</div>';
+ var pr='',more='';
+ s.blocks.forEach(function(bl){
+  var t=bl[0];
+  if(t==='prompt'){var tx=p[bl[2]]||'';pr+=mkPrompt(bl[1],mkFill(tx,x?mkBeatFor(p,x,0):mkNoTopic(p)))}
+  else if(t==='lockprompt'){var m0=x?mkBeatFor(p,x,0):mkNoTopic(p);pr+=mkPrompt(bl[1],mkFill(p.video,m0))}
+  else if(t==='beats'){[0,1,2].forEach(function(i){
+    var m=x?mkBeatFor(p,x,i):mkNoTopic(p),tl='Clip '+(i+1)+' of 3 · '+['hook','pain and desire','payoff'][i]+' · '+m.secs+' s';
+    pr+=mkPrompt(tl,mkFill(p.video,m));
+    if(x)pr+='<p class="mkinfo">Line: '+esc(m.plain)+(m.fill?' (the last sentence is extra: cut it later)':'')+(m.texts.length?'<br>Add in the edit: '+esc(m.texts.join(' / ')):'')+'</p>';
+   })}
+  else if(t==='scenes'){[['A. New position',''],['B. Other corner of the room','Use another corner of the same room, with the same furniture and the same lighting.'],['C. Closer framing','Closer framing from the chest up, same position and same room.']].forEach(function(v){pr+=mkPrompt(v[0],mkFill(p.scene,{extra:v[1]}))})}
+  else if(t==='p')more+='<p class="pp">'+esc(bl[1])+'</p>';
+  else if(t==='h')more+='<h3 class="sm">'+esc(bl[1])+'</h3>';
+  else if(t==='list')more+=ul(bl[1]);
+  else if(t==='warn')more+='<div class="note">'+esc(bl[1])+'</div>';
  });
+ if(pr)h+='<h3 class="mkh">Copy this</h3>'+pr;
+ if(more)h+='<details class="mkmore"><summary>Why, and the full details</summary><div class="mkmb">'+more+'</div></details>';
+ h+='<div class="mkact">'+(si<N?'<button class="btn big" data-do="mkdone" data-s="'+si+'">Done. Next step</button>':'<button class="btn big" data-do="mkdone" data-s="'+si+'">'+(dn?'Done':'Mark all done')+'</button>')+(si>0?'<button class="btn big sec" data-do="mkgo" data-s="'+(si-1)+'">Back</button>':'')+'</div></section>';
  return h;
+}
+function mkPrompt(title,text){
+ return '<div class="mkp"><div class="mkpt">'+esc(title)+'</div><button class="btn big" data-do="copy" data-i="'+reg(text)+'">Copy prompt</button><details class="mkshow"><summary>Show the text</summary><div class="prompt">'+esc(text)+'</div></details></div>';
 }
 function mkBeatFor(p,x,i){return mkBeat(p,x,i)}
 
@@ -341,7 +350,7 @@ function calOf(){
  for(var w=0;w<4;w++){var b=3*w,r=[['Mon','r',b],['Tue','t',b+1],['Wed','r',b+1],['Fri','t',b+2],['Sat','r',b+2]];if(w<3)r.push(['Sun','t',b+3]);c.push(['Week '+(w+1),r])}
  return c;
 }
-function stepHead(n,t){return '<h3 class="sm">'+n+'. '+t+'</h3>'}
+function stepHead(n,t){return '<div class="stp"><span class="stn">'+n+'</span><span class="stt">'+t+'</span></div>'}
 function topicHtml(p,x,n,L){
  var l=lgOf(p),en='en',open=nav.openItem==='t'+n,d=topicDone(p,n);
  var h='<details class="det" id="it-t'+n+'"'+(open?' open':'')+'><summary><span class="dnum'+(d===5?' ok':'')+'">'+(n+1)+'</span><span class="grow"><div class="t1">'+esc(sb(x.t,p))+'</div><div class="t2">'+d+' of 5 steps done</div></span>'+CHEV+'</summary><div class="db">';
@@ -414,22 +423,27 @@ function planHtml(p){
 }
 
 var SECS=['Overview','Look and voice','Content','Content plan','Sell','Rules','Prompts','Checklist'];
+var SECTXT={'Overview':['Who they are','The angle, the market and the backstory','person','#8B7CC7','#5A3B8C'],'Look and voice':['Look and voice','Hair, outfit, voice and local details','mic','#FF8FB1','#E5446D'],'Content':['What they post','Series, first 10 clips and hooks','text','#64D2FF','#0A84FF'],'Content plan':['Content plan','Calendar, topics and setup','plan','#30D158','#248A3D'],'Sell':['What they sell','Offer, price, research and captions','chart','#FFD60A','#FF9F0A'],'Rules':['Rules','What to avoid and the label','lock','#FF6482','#C93454'],'Prompts':['Prompts','All prompts for this persona','code','#BF5AF2','#8944AB'],'Checklist':['Checklist and notes','Tick off what you did','check','#34C759','#248A3D']};
 function vPersona(id){
- var p=PK[id],n=NK[p.niche],m=MK[p.mkt],st=pStatus(id);
+ var p=PK[id],n=NK[p.niche],m=MK[p.mkt],st=pStatus(id),ni=mkNext(p),stp=D.make[ni];
  var h='<div style="display:flex;gap:1rem;align-items:center;margin:.3rem 0 1rem">'+avHtml(p,'lg')+'<div><h1 class="lt" style="margin:0">'+esc(p.name)+'</h1><div style="color:var(--label2)">'+esc(n.name)+' · '+flag(p.mkt,'s')+esc(m.name)+'</div></div></div>';
- h+='<div>'+tagW(p.wave)+'<span class="tag g'+p.g+'">'+gtxt(p.g)+', '+p.age+'</span><span class="tag">'+esc(m.city)+'</span>'+(p.niche==='bet'?betTag(m):'')+'</div>';
- h+='<div class="seg" role="group" aria-label="Review status" style="margin-top:.5rem">'+[['review','To review'],['ok','Approved'],['skip','Skip']].map(function(s){return '<button aria-pressed="'+(st===s[0])+'" data-do="status" data-id="'+id+'" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('')+'</div>';
- h+='<div class="pw"><div class="pills" role="tablist">'+SECS.map(function(s){return '<button class="pill" role="tab" aria-current="'+(nav.sec===s)+'" data-do="sec" data-v="'+s+'">'+s+'</button>'}).join('')+'</div></div>';
- h+=secHtml(p,n,m);
+ h+='<div>'+tagW(p.wave)+'<span class="tag g'+p.g+'">'+gtxt(p.g)+', '+p.age+'</span></div>';
+ var doneN=D.make.filter(function(_,i){return isDone(p,'mk',mkKey(i,0))}).length;
+ h+='<section class="mkcard start"><div class="mkcr">Start here</div><h2 class="mkt">'+(ni===0?'Setup':'Step '+ni+': ')+(ni===0?'':esc(stp.title))+'</h2><p class="mkgoal">'+esc(stp.goal)+'</p><div class="bar"><i style="width:'+Math.round(doneN/D.make.length*100)+'%"></i></div><p class="mkinfo">'+doneN+' of '+D.make.length+' steps done</p><button class="btn big" data-do="mkopen" data-id="'+id+'" data-s="'+ni+'">Open this step</button></section>';
+ h+='<h2>Everything about '+esc(p.name)+'</h2><div class="grp">'+SECS.map(function(k){var x=SECTXT[k];return '<button class="row" data-do="open" data-v="psec" data-id="'+id+'" data-sec="'+k+'"><span class="ic" style="--c1:'+x[3]+';--c2:'+x[4]+'">'+svg(x[2])+'</span><span class="grow"><div class="t1">'+x[0]+'</div><div class="t2">'+x[1]+'</div></span>'+CHEV+'</button>'}).join('')+'</div>';
+ h+='<h2>Review</h2><div class="seg" role="group" aria-label="Review status">'+[['review','To review'],['ok','Approved'],['skip','Skip']].map(function(s){return '<button aria-pressed="'+(st===s[0])+'" data-do="status" data-id="'+id+'" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('')+'</div>';
  return h;
+}
+function vPersonaSec(id,sec){
+ var p=PK[id],n=NK[p.niche],m=MK[p.mkt];nav.sec=sec;
+ return '<h1 class="lt">'+esc(SECTXT[sec][0])+'</h1><p class="sub">'+esc(p.name)+' · '+esc(n.name)+' · '+esc(m.name)+'</p>'+secHtml(p,n,m);
 }
 function secHtml(p,n,m){
  var s=nav.sec,h='',id=p.id;
  if(s==='Overview'){
   h+='<div class="card"><div class="big">'+esc(p.angle)+'</div><p style="color:var(--label2);margin-bottom:0">The signature angle that makes this persona distinctive rather than generic.</p></div>';
-  h+='<div class="card">'+kv('Niche',n.name+': '+n.tagline)+kv('Market',m.name+' · '+m.city)+kv('Wave',p.wave===0?'Pilot: build first. Two personas for four weeks, then decide':p.wave===1?'Wave 1: build first (default test languages: English US and Portuguese Portugal)':p.wave===2?'Wave 2: after Wave 1 works':p.wave===3?'Wave 3: only after a legal check':'Wave 4: later markets'+(['fi','dk','no'].indexOf(p.mkt)>=0?' (Nordic: last)':''))+kv('Credits',p.wave===0?'Setup about 2,000 to 2,500 credits. One 12 s talking video 3,850; one 4K photo 245. See Credits and cost.':'A 12 s talking video is 3,850 credits and a 4K photo 245. See Credits and cost before adding this persona.')+kv('Account bio',p.bio)+(p.learner?kv('Audience',(p.niche==='lang'&&['us','uk'].indexOf(p.mkt)>=0?'Learners of English; captions in '+p.learner:'English speakers learning '+m.lang+'; captions in English')):'')+'</div>';
-  h+='<h2>Backstory</h2><div class="card"><p style="margin:0">'+esc(p.backstory)+'</p></div>';
-  h+='<div class="note">'+esc(n.what)+'</div>';
+  h+='<div class="card">'+kv('Niche',n.name+': '+n.tagline)+kv('Market',m.name+' · '+m.city)+kv('Wave',p.wave===0?'Pilot: build first':p.wave===1?'Wave 1: build first':p.wave===2?'Wave 2: after Wave 1 works':p.wave===3?'Wave 3: only after a legal check':'Wave 4: later')+'</div>';
+  h+='<details class="mkmore"><summary>Backstory and what this niche is</summary><div class="mkmb"><p class="pp">'+esc(p.backstory)+'</p><p class="pp">'+esc(n.what)+'</p></div></details>';
  }else if(s==='Look and voice'){
   h+='<div class="card">'+kv('Age and gender',p.age+', '+gtxt(p.g).toLowerCase())+kv('Hair',p.hair)+kv('Outfit for the saved look',p.outfit)+kv('Setting',p.setting)+kv('Weather note',p.weather)+'</div>';
   h+='<div class="card">'+kv('Voice',p.voice)+kv('Speak it as',m.speech)+kv('Natural filler words',m.fillers)+kv('Watch out for',m.watch)+'</div>';
@@ -477,13 +491,13 @@ function secHtml(p,n,m){
 
 /* ---------- render ---------- */
 function titleOf(c){
- if(c.v==='persona')return PK[c.id].name;if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
+ if(c.v==='persona')return PK[c.id].name;if(c.v==='psec')return SECTXT[c.sec][0];if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
  return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',plan:'Plan'})[c.v]||'';
 }
 function viewHtml(c){
  copyStore=[];
  switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();case'make':return vMake();
-  case'persona':return vPersona(c.id);case'niche':return vNiche(c.id);case'market':return vMarket(c.id);case'plan-page':return vPlanPage(c.id);}
+  case'persona':return vPersona(c.id);case'psec':return vPersonaSec(c.id,c.sec);case'niche':return vNiche(c.id);case'market':return vMarket(c.id);case'plan-page':return vPlanPage(c.id);}
  return '';
 }
 function renderTop(){
@@ -542,7 +556,7 @@ document.addEventListener('click',function(e){
   setTab(d.v);
  }else if(a==='open'){
   var vv=d.v==='plan'?'plan-page':d.v;
-  scrolls.push(scrollY);go('fwd',function(){nav.stack.push({v:vv,id:d.id});nav.sec='Overview';renderView();scrollTo(0,0)});
+  scrolls.push(scrollY);go('fwd',function(){nav.stack.push({v:vv,id:d.id,sec:d.sec});nav.sec=d.sec||'Overview';renderView();scrollTo(0,0)});
  }else if(a==='back'){
   var by=scrolls.pop()||0;go('back',function(){nav.stack.pop();nav.sec='Overview';renderView();scrollTo(0,by)});
  }else if(a==='filters'){openSheet();
@@ -576,6 +590,13 @@ document.addEventListener('change',function(e){
  if(a==='mkp'||a==='mkt'){
   var st=mkState();if(a==='mkp'){st.p=el.value;st.t=0}else st.t=+el.value;save();var y=scrollY;renderView();scrollTo(0,y);
  }
+});
+document.addEventListener('click',function(e){
+ var el=e.target.closest('[data-do]');if(!el)return;var d=el.dataset,a=d.do;
+ if(a==='mkc'){S.mc=S.mc||{};S.mc[d.k]=!S.mc[d.k];if(!S.mc[d.k])delete S.mc[d.k];save();var y=scrollY;renderView();scrollTo(0,y)}
+ else if(a==='mkgo'){var st=mkState();st.s=+d.s;save();renderView();scrollTo(0,0)}
+ else if(a==='mkdone'){var st2=mkState(),p=PK[st2.p],si=+d.s;S.pd=S.pd||{};S.pd[pdKey(p,'mk',mkKey(si,st2.t||0))]=true;st2.s=Math.min(D.make.length-1,si+1);save();renderView();scrollTo(0,0)}
+ else if(a==='mkopen'){var st3=mkState();if(st3.p!==d.id)st3.t=0;st3.p=d.id;st3.s=+d.s;save();setTab('make')}
 });
 document.addEventListener('toggle',function(e){var d=e.target;if(d&&d.dataset&&d.dataset.mk){nav.mkOpen=nav.mkOpen||{};nav.mkOpen[d.dataset.mk]=d.open}},true);
 document.addEventListener('input',function(e){
