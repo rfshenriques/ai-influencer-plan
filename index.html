@@ -12,8 +12,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Persona Plan">
-<meta name="theme-color" content="#F4F1FB" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E0B1D" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <link rel="apple-touch-startup-image" href="splash/440x956@3-light.png" media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait) and (prefers-color-scheme:light)">
 <link rel="apple-touch-startup-image" href="splash/440x956@3-dark.png" media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait) and (prefers-color-scheme:dark)">
@@ -42,23 +42,23 @@
 <script>try{var s=JSON.parse(localStorage.getItem('aiplan.v1')||'{}');if(s.theme&&s.theme!=='auto')document.documentElement.setAttribute('data-theme',s.theme)}catch(e){}</script>
 <style>:root{
 --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Segoe UI",Roboto,sans-serif;
---bg:#F4F1FB;--card:#fff;--elev:#fff;--label:#0E0B1D;--label2:rgba(58,58,82,.78);--label3:rgba(58,58,82,.4);--sep:rgba(58,58,82,.16);
---acc:#5A3B8C;--blue:#007AFF;--red:#FF3B30;--green:#34C759;--orange:#FF9500;--acc1:#7B64BF;--acc2:#5A3B8C;--fill:rgba(139,124,199,.15);
---lg-tint:rgba(255,255,255,.58);--lg-edge2:rgba(42,30,77,.14);--lg-rim:#fff;--lg-rim2:rgba(42,30,77,.18);--lg-act:rgba(139,124,199,.22);
---lg-ink:rgba(14,11,29,.8);--lg-sh:rgba(14,11,29,.2);--lg-spec:rgba(255,255,255,.5);--lg-flash:rgba(255,255,255,.85);
---glow1:rgba(201,194,227,.85);--glow2:rgba(139,124,199,.28);color-scheme:light dark}
+--bg:#F2F2F7;--card:#fff;--elev:#fff;--label:#000;--label2:rgba(60,60,67,.62);--label3:rgba(60,60,67,.3);--sep:rgba(60,60,67,.22);
+--acc:#6C4BD6;--blue:#007AFF;--red:#FF3B30;--green:#34C759;--orange:#FF9500;--acc1:#7A5AE0;--acc2:#6444CF;--fill:rgba(120,120,128,.12);
+--lg-tint:rgba(255,255,255,.62);--lg-edge2:rgba(0,0,0,.08);--lg-rim:#fff;--lg-rim2:rgba(0,0,0,.1);--lg-act:rgba(108,75,214,.14);
+--lg-ink:rgba(0,0,0,.8);--lg-sh:rgba(0,0,0,.16);--lg-spec:rgba(255,255,255,.5);--lg-flash:rgba(255,255,255,.85);
+--glow1:rgba(122,90,224,.10);--glow2:rgba(122,90,224,.04);color-scheme:light dark}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
---bg:#0E0B1D;--card:#1A1433;--elev:#2A1E4D;--label:#F4F1FB;--label2:rgba(201,194,227,.72);--label3:rgba(201,194,227,.4);--sep:rgba(58,58,82,.85);
---acc:#9A8BD6;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--acc1:#7B64BF;--acc2:#5A3B8C;--fill:rgba(58,58,82,.6);
---lg-tint:rgba(42,30,77,.62);--lg-edge2:rgba(201,194,227,.12);--lg-rim:rgba(201,194,227,.2);--lg-rim2:rgba(201,194,227,.05);--lg-act:rgba(139,124,199,.28);
---lg-ink:rgba(244,241,251,.9);--lg-sh:rgba(0,0,0,.4);--lg-spec:rgba(201,194,227,.06);--lg-flash:rgba(201,194,227,.28);
---glow1:rgba(139,124,199,.42);--glow2:rgba(90,59,140,.55)}}
+--bg:#000;--card:#1C1C1E;--elev:#2C2C2E;--label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);--sep:rgba(84,84,88,.65);
+--acc:#A48CFF;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--acc1:#7A5AE0;--acc2:#6444CF;--fill:rgba(120,120,128,.24);
+--lg-tint:rgba(44,44,46,.62);--lg-edge2:rgba(255,255,255,.1);--lg-rim:rgba(255,255,255,.18);--lg-rim2:rgba(255,255,255,.04);--lg-act:rgba(164,140,255,.22);
+--lg-ink:rgba(255,255,255,.9);--lg-sh:rgba(0,0,0,.5);--lg-spec:rgba(255,255,255,.06);--lg-flash:rgba(255,255,255,.25);
+--glow1:rgba(122,90,224,.20);--glow2:rgba(122,90,224,.06)}}
 :root[data-theme="dark"]{
---bg:#0E0B1D;--card:#1A1433;--elev:#2A1E4D;--label:#F4F1FB;--label2:rgba(201,194,227,.72);--label3:rgba(201,194,227,.4);--sep:rgba(58,58,82,.85);
---acc:#9A8BD6;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--acc1:#7B64BF;--acc2:#5A3B8C;--fill:rgba(58,58,82,.6);
---lg-tint:rgba(42,30,77,.62);--lg-edge2:rgba(201,194,227,.12);--lg-rim:rgba(201,194,227,.2);--lg-rim2:rgba(201,194,227,.05);--lg-act:rgba(139,124,199,.28);
---lg-ink:rgba(244,241,251,.9);--lg-sh:rgba(0,0,0,.4);--lg-spec:rgba(201,194,227,.06);--lg-flash:rgba(201,194,227,.28);
---glow1:rgba(139,124,199,.42);--glow2:rgba(90,59,140,.55);color-scheme:dark}
+--bg:#000;--card:#1C1C1E;--elev:#2C2C2E;--label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);--sep:rgba(84,84,88,.65);
+--acc:#A48CFF;--blue:#0A84FF;--red:#FF453A;--green:#30D158;--orange:#FF9F0A;--acc1:#7A5AE0;--acc2:#6444CF;--fill:rgba(120,120,128,.24);
+--lg-tint:rgba(44,44,46,.62);--lg-edge2:rgba(255,255,255,.1);--lg-rim:rgba(255,255,255,.18);--lg-rim2:rgba(255,255,255,.04);--lg-act:rgba(164,140,255,.22);
+--lg-ink:rgba(255,255,255,.9);--lg-sh:rgba(0,0,0,.5);--lg-spec:rgba(255,255,255,.06);--lg-flash:rgba(255,255,255,.25);
+--glow1:rgba(122,90,224,.20);--glow2:rgba(122,90,224,.06);color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;touch-action:manipulation;background:var(--bg)}
 body{margin:0;font:400 1.0625rem/1.4 var(--font);background:transparent;color:var(--label);min-height:100vh;min-height:100dvh;

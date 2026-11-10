@@ -22,8 +22,8 @@ html = f'''<!doctype html>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Persona Plan">
-<meta name="theme-color" content="#F4F1FB" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E0B1D" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 {links}<script>try{{var s=JSON.parse(localStorage.getItem('aiplan.v1')||'{{}}');if(s.theme&&s.theme!=='auto')document.documentElement.setAttribute('data-theme',s.theme)}}catch(e){{}}</script>
 <style>{css}</style>
