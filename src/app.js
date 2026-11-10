@@ -229,23 +229,34 @@ function mkNext(p){ // first step not done for this persona (topic 1 or the chos
  for(var i=0;i<D.make.length;i++){if(!isDone(p,'mk',mkKey(i,t)))return i}
  return D.make.length-1;
 }
-function vMake(){
+function vMake(){return mkView(false)}
+function vMakeStep(){return mkView(true)}
+function mkView(isStep){
  var st=mkState(),p=PK[st.p],b=bankOf(p),topics=planOf(p)?b.topics:null,STEPS=D.make,N=STEPS.length-1;
  if(topics&&st.t>=topics.length)st.t=0;
  st.s=Math.max(0,Math.min(N,+st.s||0));
  var si=st.s,s=STEPS[si],x=topics?topics[st.t]:null,l=lgOf(p),key=mkKey(si,st.t||0),dn=isDone(p,'mk',key);
- var h='<h1 class="lt">Make</h1>';
- h+='<details class="mkwho"><summary><span class="grow"><div class="t2">Working on</div><div class="t1">'+esc(p.name)+' · '+esc(NK[p.niche].name)+(x?' · topic '+(st.t+1):'')+'</div></span><span class="chg">Change</span></summary><div class="mksel"><label for="mkp">Persona</label><select id="mkp" data-do="mkp">';
+ var h=isStep?'':'<h1 class="lt">Make</h1>';
+ if(isStep)h+='<div class="mkwho2">'+esc(p.name)+' · '+esc(NK[p.niche].name)+(x?' · topic '+(st.t+1):'')+'</div>';
+ else h+='<details class="mkwho"><summary><span class="grow"><div class="t2">Working on</div><div class="t1">'+esc(p.name)+' · '+esc(NK[p.niche].name)+(x?' · topic '+(st.t+1):'')+'</div></span><span class="chg">Change</span></summary><div class="mksel"><label for="mkp">Persona</label><select id="mkp" data-do="mkp">';
+ var hs=h;
  [[0,'Pilot'],[1,'Wave 1'],[2,'Wave 2'],[3,'Wave 3'],[4,'Later waves']].forEach(function(w){
   var ps=D.personas.filter(function(q){return q.wave===w[0]});if(!ps.length)return;
   h+='<optgroup label="'+w[1]+'">'+ps.map(function(q){return '<option value="'+q.id+'"'+(q.id===p.id?' selected':'')+'>'+esc(q.name+' · '+NK[q.niche].name+' · '+MK[q.mkt].name)+'</option>'}).join('')+'</optgroup>';
  });
  h+='</select>';
  if(x)h+='<label for="mkt">Topic</label><select id="mkt" data-do="mkt">'+topics.map(function(t,i){return '<option value="'+i+'"'+(i===st.t?' selected':'')+'>'+(i+1)+'. '+esc(sb(t.t,p))+'</option>'}).join('')+'</select>';
- h+='</div></details>';
- if(!x)h+='<div class="note">'+esc(p.name)+' has no topic list yet, so clip prompts use placeholders.</div>';
+ if(isStep)h=hs;else h+='</div></details>';
+ if(!x&&!isStep)h+='<div class="note">'+esc(p.name)+' has no topic list yet, so clip prompts use placeholders.</div>';
  // progress
  var doneN=STEPS.filter(function(_,i){return isDone(p,'mk',mkKey(i,st.t||0))}).length;
+ if(!isStep){
+  h+='<div class="mkprog"><div class="mkpl"><b>Your progress</b><span>'+doneN+' of '+STEPS.length+' steps done</span></div><div class="bar"><i style="width:'+Math.round(doneN/STEPS.length*100)+'%"></i></div></div>';
+  var nx=mkNext(p);
+  h+='<button class="btn big mkcont" data-do="mkstep" data-s="'+nx+'">'+(doneN?'Continue: ':'Start: ')+(nx?'Step '+nx+', ':'')+esc(STEPS[nx].title)+'</button>';
+  h+='<h3 class="mkh">All steps</h3><div class="grp mklist">'+STEPS.map(function(q,i){var d=isDone(p,'mk',mkKey(i,st.t||0));return '<button class="row" data-do="mkstep" data-s="'+i+'"><span class="mknum sm'+(d?' ok':'')+'">'+(d?svg('check',3):i)+'</span><span class="grow"><span class="t1">'+esc(q.title)+'</span></span>'+CHEV+'</button>'}).join('')+'</div>';
+  return h;
+ }
  h+='<div class="mkprog"><div class="mkpl"><b>'+(si===0?'Setup':'Step '+si+' of '+N)+'</b><span>'+doneN+' of '+STEPS.length+' done</span></div><div class="bar"><i style="width:'+Math.round(doneN/STEPS.length*100)+'%"></i></div><div class="dots">'+
   STEPS.map(function(_,i){var d=isDone(p,'mk',mkKey(i,st.t||0));return '<button class="dot'+(d?' on':'')+(i===si?' cur':'')+'" data-do="mkgo" data-s="'+i+'" aria-label="Step '+i+'">'+i+'</button>'}).join('')+'</div></div>';
  // the step
@@ -491,12 +502,12 @@ function secHtml(p,n,m){
 
 /* ---------- render ---------- */
 function titleOf(c){
- if(c.v==='persona')return PK[c.id].name;if(c.v==='psec')return SECTXT[c.sec][0];if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
+ if(c.v==='mkstep'){var ms=mkState();return ms.s?'Step '+ms.s:'Setup'}if(c.v==='persona')return PK[c.id].name;if(c.v==='psec')return SECTXT[c.sec][0];if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
  return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',plan:'Plan'})[c.v]||'';
 }
 function viewHtml(c){
  copyStore=[];
- switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();case'make':return vMake();
+ switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();case'make':return vMake();case'mkstep':return vMakeStep();
   case'persona':return vPersona(c.id);case'psec':return vPersonaSec(c.id,c.sec);case'niche':return vNiche(c.id);case'market':return vMarket(c.id);case'plan-page':return vPlanPage(c.id);}
  return '';
 }
@@ -594,9 +605,10 @@ document.addEventListener('change',function(e){
 document.addEventListener('click',function(e){
  var el=e.target.closest('[data-do]');if(!el)return;var d=el.dataset,a=d.do;
  if(a==='mkc'){S.mc=S.mc||{};S.mc[d.k]=!S.mc[d.k];if(!S.mc[d.k])delete S.mc[d.k];save();var y=scrollY;renderView();scrollTo(0,y)}
- else if(a==='mkgo'){var st=mkState();st.s=+d.s;save();renderView();scrollTo(0,0)}
- else if(a==='mkdone'){var st2=mkState(),p=PK[st2.p],si=+d.s;S.pd=S.pd||{};S.pd[pdKey(p,'mk',mkKey(si,st2.t||0))]=true;st2.s=Math.min(D.make.length-1,si+1);save();renderView();scrollTo(0,0)}
- else if(a==='mkopen'){var st3=mkState();if(st3.p!==d.id)st3.t=0;st3.p=d.id;st3.s=+d.s;save();setTab('make')}
+ else if(a==='mkstep'){var st4=mkState();st4.s=+d.s;save();scrolls.push(scrollY);go('fwd',function(){nav.stack.push({v:'mkstep'});renderView();scrollTo(0,0)})}
+ else if(a==='mkgo'){var st=mkState(),was=st.s;st.s=+d.s;save();go(st.s>=was?'fwd':'back',function(){renderView();scrollTo(0,0)})}
+ else if(a==='mkdone'){var st2=mkState(),p=PK[st2.p],si=+d.s;S.pd=S.pd||{};S.pd[pdKey(p,'mk',mkKey(si,st2.t||0))]=true;st2.s=Math.min(D.make.length-1,si+1);save();go('fwd',function(){renderView();scrollTo(0,0)})}
+ else if(a==='mkopen'){var st3=mkState();if(st3.p!==d.id)st3.t=0;st3.p=d.id;st3.s=+d.s;save();scrolls.push(scrollY);go('fwd',function(){nav.stack.push({v:'mkstep'});renderView();scrollTo(0,0)})}
 });
 document.addEventListener('toggle',function(e){var d=e.target;if(d&&d.dataset&&d.dataset.mk){nav.mkOpen=nav.mkOpen||{};nav.mkOpen[d.dataset.mk]=d.open}},true);
 document.addEventListener('input',function(e){
