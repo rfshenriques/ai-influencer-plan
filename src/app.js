@@ -28,7 +28,7 @@ var IC={
  search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/>',
  fork:'<path d="M7 4v7a2 2 0 002 2v7M11 4v7a2 2 0 01-2 2M17 4c-2 2-2.5 5-2.5 8h2.5v8"/>',
  code:'<path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/>',pen:'<path d="M4 20l1-4L16.5 4.5a2 2 0 013 3L8 19z"/>',
- ball:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7l4 3-1.5 5h-5L8 10z"/>',bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+ ball:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7l4 3-1.5 5h-5L8 10z"/>',flask:'<path d="M9 3h6"/><path d="M10 3v6L5 19a1.5 1.5 0 001.3 2h11.4A1.5 1.5 0 0019 19l-5-10V3"/><path d="M7.5 15h9"/>',bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
  home:'<path d="M4 11l8-7 8 7v8.5a.5.5 0 01-.5.5H15v-5H9v5H4.5a.5.5 0 01-.5-.5z"/>',speech:'<path d="M4 6.5A2.5 2.5 0 016.5 4h11A2.5 2.5 0 0120 6.5v7a2.5 2.5 0 01-2.5 2.5H11l-4.5 4v-4A2.5 2.5 0 014 13.5z"/>',
  flag:'<path d="M5 21V4M5 5h12l-2 4 2 4H5"/>',steps:'<path d="M5 7h4M5 12h8M5 17h12"/>',hook:'<path d="M12 4v10a4 4 0 11-4-4"/>',tag:'<path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.2"/>',
  text:'<path d="M5 6h14M5 11h14M5 16h9"/>',eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
@@ -68,7 +68,7 @@ function betTag(m){var b=m.bet[0];return '<span class="tag '+b+'">'+(b==='ok'?'B
 var nav={tab:'personas',stack:[],sec:'Overview'},scrolls=[];
 var cur=function(){return nav.stack[nav.stack.length-1]||{v:nav.tab}};
 var navbg=document.querySelector('.nav-bg'),root=document.getElementById('root'),top=document.getElementById('top'),tabbar=document.getElementById('tabbar'),toastEl=document.getElementById('toast');
-var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['make','Make','bolt'],['plan','Plan','plan']];
+var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['make','Make','bolt'],['free','Free test','flask'],['plan','Plan','plan']];
 
 /* ---------- views ---------- */
 function blocksHtml(bl){
@@ -281,6 +281,51 @@ function mkView(isStep){
  if(pr)h+='<h3 class="mkh">Copy this</h3>'+pr;
  if(more)h+='<details class="mkmore"><summary>Why, and the full details</summary><div class="mkmb">'+more+'</div></details>';
  h+='<div class="mkact">'+(si<N?'<button class="btn big" data-do="mkdone" data-s="'+si+'">Done. Next step</button>':'<button class="btn big" data-do="mkdone" data-s="'+si+'">'+(dn?'Done':'Mark all done')+'</button>')+(si>0?'<button class="btn big sec" data-do="mkgo" data-s="'+(si-1)+'">Back</button>':'')+'</div></section>';
+ return h;
+}
+function frPilots(){return D.personas.filter(function(p){return p.wave===0||p.id==='pt-food-w'})}
+function frState(){
+ S.fr=S.fr||{};var ps=frPilots();
+ if(!S.fr.p||!PK[S.fr.p])S.fr.p=ps[0].id;
+ S.fr.s=Math.max(0,Math.min(D.free.length-1,+S.fr.s||0));
+ return S.fr;
+}
+function frNext(p){for(var i=0;i<D.free.length;i++){if(!isDone(p,'fr',i))return i}return D.free.length-1}
+function vFree(){return frView(false)}
+function vFreeStep(){return frView(true)}
+function frView(isStep){
+ var st=frState(),p=PK[st.p],STEPS=D.free,N=STEPS.length-1,si=st.s,s=STEPS[si],dn=isDone(p,'fr',si);
+ var doneN=STEPS.filter(function(_,i){return isDone(p,'fr',i)}).length;
+ var h='';
+ if(!isStep){
+  h+='<h1 class="lt">Free test</h1><p class="sub">Test a pilot for free with Google Flow before you pay for anything.</p>';
+  h+='<details class="mkwho"><summary><span class="grow"><div class="t2">Testing</div><div class="t1">'+esc(p.name)+' · '+esc(NK[p.niche].name)+' · '+esc(MK[p.mkt].name)+'</div></span><span class="chg">Change</span></summary><div class="mksel"><label for="frp">Pilot persona</label><select id="frp" data-do="frp">'+
+   frPilots().map(function(q){return '<option value="'+q.id+'"'+(q.id===p.id?' selected':'')+'>'+esc(q.name+' · '+NK[q.niche].name+' · '+MK[q.mkt].name)+'</option>'}).join('')+'</select></div></details>';
+  h+='<div class="mkprog"><div class="mkpl"><b>Your progress</b><span>'+doneN+' of '+STEPS.length+' steps done</span></div><div class="bar"><i style="width:'+Math.round(doneN/STEPS.length*100)+'%"></i></div></div>';
+  var nx=frNext(p);
+  h+='<button class="btn big mkcont" data-do="frstep" data-s="'+nx+'">'+(doneN?'Continue: ':'Start: ')+esc(STEPS[nx].title)+'</button>';
+  h+='<h3 class="mkh">All steps</h3><div class="grp mklist">'+STEPS.map(function(q,i){var d=isDone(p,'fr',i);return '<button class="row" data-do="frstep" data-s="'+i+'"><span class="mknum sm'+(d?' ok':'')+'">'+(d?svg('check',3):i)+'</span><span class="grow"><span class="t1">'+esc(q.title)+'</span></span>'+CHEV+'</button>'}).join('')+'</div>';
+  h+='<div class="note" style="margin-top:1.25rem">About 50 free credits a day. Free is for testing only, not for posting.</div>';
+  return h;
+ }
+ h+='<div class="mkwho2">'+esc(p.name)+' · '+esc(NK[p.niche].name)+'</div>';
+ h+='<div class="mkprog"><div class="mkpl"><b>'+(si===0?'Check':'Step '+si+' of '+N)+'</b><span>'+doneN+' of '+STEPS.length+' done</span></div><div class="bar"><i style="width:'+Math.round(doneN/STEPS.length*100)+'%"></i></div><div class="dots">'+
+  STEPS.map(function(_,i){var d=isDone(p,'fr',i);return '<button class="dot'+(d?' on':'')+(i===si?' cur':'')+'" data-do="frgo" data-s="'+i+'" aria-label="Step '+i+'">'+i+'</button>'}).join('')+'</div></div>';
+ h+='<section class="mkcard"><div class="mkhead"><span class="mknum'+(dn?' ok':'')+'">'+(si||'0')+'</span><div><h2 class="mkt">'+esc(s.title)+'</h2><div class="mkcr">'+esc(s.credits)+'</div></div></div><p class="mkgoal">'+esc(s.goal)+'</p>';
+ h+='<h3 class="mkh">Do this</h3><div class="grp mkdo">'+s.do.map(function(d,j){var k=p.id+':fr'+si+':'+j,on=!!(S.mc&&S.mc[k]);return '<button class="check'+(on?' on':'')+'" data-do="mkc" data-k="'+k+'" aria-pressed="'+on+'"><span class="box">'+svg('check',3)+'</span><span class="tx">'+esc(d)+'</span></button>'}).join('')+'</div>';
+ var pr='',more='',topics=planOf(p)?bankOf(p).topics:null,x=topics?topics[0]:null;
+ s.blocks.forEach(function(bl){
+  var t=bl[0];
+  if(t==='prompt')pr+=mkPrompt(bl[1],p[bl[2]]||'');
+  else if(t==='clip'){var m0=x?mkBeatFor(p,x,0):mkNoTopic(p);pr+=mkPrompt(bl[1],mkFill(p.video,m0));if(x)pr+='<p class="mkinfo">Spoken line: '+esc(m0.plain)+'</p>'}
+  else if(t==='p')more+='<p class="pp">'+esc(bl[1])+'</p>';
+  else if(t==='h')more+='<h3 class="sm">'+esc(bl[1])+'</h3>';
+  else if(t==='list')more+=ul(bl[1]);
+  else if(t==='warn')more+='<div class="note">'+esc(bl[1])+'</div>';
+ });
+ if(pr)h+='<h3 class="mkh">Copy this</h3>'+pr;
+ if(more)h+='<h3 class="mkh">Good to know</h3><div class="mkmb2">'+more+'</div>';
+ h+='<div class="mkact"><button class="btn big" data-do="frdone" data-s="'+si+'">'+(si<N?'Done. Next step':(dn?'Done':'Mark all done'))+'</button>'+(si>0?'<button class="btn big sec" data-do="frgo" data-s="'+(si-1)+'">Back</button>':'')+'</div></section>';
  return h;
 }
 function mkPrompt(title,text){
@@ -502,12 +547,12 @@ function secHtml(p,n,m){
 
 /* ---------- render ---------- */
 function titleOf(c){
- if(c.v==='mkstep'){var ms=mkState();return ms.s?'Step '+ms.s:'Setup'}if(c.v==='persona')return PK[c.id].name;if(c.v==='psec')return SECTXT[c.sec][0];if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
- return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',plan:'Plan'})[c.v]||'';
+ if(c.v==='frstep'){var fs=frState();return fs.s?'Step '+fs.s:'Check'}if(c.v==='mkstep'){var ms=mkState();return ms.s?'Step '+ms.s:'Setup'}if(c.v==='persona')return PK[c.id].name;if(c.v==='psec')return SECTXT[c.sec][0];if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
+ return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',free:'Free test',plan:'Plan'})[c.v]||'';
 }
 function viewHtml(c){
  copyStore=[];
- switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();case'make':return vMake();case'mkstep':return vMakeStep();
+ switch(c.v){case'personas':return vPersonas();case'niches':return vNiches();case'markets':return vMarkets();case'plan':return vPlan();case'make':return vMake();case'mkstep':return vMakeStep();case'free':return vFree();case'frstep':return vFreeStep();
   case'persona':return vPersona(c.id);case'psec':return vPersonaSec(c.id,c.sec);case'niche':return vNiche(c.id);case'market':return vMarket(c.id);case'plan-page':return vPlanPage(c.id);}
  return '';
 }
@@ -598,6 +643,7 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('change',function(e){
  var el=e.target,a=el.dataset&&el.dataset.do;
+ if(a==='frp'){frState().p=el.value;save();var yf=scrollY;renderView();scrollTo(0,yf);return}
  if(a==='mkp'||a==='mkt'){
   var st=mkState();if(a==='mkp'){st.p=el.value;st.t=0}else st.t=+el.value;save();var y=scrollY;renderView();scrollTo(0,y);
  }
@@ -605,6 +651,9 @@ document.addEventListener('change',function(e){
 document.addEventListener('click',function(e){
  var el=e.target.closest('[data-do]');if(!el)return;var d=el.dataset,a=d.do;
  if(a==='mkc'){S.mc=S.mc||{};S.mc[d.k]=!S.mc[d.k];if(!S.mc[d.k])delete S.mc[d.k];save();var y=scrollY;renderView();scrollTo(0,y)}
+ else if(a==='frstep'){var f1=frState();f1.s=+d.s;save();scrolls.push(scrollY);go('fwd',function(){nav.stack.push({v:'frstep'});renderView();scrollTo(0,0)})}
+ else if(a==='frgo'){var f2=frState(),was2=f2.s;f2.s=+d.s;save();go(f2.s>=was2?'fwd':'back',function(){renderView();scrollTo(0,0)})}
+ else if(a==='frdone'){var f3=frState(),fp=PK[f3.p],fi=+d.s;S.pd=S.pd||{};S.pd[pdKey(fp,'fr',fi)]=true;f3.s=Math.min(D.free.length-1,fi+1);save();go('fwd',function(){renderView();scrollTo(0,0)})}
  else if(a==='mkstep'){var st4=mkState();st4.s=+d.s;save();scrolls.push(scrollY);go('fwd',function(){nav.stack.push({v:'mkstep'});renderView();scrollTo(0,0)})}
  else if(a==='mkgo'){var st=mkState(),was=st.s;st.s=+d.s;save();go(st.s>=was?'fwd':'back',function(){renderView();scrollTo(0,0)})}
  else if(a==='mkdone'){var st2=mkState(),p=PK[st2.p],si=+d.s;S.pd=S.pd||{};S.pd[pdKey(p,'mk',mkKey(si,st2.t||0))]=true;st2.s=Math.min(D.make.length-1,si+1);save();go('fwd',function(){renderView();scrollTo(0,0)})}

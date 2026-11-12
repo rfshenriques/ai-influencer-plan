@@ -3,6 +3,7 @@
 import json
 import research as RS
 import make_guide as MG
+import free_guide as FG
 import bank_glam, bank_food, bank_shred, bank_code, bank_design, bank_gadget, bank_home, bank_lang, bank_wealth, bank_rel, bank_self
 
 # ---------------------------------------------------------------- markets
@@ -920,6 +921,6 @@ def bank_key(p): return 'shred' if (p['niche'] == 'food' and p['g'] == 'm') else
 for p in P:
     p['plan'] = bool(p['wave'] <= 2 and p['mkt'] in ('us', 'pt') and bank_key(p) in BANK)
     p['bank'] = bank_key(p)
-out = dict(markets=M, niches=N, personas=P, plan=[{k: v for k, v in s.items()} for s in PLAN], epis=EPIS, bank=BANK, make=MG.MAKE)
+out = dict(markets=M, niches=N, personas=P, plan=[{k: v for k, v in s.items()} for s in PLAN], epis=EPIS, bank=BANK, make=MG.MAKE, free=FG.FREE)
 json.dump(out, open('data.json', 'w'), ensure_ascii=False, separators=(',', ':'))
 print('personas', len(P), 'bytes', len(json.dumps(out, ensure_ascii=False)))
