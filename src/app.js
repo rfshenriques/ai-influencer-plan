@@ -38,6 +38,8 @@ var IC={
  chart:'<path d="M4 19.5h16M7 16v-5M12 16V6M17 16v-8"/>',heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/>',
  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',filter:'<path d="M4 7h16M7 12h10M10 17h4"/>'
 };
+var TF={"person": "<circle cx=\"12\" cy=\"8\" r=\"4.2\"/><path d=\"M3.8 20.5c.6-4.4 3.8-6.7 8.2-6.7s7.6 2.3 8.2 6.7z\"/>", "grid": "<rect x=\"3.5\" y=\"3.5\" width=\"7.5\" height=\"7.5\" rx=\"2\"/><rect x=\"13\" y=\"3.5\" width=\"7.5\" height=\"7.5\" rx=\"2\"/><rect x=\"3.5\" y=\"13\" width=\"7.5\" height=\"7.5\" rx=\"2\"/><rect x=\"13\" y=\"13\" width=\"7.5\" height=\"7.5\" rx=\"2\"/>", "globe": "<mask id=\"gm\"><rect width=\"24\" height=\"24\" fill=\"#fff\"/><path d=\"M3 12h18M12 3c2.8 2.8 3.9 5.8 3.9 9s-1.1 6.2-3.9 9c-2.8-2.8-3.9-5.8-3.9-9s1.1-6.2 3.9-9z\" fill=\"none\" stroke=\"#000\" stroke-width=\"1.6\"/></mask><circle cx=\"12\" cy=\"12\" r=\"9.5\" mask=\"url(#gm)\"/>", "bolt": "<path d=\"M13.6 2.5L4.5 14h6.2l-1 7.5L19.5 10h-6.3z\" stroke-width=\"1.2\" stroke=\"currentColor\" stroke-linejoin=\"round\"/>", "plan": "<path d=\"M8 6h12M8 12h12M8 18h12\" stroke-width=\"3\"/><circle cx=\"4\" cy=\"6\" r=\"1.6\" stroke=\"none\"/><circle cx=\"4\" cy=\"12\" r=\"1.6\" stroke=\"none\"/><circle cx=\"4\" cy=\"18\" r=\"1.6\" stroke=\"none\"/>"};
+function svgf(n){return '<svg class="f" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(TF[n]||IC[n])+'</svg>'}
 function svg(n,sw){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.9)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
 
 var FLAG={
@@ -68,7 +70,7 @@ function betTag(m){var b=m.bet[0];return '<span class="tag '+b+'">'+(b==='ok'?'B
 var nav={tab:'personas',stack:[],sec:'Overview'},scrolls=[];
 var cur=function(){return nav.stack[nav.stack.length-1]||{v:nav.tab}};
 var navbg=document.querySelector('.nav-bg'),root=document.getElementById('root'),top=document.getElementById('top'),tabbar=document.getElementById('tabbar'),toastEl=document.getElementById('toast');
-var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['make','Make','bolt'],['free','Free test','flask'],['plan','Plan','plan']];
+var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['make','Make','bolt'],['plan','Plan','plan']];
 
 /* ---------- views ---------- */
 function blocksHtml(bl){
@@ -161,25 +163,26 @@ function sheetBody(){
   '<div class="sl">Language</div>'+optList('mkt',[['all','All languages']].concat(D.markets.map(function(m){return [m.id,m.name,'',flag(m.id)]})))+
   '<div class="sl">Gender</div><div class="seg" role="radiogroup" aria-label="Gender">'+[['all','All'],['w','Women'],['m','Men']].map(function(t){return '<button class="'+(t[0]==='w'?'gw':t[0]==='m'?'gm':'')+'" role="radio" aria-pressed="'+(S.f.g===t[0])+'" data-do="fset" data-k="g" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
 }
-function sheetInner(){return '<div class="sh" id="sh"><button data-do="freset">Reset</button><b>Filters</b><button class="dn" data-do="fclose">Done</button></div><div class="sb" id="sb">'+sheetBody()+'</div>'}
+function sheetInner(){return '<div class="grab"></div><div class="sh" id="sh"><button data-do="freset">Reset</button><b>Filters</b><button class="dn" data-do="fclose">Done</button></div><div class="sb" id="sb">'+sheetBody()+'</div>'}
 function openSheet(){
  if(sheetEl)return;
  scrimEl=document.createElement('div');scrimEl.className='scrim';scrimEl.dataset.do='fclose';
  sheetEl=document.createElement('div');sheetEl.className='sheet';sheetEl.setAttribute('role','dialog');sheetEl.setAttribute('aria-modal','true');sheetEl.setAttribute('aria-label','Filters');
  sheetEl.innerHTML=sheetInner();
  document.body.appendChild(scrimEl);document.body.appendChild(sheetEl);
+ document.body.classList.add('sheet-tall');root.inert=true;top.inert=true;tabbar.inert=true;
  requestAnimationFrame(function(){requestAnimationFrame(function(){if(scrimEl){scrimEl.classList.add('on');sheetEl.classList.add('on')}})});
  dragInit();
 }
 function closeSheet(){
  if(!sheetEl)return;var s=sheetEl,c=scrimEl;sheetEl=null;scrimEl=null;
- s.style.transform='';s.classList.remove('on');c.classList.remove('on');setTimeout(function(){s.remove();c.remove()},350);
+ s.style.transform='';s.classList.remove('on');c.classList.remove('on');document.body.classList.remove('sheet-tall');root.style.transform='';c.style.opacity='';root.inert=false;top.inert=false;tabbar.inert=false;setTimeout(function(){s.remove();c.remove()},350);
 }
 function dragInit(){
  var sh=document.getElementById('sh'),y0=0,dy=0,t0=0,on=false;
  sh.addEventListener('touchstart',function(e){on=true;y0=e.touches[0].clientY;t0=Date.now();dy=0;sheetEl.style.transition='none'},{passive:true});
- sh.addEventListener('touchmove',function(e){if(!on)return;dy=Math.max(0,e.touches[0].clientY-y0);sheetEl.style.transform='translateY('+dy+'px)'},{passive:true});
- sh.addEventListener('touchend',function(){if(!on)return;on=false;var v=dy/Math.max(1,Date.now()-t0);sheetEl.style.transition='';if(dy>sheetEl.offsetHeight*.28||v>.5)closeSheet();else sheetEl.style.transform=''});
+ sh.addEventListener('touchmove',function(e){if(!on)return;dy=Math.max(0,e.touches[0].clientY-y0);sheetEl.style.transform='translateY('+dy+'px)';var pr=Math.min(1,dy/Math.max(1,sheetEl.offsetHeight));root.style.transition='none';root.style.transform='scale('+(.95+.05*pr)+')';scrimEl.style.opacity=String(1-pr)},{passive:true});
+ sh.addEventListener('touchend',function(){if(!on)return;on=false;var v=dy/Math.max(1,Date.now()-t0);sheetEl.style.transition='';root.style.transition='';scrimEl.style.opacity='';if(dy>sheetEl.offsetHeight*.28||v>.5)closeSheet();else{sheetEl.style.transform='';root.style.transform=''}});
 }
 function vNiches(){
  var h='<h1 class="lt">Niches</h1><p class="sub">Seven niches. Open one for its format, series, clips and offer.</p><div class="grp">';
@@ -253,6 +256,7 @@ function mkView(isStep){
  if(!isStep){
   h+='<div class="mkprog"><div class="mkpl"><b>Your progress</b><span>'+doneN+' of '+STEPS.length+' steps done</span></div><div class="bar"><i style="width:'+Math.round(doneN/STEPS.length*100)+'%"></i></div></div>';
   var nx=mkNext(p);
+  h+='<button class="row freecard" data-do="open" data-v="free"><span class="ico">'+svg('flask',2)+'</span><span class="grow"><span class="t1">Test a pilot for free first</span><span class="t2">Try it with Google Flow</span></span>'+CHEV+'</button>';
   h+='<button class="btn big mkcont" data-do="mkstep" data-s="'+nx+'">'+(doneN?'Continue: ':'Start: ')+(nx?'Step '+nx+', ':'')+esc(STEPS[nx].title)+'</button>';
   h+='<h3 class="mkh">All steps</h3><div class="grp mklist">'+STEPS.map(function(q,i){var d=isDone(p,'mk',mkKey(i,st.t||0));return '<button class="row" data-do="mkstep" data-s="'+i+'"><span class="mknum sm'+(d?' ok':'')+'">'+(d?svg('check',3):i)+'</span><span class="grow"><span class="t1">'+esc(q.title)+'</span></span>'+CHEV+'</button>'}).join('')+'</div>';
   return h;
@@ -548,7 +552,7 @@ function secHtml(p,n,m){
 /* ---------- render ---------- */
 function titleOf(c){
  if(c.v==='frstep'){var fs=frState();return fs.s?'Step '+fs.s:'Check'}if(c.v==='mkstep'){var ms=mkState();return ms.s?'Step '+ms.s:'Setup'}if(c.v==='persona')return PK[c.id].name;if(c.v==='psec')return SECTXT[c.sec][0];if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
- return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',free:'Free test',plan:'Plan'})[c.v]||'';
+ return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',plan:'Plan'})[c.v]||'';
 }
 function viewHtml(c){
  copyStore=[];
@@ -564,11 +568,39 @@ function renderTop(){
 function renderTab(){
  tabbar.style.setProperty('--n',TABS.length);
  tabbar.innerHTML='<div class="tb-ind" style="width:calc((100% - .5rem)/'+TABS.length+');transform:translateX('+TABS.findIndex(function(t){return t[0]===nav.tab})*100+'%)"></div>'+
-  TABS.map(function(t){return '<button class="tab" data-do="tab" data-v="'+t[0]+'" aria-label="'+t[1]+'"'+(t[0]===nav.tab?' aria-current="page"':'')+'>'+svg(t[2])+'<span>'+t[1]+'</span></button>'}).join('');
+  TABS.map(function(t){return '<button class="tab" data-do="tab" data-v="'+t[0]+'" aria-label="'+t[1]+'"'+(t[0]===nav.tab?' aria-current="page"':'')+'>'+svg(t[2]).replace('<svg ','<svg class="o" ')+svgf(t[2])+'<span>'+t[1]+'</span></button>'}).join('');
 }
+
+var blkRaf=0;
+function blockify(v){
+ var kids=[].slice.call(v.children);
+ for(var i=0;i<kids.length;i++){
+  var h=kids[i];
+  if(!(h.tagName==='H2'||(h.tagName==='H3'&&h.classList.contains('mkh'))))continue;
+  var run=[],j=i+1;
+  while(j<kids.length&&(kids[j].classList.contains('grp')||kids[j].classList.contains('card')))run.push(kids[j++]);
+  if(!run.length)continue;
+  var sec=document.createElement('section');sec.className='sblock';
+  v.insertBefore(sec,h);h.classList.add('sb-h');sec.appendChild(h);run.forEach(function(r){sec.appendChild(r)});
+  i=j-1;kids=[].slice.call(v.children);i=kids.indexOf(sec);
+ }
+}
+function paintBlocks(){
+ blkRaf=0;var line=top.getBoundingClientRect().bottom+4;
+ root.querySelectorAll('.sblock').forEach(function(b){
+  var h=b.querySelector(':scope > .sb-h');if(!h)return;
+  var r=b.getBoundingClientRect(),hh=h.offsetHeight,d=line-r.top;
+  if(d<=0||r.bottom<0){if(b.dataset.on){b.style.clipPath='';b.style.opacity='';h.style.transform='';delete b.dataset.on}return}
+  var shift=Math.max(0,Math.min(d,r.height-hh)),left=r.bottom-line,fade=hh*1.6;
+  b.dataset.on='1';h.style.transform='translateY('+shift+'px)';b.style.clipPath='inset('+d+'px 0 0 0 round 1.375rem)';
+  b.style.opacity=left<fade?Math.max(0,left/fade).toFixed(3):'';
+ });
+}
+addEventListener('scroll',function(){if(!blkRaf)blkRaf=requestAnimationFrame(paintBlocks)},{passive:true});
+addEventListener('resize',function(){if(!blkRaf)blkRaf=requestAnimationFrame(paintBlocks)});
 function renderView(){
  var c=cur();
- root.innerHTML='<main class="view cur'+(nav.stack.length?' pushed':'')+'">'+viewHtml(c)+'</main>';
+ root.innerHTML='<main class="view cur'+(nav.stack.length?' pushed':'')+'">'+viewHtml(c)+'</main>';var mv=root.firstChild;if(mv){blockify(mv);if(!blkRaf)blkRaf=requestAnimationFrame(paintBlocks)}
  renderTop();
 }
 var animUntil=0;

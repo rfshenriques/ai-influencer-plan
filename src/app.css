@@ -282,3 +282,27 @@ h3.sm{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.
 .mksel select{background-color:color-mix(in srgb,var(--acc) 10%,var(--card));border:1.5px solid color-mix(in srgb,var(--acc) 45%,transparent);color:var(--label);font-weight:600;padding-right:2.5rem;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5l6 6 6-6' fill='none' stroke='%238a6cf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center}
 .mklist .row .t1{display:block}
 .mkmb2 .pp{margin:.6rem 0}.mkmb2 .note{margin:.75rem 0}.mkmb2 ul,.mkmb2 .ul{margin:.5rem 0}
+/* ---- iOS skill update: filled tab icons, floating sheet, sticky blocks ---- */
+.tab svg.f{display:none}.tab[aria-current="page"] svg.o{display:none}.tab[aria-current="page"] svg.f{display:block}
+.freecard{width:100%;display:flex;align-items:center;gap:.8rem;min-height:3.75rem;padding:.75rem 1rem;margin:0 0 .75rem;border-radius:1.25rem;background:var(--card);text-align:left}
+.freecard .ico{width:2.25rem;height:2.25rem;border-radius:.65rem;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc)}
+.freecard .ico svg{width:1.3rem;height:1.3rem}.freecard .t1{display:block;font-weight:600}.freecard .t2{display:block;color:var(--label2);font-size:.875rem}
+.freecard>svg{width:1rem;height:1rem;color:var(--label3)}
+.sheet{left:1rem;right:1rem;bottom:1rem;width:auto;max-width:36rem;border-radius:2rem;max-height:calc(100% - max(env(safe-area-inset-top),1.25rem) - 1.625rem);padding-bottom:0;overflow:hidden;transform:translateY(calc(100% + 1.5rem));box-shadow:0 0 0 .5px var(--lg-edge2),0 .75rem 2.5rem rgba(0,0,0,.32);transition:transform .42s cubic-bezier(.32,.72,0,1)}
+.sheet.on{transform:none}
+.grab{width:2.25rem;height:.3125rem;border-radius:999px;background:var(--label3);margin:.5rem auto 0}
+.sh::before{display:none}.sh{padding:0 1.25rem;min-height:3rem}
+.sb{padding:.5rem 1rem 1rem}
+.scrim{background:rgba(0,0,0,.46)}@media (prefers-color-scheme:dark){.scrim{background:rgba(0,0,0,.58)}}
+#root,#top,.nav-bg{will-change:auto}
+body.sheet-tall #root{transform:scale(.95);transform-origin:50% 30%;transition:transform .5s cubic-bezier(.32,.72,0,1)}
+#root{transition:transform .5s cubic-bezier(.32,.72,0,1)}
+.sblock{position:relative;display:flex;flex-direction:column;background:var(--card);border-radius:1.375rem;margin:0 0 .75rem;will-change:clip-path,opacity}
+.sblock>.sb-h{position:relative;z-index:2;margin:0;padding:.8rem 1rem .45rem;background:var(--card);border-radius:1.375rem 1.375rem 0 0;will-change:transform}
+.sblock>.grp,.sblock>.card{background:none;border-radius:0;margin:0;box-shadow:none}
+.sblock>.card{padding-top:.25rem}
+.sblock>.grp+.grp,.sblock>.card+.card,.sblock>.grp+.card,.sblock>.card+.grp{border-top:.5px solid var(--sep)}
+.sblock>.sb-h.mkh{margin:0;padding:.9rem 1rem .5rem}
+.sblock>.grp:last-child .row:last-child,.sblock>.grp:last-child .opt:last-child{border-radius:0 0 1.375rem 1.375rem}
+@media (forced-colors:active){.sblock,.card,.grp,.sheet{border:1px solid CanvasText}}
+@media (prefers-reduced-motion:reduce){#root,body.sheet-tall #root{transition:none}.sheet{transition:none}}
