@@ -70,7 +70,7 @@ function betTag(m){var b=m.bet[0];return '<span class="tag '+b+'">'+(b==='ok'?'B
 var nav={tab:'personas',stack:[],sec:'Overview'},scrolls=[];
 var cur=function(){return nav.stack[nav.stack.length-1]||{v:nav.tab}};
 var navbg=document.querySelector('.nav-bg'),root=document.getElementById('root'),top=document.getElementById('top'),tabbar=document.getElementById('tabbar'),toastEl=document.getElementById('toast');
-var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['markets','Languages','globe'],['make','Make','bolt'],['plan','Plan','plan']];
+var TABS=[['personas','Personas','person'],['niches','Niches','grid'],['make','Make','bolt'],['free','Free test','flask'],['plan','Plan','plan']];
 
 /* ---------- views ---------- */
 function blocksHtml(bl){
@@ -185,7 +185,7 @@ function dragInit(){
  sh.addEventListener('touchend',function(){if(!on)return;on=false;var v=dy/Math.max(1,Date.now()-t0);sheetEl.style.transition='';root.style.transition='';scrimEl.style.opacity='';if(dy>sheetEl.offsetHeight*.28||v>.5)closeSheet();else{sheetEl.style.transform='';root.style.transform=''}});
 }
 function vNiches(){
- var h='<h1 class="lt">Niches</h1><p class="sub">Seven niches. Open one for its format, series, clips and offer.</p><div class="grp">';
+ var h='<h1 class="lt">Niches</h1><p class="sub">Open one for its format, series, clips and offer.</p><button class="row freecard" data-do="open" data-v="markets"><span class="ico">'+svg('globe',2)+'</span><span class="grow"><span class="t1">Languages and countries</span><span class="t2">Rules, voice and what sells in each</span></span>'+CHEV+'</button><div class="grp">';
  D.niches.forEach(function(n){
   var c=D.personas.filter(function(p){return p.niche===n.id}).length;
   h+='<button class="row" data-do="open" data-v="niche" data-id="'+n.id+'"><span class="ic" style="'+cvars(n)+'">'+svg(n.icon)+'</span><span class="grow"><div class="t1">'+esc(n.name)+'</div><div class="t2">'+esc(n.tagline)+'</div></span><span class="t2">'+c+'</span>'+CHEV+'</button>';
@@ -256,7 +256,6 @@ function mkView(isStep){
  if(!isStep){
   h+='<div class="mkprog"><div class="mkpl"><b>Your progress</b><span>'+doneN+' of '+STEPS.length+' steps done</span></div><div class="bar"><i style="width:'+Math.round(doneN/STEPS.length*100)+'%"></i></div></div>';
   var nx=mkNext(p);
-  h+='<button class="row freecard" data-do="open" data-v="free"><span class="ico">'+svg('flask',2)+'</span><span class="grow"><span class="t1">Test a pilot for free first</span><span class="t2">Try it with Google Flow</span></span>'+CHEV+'</button>';
   h+='<button class="btn big mkcont" data-do="mkstep" data-s="'+nx+'">'+(doneN?'Continue: ':'Start: ')+(nx?'Step '+nx+', ':'')+esc(STEPS[nx].title)+'</button>';
   h+='<h3 class="mkh">All steps</h3><div class="grp mklist">'+STEPS.map(function(q,i){var d=isDone(p,'mk',mkKey(i,st.t||0));return '<button class="row" data-do="mkstep" data-s="'+i+'"><span class="mknum sm'+(d?' ok':'')+'">'+(d?svg('check',3):i)+'</span><span class="grow"><span class="t1">'+esc(q.title)+'</span></span>'+CHEV+'</button>'}).join('')+'</div>';
   return h;
@@ -552,7 +551,7 @@ function secHtml(p,n,m){
 /* ---------- render ---------- */
 function titleOf(c){
  if(c.v==='frstep'){var fs=frState();return fs.s?'Step '+fs.s:'Check'}if(c.v==='mkstep'){var ms=mkState();return ms.s?'Step '+ms.s:'Setup'}if(c.v==='persona')return PK[c.id].name;if(c.v==='psec')return SECTXT[c.sec][0];if(c.v==='niche')return NK[c.id].name;if(c.v==='market')return MK[c.id].name;if(c.v==='plan-page')return PLK[c.id].title;
- return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',plan:'Plan'})[c.v]||'';
+ return ({personas:'Personas',niches:'Niches',markets:'Languages',make:'Make',free:'Free test',plan:'Plan'})[c.v]||'';
 }
 function viewHtml(c){
  copyStore=[];
